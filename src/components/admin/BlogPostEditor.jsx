@@ -8,7 +8,7 @@ import RichEditor from './RichEditor';
 
 const EMPTY = {
   title: '', slug: '', excerpt: '', content: '', cover_image: '',
-  gallery: [], location: '', coordinates: '', date_traveled: '', status: 'published', tags: [],
+  gallery: [], gallery_captions: [], location: '', coordinates: '', date_traveled: '', status: 'published', tags: [],
 };
 
 function slugify(str) {
@@ -131,6 +131,28 @@ export default function BlogPostEditor() {
 
         <ImageUploader label="Cover Image" value={editing.cover_image} onChange={(v) => set('cover_image', v)} />
         <ImageUploader label="Gallery Photos" value={editing.gallery} onChange={(v) => set('gallery', v)} multiple />
+
+        {editing.gallery && editing.gallery.length > 0 && (
+          <AdminField label="Gallery Captions (optional)">
+            <div className="space-y-3 mt-2">
+              {editing.gallery.map((url, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <img src={url} alt="" className="w-16 h-10 object-cover flex-shrink-0" />
+                  <input
+                    className="flex-1 bg-transparent border-b border-border focus:border-foreground outline-none py-1 font-serif text-sm"
+                    placeholder={`Caption for photo ${i + 1}`}
+                    value={(editing.gallery_captions || [])[i] || ''}
+                    onChange={(e) => {
+                      const caps = [...(editing.gallery_captions || [])];
+                      caps[i] = e.target.value;
+                      set('gallery_captions', caps);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </AdminField>
+        )}
 
         <AdminField label="Tags">
           <div className="flex flex-wrap gap-2 mb-3">

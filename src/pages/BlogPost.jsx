@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
 import ShareBar from '../components/ShareBar';
 import TableOfContents, { injectIds } from '../components/TableOfContents';
+import GalleryLightbox from '../components/GalleryLightbox';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -117,13 +118,7 @@ export default function BlogPost() {
         </div>
 
         {post.gallery && post.gallery.length > 0 && (
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {post.gallery.map((url, i) => (
-              <div key={i} className="aspect-[3/2] overflow-hidden">
-                <img src={url} alt="" className="w-full h-full object-cover" />
-              </div>
-            ))}
-          </div>
+          <GalleryLightbox images={post.gallery} captions={post.gallery_captions || []} />
         )}
 
         {post.tags && post.tags.length > 0 && (
