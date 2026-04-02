@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
 import ShareBar from '../components/ShareBar';
+import TableOfContents, { injectIds } from '../components/TableOfContents';
 
 export default function BlogPost() {
   const { slug } = useParams();
@@ -32,6 +33,8 @@ export default function BlogPost() {
       </div>
     );
   }
+
+  const contentWithIds = injectIds(post.content || '');
 
   return (
     <div className="pt-28 pb-24">
@@ -97,16 +100,21 @@ export default function BlogPost() {
           <div className="w-16 h-px bg-accent mb-12" />
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <div
-            className="prose-chronicle ql-content"
-            dangerouslySetInnerHTML={{ __html: post.content || '' }}
-          />
-        </motion.div>
+        <div className="flex gap-16 items-start">
+          <motion.div
+            className="flex-1 min-w-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <div
+              className="prose-chronicle ql-content"
+              dangerouslySetInnerHTML={{ __html: contentWithIds }}
+            />
+          </motion.div>
+
+          <TableOfContents html={post.content || ''} />
+        </div>
 
         {post.gallery && post.gallery.length > 0 && (
           <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
