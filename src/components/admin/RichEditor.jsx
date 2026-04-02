@@ -94,17 +94,17 @@ function useImageResizer(quillRef) {
       });
 
       const rect = img.getBoundingClientRect();
-      const editorRect = img.closest('.ql-editor').getBoundingClientRect();
-      toolbar.style.top = `${rect.top - editorRect.top - 36}px`;
-      toolbar.style.left = `${rect.left - editorRect.left + rect.width / 2}px`;
-
-      img.closest('.ql-editor').style.position = 'relative';
-      img.closest('.ql-editor').appendChild(toolbar);
+      toolbar.style.position = 'fixed';
+      toolbar.style.top = `${rect.top - 40 + window.scrollY}px`;
+      toolbar.style.left = `${rect.left + rect.width / 2}px`;
+      toolbar.style.transform = 'translateX(-50%)';
+      document.body.appendChild(toolbar);
       img.style.outline = '2px solid #6366f1';
     };
 
     const removeToolbar = () => {
-      if (toolbar) { toolbar.remove(); toolbar = null; }
+      document.querySelectorAll('.img-resize-toolbar').forEach(t => t.remove());
+      toolbar = null;
       document.querySelectorAll('.ql-editor img').forEach(i => i.style.outline = '');
     };
 
@@ -122,7 +122,7 @@ function useImageResizer(quillRef) {
       });
     };
 
-    const timer = setTimeout(attachListeners, 500);
+    const timer = setTimeout(attachListeners, 800);
     return () => {
       clearTimeout(timer);
       removeToolbar();
