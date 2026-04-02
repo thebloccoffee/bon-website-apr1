@@ -1,11 +1,35 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import { supabase } from '@/api/supabaseClient';
-import QuillResizeModule from 'quill-resize-module';
 
-Quill.register('modules/resize', QuillResizeModule);
+// Allow style attribute on images so width persists
+const Image = Quill.import('formats/image');
+Image.sanitize = (url) => url;
+class StyledImage extends Image {
+  static create(value) {
+    const node = super.create(value);
+    return node;
+  }
+  static formats(node) {
+    return {
+      src: node.getAttribute('src'),
+      style: node.getAttribute('style'),
+      width: node.getAttribute('width'),
+    };
+  }
+  format(name, value) {
+    if (name === 'style' || name === 'width') {
+      if (value) this.domNode.setAttribute(name, value);
+      else this.domNode.removeAttribute(name);
+    } else {
+      super.format(name, value);
+    }
+  }
+}
+StyledImage.blotName = 'image';
+StyledImage.tagName = 'IMG';
+Quill.register(StyledImage, true);
 
-// Custom image handler that uploads the file and inserts the URL
 function useImageHandler(quillRef) {
   return useCallback(() => {
     const input = document.createElement('input');
@@ -17,27 +41,104 @@ function useImageHandler(quillRef) {
       if (!file) return;
       const ext = file.name.split('.').pop();
       const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      await supabase.storage.from('media').upload(path, file);
+      await supabase.storage.from('media').upload(path, file, { contentType: file.type, upsert: true });
       const { data } = supabase.storage.from('media').getPublicUrl(path);
-      const file_url = data.publicUrl;
       const quill = quillRef.current?.getEditor();
       if (quill) {
         const range = quill.getSelection(true);
-        quill.insertEmbed(range.index, 'image', file_url);
+        quill.insertEmbed(range.index, 'image', data.publicUrl);
         quill.setSelection(range.index + 1);
       }
     };
   }, [quillRef]);
 }
 
+const SIZES = [
+  { label: 'S', width: '25%' },
+  { label: 'M', width: '50%' },
+  { label: 'L', width: '75%' },
+  { label: 'Full', width: '100%' },
+];
+
+function useImageResizer(quillRef) {
+  useEffect(() => {
+    let toolbar = null;
+
+    const showToolbar = (img) => {
+      removeToolbar();
+      toolbar = document.createElement('div');
+      toolbar.className = 'img-resize-toolbar';
+      toolbar.style.cssText = `
+        position:absolute; display:flex; gap:4px; background:#000; border-radius:4px;
+        padding:4px 6px; z-index:1000; transform:translateX(-50%);
+      `;
+
+      SIZES.forEach(({ label, width }) => {
+        const btn = document.createElement('button');
+        btn.textContent = label;
+        btn.style.cssText = `
+          color:#fff; font-size:11px; font-family:sans-serif; background:transparent;
+          border:1px solid rgba(255,255,255,0.3); border-radius:3px; padding:2px 7px;
+          cursor:pointer; letter-spacing:0.05em;
+        `;
+        btn.onmouseenter = () => btn.style.background = 'rgba(255,255,255,0.15)';
+        btn.onmouseleave = () => btn.style.background = 'transparent';
+        btn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          img.style.width = width;
+          img.setAttribute('width', width);
+          removeToolbar();
+        };
+        toolbar.appendChild(btn);
+      });
+
+      const rect = img.getBoundingClientRect();
+      const editorRect = img.closest('.ql-editor').getBoundingClientRect();
+      toolbar.style.top = `${rect.top - editorRect.top - 36}px`;
+      toolbar.style.left = `${rect.left - editorRect.left + rect.width / 2}px`;
+
+      img.closest('.ql-editor').style.position = 'relative';
+      img.closest('.ql-editor').appendChild(toolbar);
+      img.style.outline = '2px solid #6366f1';
+    };
+
+    const removeToolbar = () => {
+      if (toolbar) { toolbar.remove(); toolbar = null; }
+      document.querySelectorAll('.ql-editor img').forEach(i => i.style.outline = '');
+    };
+
+    const attachListeners = () => {
+      const editor = quillRef.current?.getEditor();
+      if (!editor) return;
+      const container = editor.root;
+
+      container.addEventListener('click', (e) => {
+        if (e.target.tagName === 'IMG') {
+          showToolbar(e.target);
+        } else {
+          removeToolbar();
+        }
+      });
+    };
+
+    const timer = setTimeout(attachListeners, 500);
+    return () => {
+      clearTimeout(timer);
+      removeToolbar();
+    };
+  }, [quillRef]);
+}
+
 const FORMATS = [
   'header', 'bold', 'italic', 'underline', 'blockquote',
-  'list', 'indent', 'link', 'image', 'width', 'height', 'style',
+  'list', 'indent', 'link', 'image', 'width', 'style',
 ];
 
 export default function RichEditor({ value, onChange, placeholder }) {
   const quillRef = useRef(null);
   const imageHandler = useImageHandler(quillRef);
+  useImageResizer(quillRef);
 
   const modules = {
     toolbar: {
@@ -50,9 +151,6 @@ export default function RichEditor({ value, onChange, placeholder }) {
         ['clean'],
       ],
       handlers: { image: imageHandler },
-    },
-    resize: {
-      locale: {},
     },
   };
 
@@ -85,6 +183,8 @@ export default function RichEditor({ value, onChange, placeholder }) {
           max-width: 100%;
           margin: 1.25rem 0;
           display: block;
+          cursor: pointer;
+          transition: outline 0.15s;
         }
         .rich-editor-wrap .ql-editor h1 { font-family: var(--font-sans); font-size: 2rem; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
         .rich-editor-wrap .ql-editor h2 { font-family: var(--font-sans); font-size: 1.5rem; font-weight: 300; margin-bottom: 0.5rem; }
