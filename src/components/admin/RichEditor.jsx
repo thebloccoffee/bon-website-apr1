@@ -60,28 +60,32 @@ const SIZES = [
   { label: 'Full', width: '100%' },
 ];
 
-function useImageResizer(quillRef) {
+function useImageResizer() {
   useEffect(() => {
-    let toolbar = null;
+    const removeToolbar = () => {
+      document.querySelectorAll('.img-resize-toolbar').forEach(t => t.remove());
+      document.querySelectorAll('.ql-editor img').forEach(i => i.style.outline = '');
+    };
 
     const showToolbar = (img) => {
       removeToolbar();
-      toolbar = document.createElement('div');
+      const toolbar = document.createElement('div');
       toolbar.className = 'img-resize-toolbar';
       toolbar.style.cssText = `
-        position:absolute; display:flex; gap:4px; background:#000; border-radius:4px;
-        padding:4px 6px; z-index:1000; transform:translateX(-50%);
+        position:fixed; display:flex; gap:4px; background:#111; border-radius:4px;
+        padding:4px 8px; z-index:9999;
       `;
 
       SIZES.forEach(({ label, width }) => {
         const btn = document.createElement('button');
         btn.textContent = label;
+        btn.type = 'button';
         btn.style.cssText = `
           color:#fff; font-size:11px; font-family:sans-serif; background:transparent;
-          border:1px solid rgba(255,255,255,0.3); border-radius:3px; padding:2px 7px;
+          border:1px solid rgba(255,255,255,0.3); border-radius:3px; padding:2px 8px;
           cursor:pointer; letter-spacing:0.05em;
         `;
-        btn.onmouseenter = () => btn.style.background = 'rgba(255,255,255,0.15)';
+        btn.onmouseenter = () => btn.style.background = 'rgba(255,255,255,0.2)';
         btn.onmouseleave = () => btn.style.background = 'transparent';
         btn.onclick = (e) => {
           e.preventDefault();
@@ -93,41 +97,28 @@ function useImageResizer(quillRef) {
         toolbar.appendChild(btn);
       });
 
-      const rect = img.getBoundingClientRect();
-      toolbar.style.position = 'fixed';
-      toolbar.style.top = `${rect.top - 40 + window.scrollY}px`;
-      toolbar.style.left = `${rect.left + rect.width / 2}px`;
-      toolbar.style.transform = 'translateX(-50%)';
       document.body.appendChild(toolbar);
+      const rect = img.getBoundingClientRect();
+      const tbRect = toolbar.getBoundingClientRect();
+      toolbar.style.top = `${rect.top - tbRect.height - 6}px`;
+      toolbar.style.left = `${rect.left + rect.width / 2 - tbRect.width / 2}px`;
       img.style.outline = '2px solid #6366f1';
     };
 
-    const removeToolbar = () => {
-      document.querySelectorAll('.img-resize-toolbar').forEach(t => t.remove());
-      toolbar = null;
-      document.querySelectorAll('.ql-editor img').forEach(i => i.style.outline = '');
+    const handleClick = (e) => {
+      if (e.target.tagName === 'IMG' && e.target.closest('.ql-editor')) {
+        showToolbar(e.target);
+      } else if (!e.target.closest('.img-resize-toolbar')) {
+        removeToolbar();
+      }
     };
 
-    const attachListeners = () => {
-      const editor = quillRef.current?.getEditor();
-      if (!editor) return;
-      const container = editor.root;
-
-      container.addEventListener('click', (e) => {
-        if (e.target.tagName === 'IMG') {
-          showToolbar(e.target);
-        } else {
-          removeToolbar();
-        }
-      });
-    };
-
-    const timer = setTimeout(attachListeners, 800);
+    document.addEventListener('click', handleClick);
     return () => {
-      clearTimeout(timer);
+      document.removeEventListener('click', handleClick);
       removeToolbar();
     };
-  }, [quillRef]);
+  }, []);
 }
 
 const FORMATS = [
@@ -138,7 +129,7 @@ const FORMATS = [
 export default function RichEditor({ value, onChange, placeholder }) {
   const quillRef = useRef(null);
   const imageHandler = useImageHandler(quillRef);
-  useImageResizer(quillRef);
+  useImageResizer();
 
   const modules = {
     toolbar: {
