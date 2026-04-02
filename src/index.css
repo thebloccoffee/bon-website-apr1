@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+
+    --background: 30 14% 94%;
+    --foreground: 0 0% 7%;
+    --card: 30 14% 94%;
+    --card-foreground: 0 0% 7%;
+    --popover: 30 14% 94%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 0 0% 7%;
+    --primary-foreground: 30 14% 94%;
+    --secondary: 33 8% 80%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 33 8% 88%;
+    --muted-foreground: 30 7% 39%;
+    --accent: 30 7% 62%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 33 8% 82%;
+    --input: 33 8% 82%;
+    --ring: 0 0% 7%;
+    --chart-1: 30 20% 50%;
+    --chart-2: 30 15% 40%;
+    --chart-3: 30 10% 30%;
+    --chart-4: 30 25% 60%;
+    --chart-5: 30 30% 70%;
+    --radius: 0.25rem;
+    --sidebar-background: 30 14% 92%;
+    --sidebar-foreground: 0 0% 7%;
+    --sidebar-primary: 0 0% 7%;
+    --sidebar-primary-foreground: 30 14% 94%;
+    --sidebar-accent: 33 8% 88%;
+    --sidebar-accent-foreground: 0 0% 7%;
+    --sidebar-border: 33 8% 82%;
+    --sidebar-ring: 0 0% 7%;
+  }
+
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 30 14% 92%;
+    --card: 0 0% 7%;
+    --card-foreground: 30 14% 92%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 30 14% 92%;
+    --primary: 30 14% 92%;
+    --primary-foreground: 0 0% 7%;
+    --secondary: 30 5% 18%;
+    --secondary-foreground: 30 14% 92%;
+    --muted: 30 5% 15%;
+    --muted-foreground: 30 7% 55%;
+    --accent: 30 7% 40%;
+    --accent-foreground: 30 14% 92%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30 5% 18%;
+    --input: 30 5% 18%;
+    --ring: 30 14% 92%;
+    --chart-1: 30 20% 50%;
+    --chart-2: 30 15% 40%;
+    --chart-3: 30 10% 30%;
+    --chart-4: 30 25% 60%;
+    --chart-5: 30 30% 70%;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 30 14% 92%;
+    --sidebar-primary: 30 14% 92%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 30 5% 15%;
+    --sidebar-accent-foreground: 30 14% 92%;
+    --sidebar-border: 30 5% 18%;
+    --sidebar-ring: 30 14% 92%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--accent));
+  border-radius: 2px;
+}
+
+/* Horizontal scroll container */
+.filmstrip-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.filmstrip-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prose styles for blog content */
+.prose-chronicle h1 { font-family: var(--font-sans); font-size: 2.5rem; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+.prose-chronicle h2 { font-family: var(--font-sans); font-size: 1.75rem; line-height: 1.2; letter-spacing: -0.01em; margin-top: 3rem; margin-bottom: 1rem; }
+.prose-chronicle h3 { font-family: var(--font-sans); font-size: 1.25rem; line-height: 1.3; margin-top: 2rem; margin-bottom: 0.75rem; }
+.prose-chronicle p { font-family: var(--font-serif); font-size: 1.125rem; line-height: 1.7; margin-bottom: 1.5rem; color: hsl(var(--foreground)); }
+.prose-chronicle blockquote { border-left: 1px solid hsl(var(--accent)); padding-left: 1.5rem; margin: 2rem 0; font-style: italic; color: hsl(var(--muted-foreground)); }
+.prose-chronicle img { width: 100%; margin: 2rem 0; }
+.prose-chronicle ul, .prose-chronicle ol { font-family: var(--font-serif); font-size: 1.125rem; line-height: 1.7; margin-bottom: 1.5rem; padding-left: 1.5rem; }
+
+/* Rich editor HTML output (ql-content) on public pages */
+.ql-content img { width: 100%; margin: 2rem 0; display: block; }
+.ql-content p { font-family: var(--font-serif); font-size: 1.125rem; line-height: 1.75; margin-bottom: 1.5rem; }
+.ql-content h1 { font-family: var(--font-sans); font-size: 2.25rem; font-weight: 300; letter-spacing: -0.02em; margin: 2.5rem 0 1rem; }
+.ql-content h2 { font-family: var(--font-sans); font-size: 1.6rem; font-weight: 300; margin: 2.5rem 0 0.75rem; }
+.ql-content h3 { font-family: var(--font-sans); font-size: 1.2rem; font-weight: 400; margin: 2rem 0 0.5rem; }
+.ql-content blockquote { border-left: 1px solid hsl(var(--accent)); padding-left: 1.5rem; margin: 2rem 0; font-style: italic; color: hsl(var(--muted-foreground)); }
+.ql-content ul, .ql-content ol { font-family: var(--font-serif); font-size: 1.125rem; line-height: 1.7; margin-bottom: 1.5rem; padding-left: 1.75rem; }
+.ql-content li { margin-bottom: 0.4rem; }
+.ql-content a { color: hsl(var(--foreground)); text-decoration: underline; text-underline-offset: 3px; }
+.ql-content strong { font-weight: 600; }
+.ql-content em { font-style: italic; }

@@ -1,0 +1,40 @@
+{
+  "name": "ContactInquiry",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Inquirer's name"
+    },
+    "email": {
+      "type": "string",
+      "description": "Contact email"
+    },
+    "project_type": {
+      "type": "string",
+      "description": "What they want to document"
+    },
+    "location": {
+      "type": "string",
+      "description": "Where the project would take place"
+    },
+    "message": {
+      "type": "string",
+      "description": "Additional details"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "responded",
+        "booked",
+        "archived"
+      ],
+      "default": "new"
+    }
+  },
+  "required": [
+    "name",
+    "email"
+  ]
+}

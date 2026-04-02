@@ -1,0 +1,60 @@
+{
+  "name": "PortfolioProject",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Project title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief project description"
+    },
+    "thumbnail": {
+      "type": "string",
+      "description": "Thumbnail image URL (21:9 aspect ratio)"
+    },
+    "gallery": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Additional project photo URLs"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "Video URL or embed link"
+    },
+    "location": {
+      "type": "string",
+      "description": "Where the project was filmed"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "documentary",
+        "travel_film",
+        "commercial",
+        "wedding",
+        "music_video",
+        "short_film"
+      ],
+      "description": "Type of videography project"
+    },
+    "year": {
+      "type": "string",
+      "description": "Year the project was completed"
+    },
+    "client": {
+      "type": "string",
+      "description": "Client name if applicable"
+    },
+    "order": {
+      "type": "number",
+      "description": "Display order"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}
