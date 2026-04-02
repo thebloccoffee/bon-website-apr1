@@ -1,6 +1,9 @@
 import React, { useRef, useCallback } from 'react';
-import ReactQuill from 'react-quill';
+import ReactQuill, { Quill } from 'react-quill';
 import { supabase } from '@/api/supabaseClient';
+import QuillResizeModule from 'quill-resize-module';
+
+Quill.register('modules/resize', QuillResizeModule);
 
 // Custom image handler that uploads the file and inserts the URL
 function useImageHandler(quillRef) {
@@ -29,7 +32,7 @@ function useImageHandler(quillRef) {
 
 const FORMATS = [
   'header', 'bold', 'italic', 'underline', 'blockquote',
-  'list', 'indent', 'link', 'image',
+  'list', 'indent', 'link', 'image', 'width', 'height', 'style',
 ];
 
 export default function RichEditor({ value, onChange, placeholder }) {
@@ -47,6 +50,9 @@ export default function RichEditor({ value, onChange, placeholder }) {
         ['clean'],
       ],
       handlers: { image: imageHandler },
+    },
+    resize: {
+      locale: {},
     },
   };
 
