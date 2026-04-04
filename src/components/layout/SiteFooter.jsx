@@ -7,7 +7,7 @@ export default function SiteFooter() {
       {/* Large background text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
         <span className="font-sans text-[15vw] font-bold uppercase tracking-wider text-foreground/[0.03] leading-none">
-          Beyond
+          Travel
         </span>
       </div>
 
@@ -42,9 +42,8 @@ export default function SiteFooter() {
             © {new Date().getFullYear()} Jon Bon. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="font-sans text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">Instagram</a>
-            <a href="#" className="font-sans text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">Vimeo</a>
-            <a href="#" className="font-sans text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">YouTube</a>
+            <a href="https://instagram.com/jooonbon" target="_blank" rel="noopener noreferrer" className="font-sans text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">Instagram</a>
+            <a href="https://youtube.com/jonbontabas" target="_blank" rel="noopener noreferrer" className="font-sans text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">YouTube</a>
           </div>
         </div>
       </div>
