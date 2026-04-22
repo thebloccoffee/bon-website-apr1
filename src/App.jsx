@@ -9,7 +9,6 @@ import Home from './pages/Home';
 import Journal from './pages/Journal';
 import BlogPostPage from './pages/BlogPost';
 import Portfolio from './pages/Portfolio';
-import Destinations from './pages/Destinations';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 
@@ -24,7 +23,6 @@ function App() {
               <Route path="/journal" element={<Journal />} />
               <Route path="/journal/:slug" element={<BlogPostPage />} />
               <Route path="/portfolio" element={<Portfolio />} />
-              <Route path="/destinations" element={<Destinations />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/admin" element={<Admin />} />
             </Route>
