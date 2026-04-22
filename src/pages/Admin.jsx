@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import BlogPostEditor from '../components/admin/BlogPostEditor';
 import PortfolioEditor from '../components/admin/PortfolioEditor';
+import DestinationsEditor from '../components/admin/DestinationsEditor';
 
 const TABS = [
   { key: 'blog', label: 'Blog Posts' },
   { key: 'portfolio', label: 'Portfolio' },
+  { key: 'destinations', label: 'Destinations' },
 ];
 
 export default function Admin() {
@@ -84,6 +86,7 @@ export default function Admin() {
 
         {activeTab === 'blog' && <BlogPostEditor />}
         {activeTab === 'portfolio' && <PortfolioEditor />}
+        {activeTab === 'destinations' && <DestinationsEditor />}
       </div>
     </div>
   );
