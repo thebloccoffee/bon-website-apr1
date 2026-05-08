@@ -19,8 +19,8 @@ export default function SiteFooter() {
             <p className="font-sans text-xs tracking-[0.3em] uppercase text-foreground mb-2">
               Jon Bon
             </p>
-            <p className="font-serif text-sm text-muted-foreground">
-              Travel narratives & cinematic storytelling by Jon Bon
+            <p className="font-serif text-sm text-muted-foreground max-w-sm leading-relaxed">
+              Travel narratives and cinematic storytelling from the road. I use my camera to document new places, honest moments, and the stories that happen along the way.
             </p>
           </div>
 
@@ -29,7 +29,7 @@ export default function SiteFooter() {
               Journal
             </Link>
             <Link to="/portfolio" className="font-sans text-xs tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors">
-              Cinema
+              Works
             </Link>
             <Link to="/contact" className="font-sans text-xs tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors">
               Inquiry
