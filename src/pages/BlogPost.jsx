@@ -27,9 +27,16 @@ export default function BlogPost() {
 
   if (isLoading || !post) {
     return (
-      <div className="pt-28 pb-24 px-6 md:px-16">
-        <div className="max-w-3xl mx-auto text-center py-24">
-          <p className="font-serif text-muted-foreground">Loading dispatch...</p>
+      <div className="pt-28 pb-24 px-6 md:px-16 animate-pulse">
+        <div className="max-w-3xl mx-auto">
+          <div className="h-3 bg-muted rounded w-24 mb-10" />
+          <div className="h-8 bg-muted rounded w-2/3 mb-4" />
+          <div className="h-3 bg-muted rounded w-40 mb-12" />
+          <div className="aspect-[16/9] bg-muted rounded mb-12" />
+          <div className="space-y-3">
+            {[1,2,3,4].map(i => <div key={i} className="h-3 bg-muted rounded w-full" />)}
+            <div className="h-3 bg-muted rounded w-3/4" />
+          </div>
         </div>
       </div>
     );

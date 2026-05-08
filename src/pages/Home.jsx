@@ -11,7 +11,7 @@ export default function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select('id,title,slug,excerpt,cover_image,location,coordinates,date_traveled')
         .eq('status', 'published')
         .order('created_at', { ascending: false })
         .limit(3);

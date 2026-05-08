@@ -49,7 +49,7 @@ export default function Journal() {
     queryFn: async () => {
       const { data } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select('id,title,slug,excerpt,cover_image,location,coordinates,date_traveled,tags')
         .eq('status', 'published')
         .order('date_traveled', { ascending: false });
       return data || [];
