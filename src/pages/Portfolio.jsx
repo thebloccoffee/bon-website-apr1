@@ -28,7 +28,7 @@ export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState(null);
 
-  const { data: projects, isLoading } = useQuery({
+  const { data: projects = [], isLoading } = useQuery({
     queryKey: ['portfolio-all'],
     queryFn: async () => {
       const { data } = await supabase
@@ -38,7 +38,6 @@ export default function Portfolio() {
         .order('order', { ascending: true });
       return data || [];
     },
-    initialData: [],
   });
 
   const filtered = activeCategory === 'all'

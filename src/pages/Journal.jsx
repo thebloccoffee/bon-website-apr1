@@ -44,7 +44,7 @@ export default function Journal() {
   const [activeDestination, setActiveDestination] = useState(null);
   const [activeContinent, setActiveContinent] = useState('All');
 
-  const { data: posts, isLoading, isError } = useQuery({
+  const { data: posts = [], isLoading, isError } = useQuery({
     queryKey: ['blog-posts-all'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -55,8 +55,6 @@ export default function Journal() {
       if (error) throw error;
       return data || [];
     },
-    initialData: [],
-    retry: 2,
   });
 
   // Build destination cards from unique locations in posts

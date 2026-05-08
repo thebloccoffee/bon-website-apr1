@@ -6,7 +6,7 @@ import FeaturedPosts from '../components/home/FeaturedPosts';
 import PortfolioPreview from '../components/home/PortfolioPreview';
 
 export default function Home() {
-  const { data: posts } = useQuery({
+  const { data: posts = [] } = useQuery({
     queryKey: ['blog-posts-featured'],
     queryFn: async () => {
       const { data } = await supabase
@@ -17,10 +17,9 @@ export default function Home() {
         .limit(3);
       return data || [];
     },
-    initialData: [],
   });
 
-  const { data: projects } = useQuery({
+  const { data: projects = [] } = useQuery({
     queryKey: ['portfolio-featured'],
     queryFn: async () => {
       const { data } = await supabase
@@ -30,7 +29,6 @@ export default function Home() {
         .limit(6);
       return data || [];
     },
-    initialData: [],
   });
 
   return (
