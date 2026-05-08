@@ -2,6 +2,56 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link2, Check } from 'lucide-react';
 
+const IGModal = ({ url, onClose }) => (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-5"
+    onClick={(e) => e.target === e.currentTarget && onClose()}
+  >
+    <div className="relative bg-[#111] border border-white/10 rounded-2xl p-7 max-w-sm w-full text-center">
+      <button onClick={onClose} className="absolute top-3 right-4 text-white/40 hover:text-white text-lg">✕</button>
+      <svg className="mx-auto mb-3 w-9 h-9" viewBox="0 0 24 24" fill="url(#igGrad2)">
+        <defs>
+          <linearGradient id="igGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#f09433" />
+            <stop offset="50%" stopColor="#dc2743" />
+            <stop offset="100%" stopColor="#bc1888" />
+          </linearGradient>
+        </defs>
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+      </svg>
+      <h3 className="font-semibold text-sm mb-2">Share to Instagram Story</h3>
+      <p className="text-xs text-white/50 mb-4 leading-relaxed">
+        Instagram doesn't support direct web sharing. Copy the link, open Instagram, create a Story, and add a <strong className="text-white/70">Link sticker</strong>.
+      </p>
+      <div className="bg-black border border-white/10 rounded-lg px-3 py-2.5 text-xs text-white/40 break-all mb-4 select-all">{url}</div>
+      <div className="flex gap-2 justify-center">
+        <CopyUrlBtn url={url} />
+        <a
+          href="https://www.instagram.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs px-4 py-2 rounded-lg font-semibold text-white"
+          style={{ background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)' }}
+        >
+          Open Instagram
+        </a>
+      </div>
+    </div>
+  </div>
+);
+
+const CopyUrlBtn = ({ url }) => {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={async () => { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1800); }}
+      className="text-xs px-4 py-2 rounded-lg border border-white/15 text-white/60 hover:text-white transition-colors"
+    >
+      {copied ? '✓ Copied' : 'Copy Link'}
+    </button>
+  );
+};
+
 const TwitterIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -57,8 +107,15 @@ const PLATFORMS = [
   },
 ];
 
+const InstagramIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+  </svg>
+);
+
 export default function ShareBar({ title, image }) {
   const [copied, setCopied] = useState(false);
+  const [igModal, setIgModal] = useState(false);
   const url = window.location.href;
 
   const handleCopy = async () => {
@@ -67,8 +124,18 @@ export default function ShareBar({ title, image }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleInstagram = () => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile && navigator.share) {
+      navigator.share({ title, url }).catch(() => {});
+    } else {
+      setIgModal(true);
+    }
+  };
+
   return (
     <div className="mt-16 pt-8 border-t border-border">
+      {igModal && <IGModal url={url} onClose={() => setIgModal(false)} />}
       <p className="font-sans text-xs tracking-[0.3em] uppercase text-muted-foreground mb-6">
         Share this dispatch
       </p>
@@ -86,6 +153,16 @@ export default function ShareBar({ title, image }) {
             <span className="hidden sm:inline">{label}</span>
           </a>
         ))}
+
+        {/* Instagram Story */}
+        <button
+          onClick={handleInstagram}
+          title="Share to Instagram Story"
+          className="group flex items-center gap-2 font-sans text-xs tracking-[0.15em] uppercase text-muted-foreground border border-border px-4 py-2.5 hover:border-foreground hover:text-foreground transition-all duration-300"
+        >
+          <InstagramIcon />
+          <span className="hidden sm:inline">Instagram</span>
+        </button>
 
         {/* Copy link */}
         <button

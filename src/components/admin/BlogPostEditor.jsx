@@ -8,7 +8,7 @@ import RichEditor from './RichEditor';
 
 const EMPTY = {
   title: '', slug: '', excerpt: '', content: '', cover_image: '',
-  gallery: [], gallery_captions: [], location: '', coordinates: '', date_traveled: '', status: 'published', tags: [],
+  gallery: [], gallery_captions: [], location: '', city: '', coordinates: '', date_traveled: '', status: 'published', tags: [],
 };
 
 function slugify(str) {
@@ -96,7 +96,85 @@ export default function BlogPostEditor() {
             />
           </AdminField>
           <AdminField label="Location">
-            <input className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm" value={editing.location || ''} onChange={(e) => set('location', e.target.value)} />
+            <select
+              className="w-full bg-background border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm"
+              value={editing.location || ''}
+              onChange={(e) => set('location', e.target.value)}
+            >
+              <option value="">— Select location —</option>
+              <optgroup label="Americas">
+                <option>Canada</option>
+                <option>Quebec</option>
+                <option>USA</option>
+                <option>Mexico</option>
+                <option>Peru</option>
+                <option>Colombia</option>
+                <option>Brazil</option>
+                <option>Argentina</option>
+                <option>Costa Rica</option>
+                <option>Cuba</option>
+              </optgroup>
+              <optgroup label="Asia">
+                <option>Vietnam</option>
+                <option>Japan</option>
+                <option>Philippines</option>
+                <option>Thailand</option>
+                <option>Indonesia</option>
+                <option>Bali</option>
+                <option>Cambodia</option>
+                <option>Laos</option>
+                <option>Myanmar</option>
+                <option>Malaysia</option>
+                <option>Singapore</option>
+                <option>South Korea</option>
+                <option>China</option>
+                <option>Taiwan</option>
+                <option>Nepal</option>
+                <option>India</option>
+                <option>Sri Lanka</option>
+                <option>Hong Kong</option>
+              </optgroup>
+              <optgroup label="Europe">
+                <option>Portugal</option>
+                <option>Spain</option>
+                <option>France</option>
+                <option>Italy</option>
+                <option>Norway</option>
+                <option>Sweden</option>
+                <option>Denmark</option>
+                <option>Iceland</option>
+                <option>Germany</option>
+                <option>Netherlands</option>
+                <option>Greece</option>
+                <option>Croatia</option>
+                <option>Czech Republic</option>
+                <option>Austria</option>
+                <option>Switzerland</option>
+                <option>Poland</option>
+                <option>Hungary</option>
+              </optgroup>
+              <optgroup label="Africa">
+                <option>Morocco</option>
+                <option>Egypt</option>
+                <option>South Africa</option>
+                <option>Kenya</option>
+                <option>Tanzania</option>
+                <option>Ethiopia</option>
+              </optgroup>
+              <optgroup label="Oceania">
+                <option>Australia</option>
+                <option>New Zealand</option>
+                <option>Fiji</option>
+              </optgroup>
+            </select>
+          </AdminField>
+          <AdminField label="City / Specific Place">
+            <input
+              className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm"
+              placeholder="e.g. Britannia Beach, British Columbia"
+              value={editing.city || ''}
+              onChange={(e) => set('city', e.target.value)}
+            />
           </AdminField>
           <AdminField label="Coordinates">
             <input className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm" value={editing.coordinates || ''} onChange={(e) => set('coordinates', e.target.value)} />

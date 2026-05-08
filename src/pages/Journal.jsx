@@ -129,7 +129,7 @@ export default function Journal() {
             The Journal
           </h1>
           <p className="font-serif text-lg text-muted-foreground mt-4 max-w-lg">
-            Dispatches from the edges of the map — slow travel, quiet observation, and the stories that unfold between destinations.
+            Dispatches from the edges of the map, slow travel, quiet observation, and the stories that unfold between destinations.
           </p>
         </motion.div>
       </div>
