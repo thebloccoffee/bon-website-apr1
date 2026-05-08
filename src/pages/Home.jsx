@@ -25,6 +25,7 @@ export default function Home() {
       const { data } = await supabase
         .from('portfolio_projects')
         .select('*')
+        .or('status.eq.published,status.is.null')
         .order('order', { ascending: true })
         .limit(6);
       return data || [];
