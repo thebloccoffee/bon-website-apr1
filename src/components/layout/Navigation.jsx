@@ -37,7 +37,7 @@ export default function Navigation() {
         <nav className="flex items-center justify-between px-6 md:px-16 py-5">
           <Link to="/" className="relative z-50">
             <img
-              src="/og-image.png"
+              src="/logo.png"
               alt="Jon Bon"
               className={`h-8 w-auto transition-all duration-500 ${
                 scrolled || !isHome ? 'brightness-0' : 'brightness-0 invert'
