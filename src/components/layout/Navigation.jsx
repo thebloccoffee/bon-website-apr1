@@ -36,13 +36,13 @@ export default function Navigation() {
       >
         <nav className="flex items-center justify-between px-6 md:px-16 py-5">
           <Link to="/" className="relative z-50">
-            <span
-              className={`font-sans text-xs tracking-[0.3em] uppercase transition-colors duration-500 ${
-                scrolled || !isHome ? 'text-foreground' : 'text-white'
+            <img
+              src="/og-image.png"
+              alt="Jon Bon"
+              className={`h-8 w-auto transition-all duration-500 ${
+                scrolled || !isHome ? 'brightness-0' : 'brightness-0 invert'
               }`}
-            >
-              Jon Bon
-            </span>
+            />
           </Link>
 
           {/* Desktop nav */}
