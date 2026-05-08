@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-const HERO_IMAGE = '';
+const HERO_IMAGE = '/hero.jpg';
 
 export default function HeroSection() {
   return (
@@ -11,7 +11,7 @@ export default function HeroSection() {
       <div className="absolute inset-0">
         <img
           src={HERO_IMAGE}
-          alt="Vast desert landscape with lone traveler silhouette"
+          alt="Jon Bon standing on a frozen lake in Banff"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
