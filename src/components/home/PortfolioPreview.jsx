@@ -11,7 +11,7 @@ export default function PortfolioPreview({ projects }) {
         <div className="max-w-6xl mx-auto flex items-center gap-6">
           <div className="w-12 h-px bg-primary-foreground/30" />
           <span className="font-sans text-xs tracking-[0.3em] uppercase text-primary-foreground/60">
-            Selected work
+            Selected Works
           </span>
         </div>
       </div>
