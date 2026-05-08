@@ -33,16 +33,22 @@ export default function BlogPostEditor() {
     initialData: [],
   });
 
+  const WRITABLE_FIELDS = [
+    'title', 'slug', 'excerpt', 'content', 'cover_image',
+    'gallery', 'gallery_captions', 'location', 'coordinates',
+    'date_traveled', 'status', 'tags',
+  ];
+
   const save = useMutation({
     mutationFn: async (data) => {
-      // eslint-disable-next-line no-unused-vars
-      const { city, ...rest } = data;
-      const sanitized = { ...rest, date_traveled: rest.date_traveled || null };
+      const payload = {};
+      WRITABLE_FIELDS.forEach((k) => { payload[k] = data[k] ?? null; });
+      payload.date_traveled = payload.date_traveled || null;
       if (isNew) {
-        const { error } = await supabase.from('blog_posts').insert(sanitized);
+        const { error } = await supabase.from('blog_posts').insert(payload);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('blog_posts').update(sanitized).eq('id', editing.id);
+        const { error } = await supabase.from('blog_posts').update(payload).eq('id', data.id);
         if (error) throw error;
       }
     },
