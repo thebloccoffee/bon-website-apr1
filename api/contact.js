@@ -1,28 +1,30 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  if (!gmailPass) {
     return res.status(500).json({ error: 'Email service not configured' });
   }
 
   const { name, email, project_type, location, when, message } = req.body;
-
   if (!name || !email) {
     return res.status(400).json({ error: 'Name and email are required' });
   }
 
-  const resend = new Resend(apiKey);
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: 'tabasjonbon13@gmail.com', pass: gmailPass },
+  });
 
   try {
-    await resend.emails.send({
-      from: 'Inquiry <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: '"Jon Bon Website" <tabasjonbon13@gmail.com>',
       to: 'tabasjonbon13@gmail.com',
-      replyTo: email,
+      replyTo: `"${name}" <${email}>`,
       subject: `New inquiry from ${name}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; color: #111;">
@@ -35,14 +37,14 @@ export default async function handler(req, res) {
             ${when ? `<tr><td style="padding: 10px 0; border-bottom: 1px solid #eee; color: #666;">When</td><td style="padding: 10px 0; border-bottom: 1px solid #eee;">${when}</td></tr>` : ''}
             ${message ? `<tr><td style="padding: 10px 0; color: #666; vertical-align: top;">Message</td><td style="padding: 10px 0;">${message.replace(/\n/g, '<br>')}</td></tr>` : ''}
           </table>
-          <p style="margin-top: 32px; color: #999; font-size: 13px;">Hit reply to respond directly to ${name}.</p>
+          <p style="margin-top: 32px; color: #999; font-size: 13px;">Hit Reply to respond directly to ${name}.</p>
         </div>
       `,
     });
 
     return res.status(200).json({ ok: true });
   } catch (err) {
-    console.error('Resend error:', err);
+    console.error('Gmail error:', err);
     return res.status(500).json({ error: 'Failed to send email' });
   }
 }
