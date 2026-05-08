@@ -131,3 +131,5 @@
 .ql-content a { color: hsl(var(--foreground)); text-decoration: underline; text-underline-offset: 3px; }
 .ql-content strong { font-weight: 600; }
 .ql-content em { font-style: italic; }
+.ql-content .ql-video-wrap { margin: 2rem 0; }
+.ql-content .ql-video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }

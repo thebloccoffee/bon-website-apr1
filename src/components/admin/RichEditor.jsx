@@ -2,6 +2,34 @@ import React, { useRef, useCallback, useEffect } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import { supabase } from '@/api/supabaseClient';
 
+// Video embed blot — renders as a responsive iframe wrapper
+const BlockEmbed = Quill.import('blots/block/embed');
+class VideoBlot extends BlockEmbed {
+  static create(url) {
+    const node = super.create();
+    node.setAttribute('contenteditable', 'false');
+    node.innerHTML = `<iframe src="${url}" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`;
+    return node;
+  }
+  static value(node) {
+    return node.querySelector('iframe')?.getAttribute('src') || '';
+  }
+}
+VideoBlot.blotName = 'video-embed';
+VideoBlot.tagName = 'div';
+VideoBlot.className = 'ql-video-wrap';
+Quill.register(VideoBlot, true);
+
+function getEmbedUrl(url) {
+  if (!url) return null;
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vm = url.match(/vimeo\.com\/(\d+)/);
+  if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
+  if (url.includes('youtube.com/embed') || url.includes('player.vimeo.com')) return url;
+  return null;
+}
+
 // Allow style attribute on images so width persists
 const Image = Quill.import('formats/image');
 Image.sanitize = (url) => url;
@@ -29,6 +57,21 @@ class StyledImage extends Image {
 StyledImage.blotName = 'image';
 StyledImage.tagName = 'IMG';
 Quill.register(StyledImage, true);
+
+function useVideoHandler(quillRef) {
+  return useCallback(() => {
+    const url = prompt('Paste a YouTube or Vimeo URL:');
+    if (!url) return;
+    const embedUrl = getEmbedUrl(url.trim());
+    if (!embedUrl) { alert('Could not recognise that URL. Paste a YouTube or Vimeo link.'); return; }
+    const quill = quillRef.current?.getEditor();
+    if (quill) {
+      const range = quill.getSelection(true);
+      quill.insertEmbed(range.index, 'video-embed', embedUrl, 'user');
+      quill.setSelection(range.index + 1);
+    }
+  }, [quillRef]);
+}
 
 function useImageHandler(quillRef) {
   return useCallback(() => {
@@ -64,7 +107,7 @@ function useImageResizer() {
   useEffect(() => {
     const removeToolbar = () => {
       document.querySelectorAll('.img-resize-toolbar').forEach(t => t.remove());
-      document.querySelectorAll('.ql-editor img').forEach(i => i.style.outline = '');
+      document.querySelectorAll('.ql-editor img').forEach(i => { if (i instanceof HTMLElement) i.style.outline = ''; });
     };
 
     const showToolbar = (img) => {
@@ -123,12 +166,13 @@ function useImageResizer() {
 
 const FORMATS = [
   'header', 'bold', 'italic', 'underline', 'blockquote',
-  'list', 'indent', 'link', 'image', 'width', 'style',
+  'list', 'indent', 'link', 'image', 'width', 'style', 'video-embed',
 ];
 
 export default function RichEditor({ value, onChange, placeholder }) {
   const quillRef = useRef(null);
   const imageHandler = useImageHandler(quillRef);
+  const videoHandler = useVideoHandler(quillRef);
   useImageResizer();
 
   const modules = {
@@ -138,10 +182,10 @@ export default function RichEditor({ value, onChange, placeholder }) {
         ['bold', 'italic', 'underline'],
         ['blockquote'],
         [{ list: 'ordered' }, { list: 'bullet' }],
-        ['link', 'image'],
+        ['link', 'image', 'video'],
         ['clean'],
       ],
-      handlers: { image: imageHandler },
+      handlers: { image: imageHandler, video: videoHandler },
     },
   };
 
@@ -188,6 +232,8 @@ export default function RichEditor({ value, onChange, placeholder }) {
         .rich-editor-wrap .ql-snow.ql-toolbar button:hover .ql-stroke,
         .rich-editor-wrap .ql-snow .ql-toolbar button:hover .ql-stroke { stroke: hsl(var(--primary)); }
         .rich-editor-wrap .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: hsl(var(--primary)); }
+        .rich-editor-wrap .ql-editor .ql-video-wrap { margin: 1.5rem 0; }
+        .rich-editor-wrap .ql-editor .ql-video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
       `}</style>
       <ReactQuill
         ref={quillRef}

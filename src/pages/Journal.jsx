@@ -44,17 +44,19 @@ export default function Journal() {
   const [activeDestination, setActiveDestination] = useState(null);
   const [activeContinent, setActiveContinent] = useState('All');
 
-  const { data: posts, isLoading } = useQuery({
+  const { data: posts, isLoading, isError } = useQuery({
     queryKey: ['blog-posts-all'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('blog_posts')
         .select('id,title,slug,excerpt,cover_image,location,coordinates,date_traveled,tags')
         .eq('status', 'published')
         .order('date_traveled', { ascending: false });
+      if (error) throw error;
       return data || [];
     },
     initialData: [],
+    retry: 2,
   });
 
   // Build destination cards from unique locations in posts
@@ -181,6 +183,7 @@ export default function Journal() {
                       <img
                         src={dest.coverImage}
                         alt={dest.location}
+                        loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
@@ -260,6 +263,10 @@ export default function Journal() {
               </div>
             ))}
           </div>
+        ) : isError ? (
+          <p className="font-serif text-muted-foreground text-center py-24">
+            Could not load entries. Check your connection and refresh.
+          </p>
         ) : filteredPosts.length === 0 ? (
           <p className="font-serif text-muted-foreground text-center py-24">
             No entries for this destination yet.
@@ -285,6 +292,7 @@ export default function Journal() {
                         <img
                           src={post.cover_image}
                           alt={post.title}
+                          loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       ) : (
