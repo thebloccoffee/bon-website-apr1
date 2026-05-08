@@ -138,15 +138,15 @@ export default function Journal() {
       {!isLoading && destinations.length > 0 && (
         <section className="mb-16">
           {/* Continent filter pills */}
-          <div className="px-6 md:px-16 mb-8 flex flex-wrap items-center gap-3">
-            <span className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground mr-2">
+          <div className="px-6 md:px-16 mb-8 flex flex-wrap items-center gap-2 md:gap-3">
+            <span className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground w-full md:w-auto mb-1 md:mb-0 md:mr-2">
               Browse by
             </span>
             {continents.map((c) => (
               <button
                 key={c}
                 onClick={() => handleContinentClick(c)}
-                className={`font-sans text-xs tracking-[0.15em] uppercase px-4 py-2 border transition-all duration-300 ${
+                className={`font-sans text-xs tracking-[0.1em] md:tracking-[0.15em] uppercase px-3 md:px-4 py-2.5 md:py-2 border transition-all duration-300 ${
                   activeContinent === c && !activeDestination
                     ? 'border-foreground bg-foreground text-background'
                     : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'

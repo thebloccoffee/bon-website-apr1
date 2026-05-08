@@ -101,7 +101,7 @@ export default function Portfolio() {
                   className="group cursor-pointer"
                   onClick={() => setSelectedProject(project)}
                 >
-                  <div className="aspect-[21/9] overflow-hidden relative">
+                  <div className="aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] overflow-hidden relative">
                     <img
                       src={project.thumbnail}
                       alt={project.title}
@@ -148,7 +148,7 @@ export default function Portfolio() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-6"
+            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 md:p-6"
             onClick={() => setSelectedProject(null)}
           >
             <motion.div
@@ -192,7 +192,7 @@ export default function Portfolio() {
               </div>
               <button
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-6 right-6 font-sans text-xs text-white/50 tracking-[0.2em] uppercase hover:text-white transition-colors"
+                className="absolute top-3 right-3 md:top-6 md:right-6 font-sans text-xs text-white/50 tracking-[0.2em] uppercase hover:text-white transition-colors bg-black/40 px-3 py-2 rounded"
               >
                 Close ×
               </button>

@@ -12,7 +12,7 @@ export default function HeroSection() {
         <img
           src={HERO_IMAGE}
           alt="Jon Bon standing on a frozen lake in Banff"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-[65%_center] md:object-center"
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
@@ -25,16 +25,16 @@ export default function HeroSection() {
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-center"
         >
-          <h1 className="font-sans font-light text-white text-[8vw] md:text-[5vw] leading-[1.1] tracking-[-0.02em]">
+          <h1 className="font-sans font-light text-white text-[11vw] md:text-[5vw] leading-[1.1] tracking-[-0.02em]">
             Jon Bon
           </h1>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
-            className="mt-8"
+            className="mt-6"
           >
-            <p className="font-sans text-white/70 text-xs tracking-[0.4em] uppercase">
+            <p className="font-sans text-white/70 text-[10px] md:text-xs tracking-[0.25em] md:tracking-[0.4em] uppercase">
               Travel narratives & cinematic storytelling
             </p>
           </motion.div>
