@@ -39,7 +39,7 @@ export default function Navigation() {
             <img
               src="/logo.png"
               alt="Jon Bon"
-              className={`h-8 w-auto transition-all duration-500 ${
+              className={`h-14 w-auto transition-all duration-500 ${
                 scrolled || !isHome ? 'brightness-0' : 'brightness-0 invert'
               }`}
             />
