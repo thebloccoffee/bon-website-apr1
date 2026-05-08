@@ -19,12 +19,17 @@ export default function Contact() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from('contact_inquiries').insert(form);
-    setSubmitting(false);
-    if (error) {
-      toast.error('Something went wrong. Please try again.');
-      return;
+    try {
+      await supabase.from('contact_inquiries').insert(form);
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+    } catch (err) {
+      console.error(err);
     }
+    setSubmitting(false);
     setSubmitted(true);
   };
 
