@@ -10,7 +10,7 @@ const CATEGORIES = ['documentary', 'travel_film', 'commercial', 'wedding', 'musi
 
 const EMPTY = {
   title: '', description: '', thumbnail: '', gallery: [], video_url: '',
-  location: '', category: 'documentary', year: '', client: '', order: 0,
+  location: '', category: 'documentary', year: '', client: '', order: 0, status: 'published',
 };
 
 export default function PortfolioEditor() {
@@ -89,6 +89,12 @@ export default function PortfolioEditor() {
           <AdminField label="Display Order">
             <input type="number" className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm" value={editing.order ?? 0} onChange={(e) => set('order', Number(e.target.value))} />
           </AdminField>
+          <AdminField label="Status">
+            <select className="w-full bg-background border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm" value={editing.status || 'published'} onChange={(e) => set('status', e.target.value)}>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </AdminField>
         </div>
 
         <AdminField label="Description / Story">
@@ -141,7 +147,7 @@ export default function PortfolioEditor() {
                 {proj.thumbnail && <img src={proj.thumbnail} alt="" className="w-20 h-10 object-cover flex-shrink-0" />}
                 <div className="min-w-0">
                   <p className="font-sans text-sm font-light truncate">{proj.title}</p>
-                  <p className="font-sans text-xs text-muted-foreground">{proj.location} {proj.year && `· ${proj.year}`} · <span className="text-accent capitalize">{proj.category?.replace(/_/g, ' ')}</span></p>
+                  <p className="font-sans text-xs text-muted-foreground">{proj.location} {proj.year && `· ${proj.year}`} · <span className="text-accent capitalize">{proj.category?.replace(/_/g, ' ')}</span> · <span className={proj.status === 'published' ? 'text-foreground' : 'text-accent'}>{proj.status || 'published'}</span></p>
                 </div>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">

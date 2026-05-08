@@ -34,6 +34,7 @@ export default function Portfolio() {
       const { data } = await supabase
         .from('portfolio_projects')
         .select('*')
+        .or('status.eq.published,status.is.null')
         .order('order', { ascending: true });
       return data || [];
     },
