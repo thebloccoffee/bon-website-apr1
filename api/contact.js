@@ -17,13 +17,13 @@ export default async function handler(req, res) {
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: { user: 'tabasjonbon13@gmail.com', pass: gmailPass },
+    auth: { user: 'jooonbon@gmail.com', pass: gmailPass },
   });
 
   try {
     await transporter.sendMail({
-      from: '"Jon Bon Website" <tabasjonbon13@gmail.com>',
-      to: 'tabasjonbon13@gmail.com',
+      from: '"Jon Bon Website" <jooonbon@gmail.com>',
+      to: 'jooonbon@gmail.com',
       replyTo: `"${name}" <${email}>`,
       subject: `New inquiry from ${name}`,
       html: `
