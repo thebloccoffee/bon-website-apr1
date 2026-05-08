@@ -35,7 +35,9 @@ export default function BlogPostEditor() {
 
   const save = useMutation({
     mutationFn: async (data) => {
-      const sanitized = { ...data, date_traveled: data.date_traveled || null };
+      // eslint-disable-next-line no-unused-vars
+      const { city, ...rest } = data;
+      const sanitized = { ...rest, date_traveled: rest.date_traveled || null };
       if (isNew) {
         const { error } = await supabase.from('blog_posts').insert(sanitized);
         if (error) throw error;
@@ -50,6 +52,7 @@ export default function BlogPostEditor() {
       qc.invalidateQueries({ queryKey: ['blog-posts-featured'] });
       setEditing(null);
     },
+    onError: (err) => alert('Save failed: ' + err.message),
   });
 
   const remove = useMutation({
