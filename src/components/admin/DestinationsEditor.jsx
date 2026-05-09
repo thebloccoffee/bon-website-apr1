@@ -4,8 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import ImageUploader from './ImageUploader';
 import AdminField from './AdminField';
-
-const CONTINENTS = ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania'];
+import LocationSelect, { continentFromLocation } from './LocationSelect';
 
 const EMPTY = {
   name: '', slug: '', continent: 'Asia', region: '', tagline: '',
@@ -96,16 +95,29 @@ export default function DestinationsEditor() {
               onChange={(e) => set('slug', e.target.value)}
             />
           </AdminField>
+          <AdminField label="Country / Location">
+            <LocationSelect
+              value={editing.name}
+              onChange={(v) => {
+                set('name', v);
+                const c = continentFromLocation(v);
+                if (c) set('continent', c);
+              }}
+            />
+          </AdminField>
           <AdminField label="Continent">
             <select
               className="w-full bg-background border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm"
-              value={editing.continent}
+              value={editing.continent || ''}
               onChange={(e) => set('continent', e.target.value)}
             >
-              {CONTINENTS.map((c) => <option key={c} value={c}>{c}</option>)}
+              <option value="">— Select continent —</option>
+              {['Americas','Asia','Europe','Africa','Oceania'].map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
             </select>
           </AdminField>
-          <AdminField label="Region (optional subregion label)">
+          <AdminField label="Subregion label (optional)">
             <input
               className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm"
               placeholder="e.g. Southeast Asia"

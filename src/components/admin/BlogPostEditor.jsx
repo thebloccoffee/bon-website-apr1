@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import ImageUploader from './ImageUploader';
 import AdminField from './AdminField';
 import RichEditor from './RichEditor';
+import LocationSelect from './LocationSelect';
 
 const EMPTY = {
   title: '', slug: '', excerpt: '', content: '', cover_image: '',
@@ -105,77 +106,7 @@ export default function BlogPostEditor() {
             />
           </AdminField>
           <AdminField label="Location">
-            <select
-              className="w-full bg-background border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm"
-              value={editing.location || ''}
-              onChange={(e) => set('location', e.target.value)}
-            >
-              <option value="">— Select location —</option>
-              <optgroup label="Americas">
-                <option>Canada</option>
-                <option>Quebec</option>
-                <option>USA</option>
-                <option>Mexico</option>
-                <option>Peru</option>
-                <option>Colombia</option>
-                <option>Brazil</option>
-                <option>Argentina</option>
-                <option>Costa Rica</option>
-                <option>Cuba</option>
-              </optgroup>
-              <optgroup label="Asia">
-                <option>Vietnam</option>
-                <option>Japan</option>
-                <option>Philippines</option>
-                <option>Thailand</option>
-                <option>Indonesia</option>
-                <option>Bali</option>
-                <option>Cambodia</option>
-                <option>Laos</option>
-                <option>Myanmar</option>
-                <option>Malaysia</option>
-                <option>Singapore</option>
-                <option>South Korea</option>
-                <option>China</option>
-                <option>Taiwan</option>
-                <option>Nepal</option>
-                <option>India</option>
-                <option>Sri Lanka</option>
-                <option>Hong Kong</option>
-              </optgroup>
-              <optgroup label="Europe">
-                <option>Portugal</option>
-                <option>Spain</option>
-                <option>France</option>
-                <option>Italy</option>
-                <option>Norway</option>
-                <option>Sweden</option>
-                <option>Denmark</option>
-                <option>Iceland</option>
-                <option>Germany</option>
-                <option>Netherlands</option>
-                <option>Greece</option>
-                <option>Croatia</option>
-                <option>Czech Republic</option>
-                <option>Austria</option>
-                <option>Switzerland</option>
-                <option>Poland</option>
-                <option>Hungary</option>
-              </optgroup>
-              <optgroup label="Africa">
-                <option>Morocco</option>
-                <option>Egypt</option>
-                <option>South Africa</option>
-                <option>Kenya</option>
-                <option>Tanzania</option>
-                <option>Ethiopia</option>
-              </optgroup>
-              <optgroup label="Oceania">
-                <option>Australia</option>
-                <option>New Zealand</option>
-                <option>Fiji</option>
-              </optgroup>
-            </select>
+            <LocationSelect value={editing.location} onChange={(v) => set('location', v)} />
           </AdminField>
           <AdminField label="City / Specific Place">
             <input

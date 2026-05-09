@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import ImageUploader from './ImageUploader';
 import AdminField from './AdminField';
 import RichEditor from './RichEditor';
+import LocationSelect from './LocationSelect';
 
 const CATEGORIES = ['documentary', 'travel_film', 'commercial', 'wedding', 'music_video', 'short_film'];
 
@@ -78,7 +79,7 @@ export default function PortfolioEditor() {
             </select>
           </AdminField>
           <AdminField label="Location">
-            <input className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm" value={editing.location || ''} onChange={(e) => set('location', e.target.value)} />
+            <LocationSelect value={editing.location} onChange={(v) => set('location', v)} />
           </AdminField>
           <AdminField label="Year">
             <input className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm" value={editing.year || ''} onChange={(e) => set('year', e.target.value)} />
