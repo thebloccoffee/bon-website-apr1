@@ -15,15 +15,6 @@ function getEmbedUrl(url) {
   return url;
 }
 
-const CATEGORIES = [
-  { value: 'all', label: 'All' },
-  { value: 'documentary', label: 'Documentary' },
-  { value: 'travel_film', label: 'Travel Film' },
-  { value: 'commercial', label: 'Commercial' },
-  { value: 'wedding', label: 'Wedding' },
-  { value: 'short_film', label: 'Short Film' },
-];
-
 export default function Portfolio() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState(null);
@@ -39,6 +30,13 @@ export default function Portfolio() {
       return data || [];
     },
   });
+
+  // Build filter tabs from actual project data so custom categories always appear
+  const categories = [
+    { value: 'all', label: 'All' },
+    ...Array.from(new Set(projects.map(p => p.category).filter(Boolean)))
+      .map(value => ({ value, label: value.replace(/_/g, ' ') })),
+  ];
 
   const filtered = activeCategory === 'all'
     ? projects
@@ -62,7 +60,7 @@ export default function Portfolio() {
         </motion.div>
 
         <div className="flex items-center gap-6 mb-16 overflow-x-auto filmstrip-scroll -mx-6 px-6 md:mx-0 md:px-0">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setActiveCategory(cat.value)}
