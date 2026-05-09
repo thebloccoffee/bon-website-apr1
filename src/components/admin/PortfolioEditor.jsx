@@ -7,7 +7,20 @@ import AdminField from './AdminField';
 import RichEditor from './RichEditor';
 import LocationSelect from './LocationSelect';
 
-const CATEGORIES = ['documentary', 'travel_film', 'commercial', 'wedding', 'music_video', 'short_film'];
+const DEFAULT_CATEGORIES = ['documentary', 'travel_film', 'commercial', 'wedding', 'music_video', 'short_film'];
+const LS_KEY = 'portfolio_custom_categories';
+
+function loadCategories() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+    return [...DEFAULT_CATEGORIES, ...stored.filter(c => !DEFAULT_CATEGORIES.includes(c))];
+  } catch { return DEFAULT_CATEGORIES; }
+}
+
+function saveCustomCategories(all) {
+  const custom = all.filter(c => !DEFAULT_CATEGORIES.includes(c));
+  localStorage.setItem(LS_KEY, JSON.stringify(custom));
+}
 
 const EMPTY = {
   title: '', description: '', thumbnail: '', gallery: [], video_url: '',
@@ -18,6 +31,27 @@ export default function PortfolioEditor() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(null);
   const [isNew, setIsNew] = useState(false);
+  const [categories, setCategories] = useState(loadCategories);
+  const [addingCat, setAddingCat] = useState(false);
+  const [newCatInput, setNewCatInput] = useState('');
+
+  const addCategory = () => {
+    const slug = newCatInput.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    if (!slug || categories.includes(slug)) { setAddingCat(false); setNewCatInput(''); return; }
+    const updated = [...categories, slug];
+    setCategories(updated);
+    saveCustomCategories(updated);
+    if (editing) set('category', slug);
+    setAddingCat(false);
+    setNewCatInput('');
+  };
+
+  const removeCategory = (cat) => {
+    if (DEFAULT_CATEGORIES.includes(cat)) return;
+    const updated = categories.filter(c => c !== cat);
+    setCategories(updated);
+    saveCustomCategories(updated);
+  };
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ['admin-portfolio'],
@@ -74,9 +108,51 @@ export default function PortfolioEditor() {
             <input className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-serif text-lg" value={editing.title} onChange={(e) => set('title', e.target.value)} />
           </AdminField>
           <AdminField label="Category">
-            <select className="w-full bg-background border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm" value={editing.category || ''} onChange={(e) => set('category', e.target.value)}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}
-            </select>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <select
+                  className="flex-1 bg-background border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm"
+                  value={editing.category || ''}
+                  onChange={(e) => set('category', e.target.value)}
+                >
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>
+                  ))}
+                </select>
+                {!DEFAULT_CATEGORIES.includes(editing.category) && editing.category && (
+                  <button
+                    type="button"
+                    onClick={() => { removeCategory(editing.category); set('category', DEFAULT_CATEGORIES[0]); }}
+                    className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                    title="Remove this custom category"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+              {addingCat ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    autoFocus
+                    className="flex-1 bg-transparent border-b border-border focus:border-foreground outline-none py-1 font-sans text-xs"
+                    placeholder="New category name"
+                    value={newCatInput}
+                    onChange={(e) => setNewCatInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCategory(); } if (e.key === 'Escape') { setAddingCat(false); setNewCatInput(''); } }}
+                  />
+                  <button type="button" onClick={addCategory} className="font-sans text-xs tracking-widest uppercase text-foreground hover:text-muted-foreground transition-colors shrink-0">Add</button>
+                  <button type="button" onClick={() => { setAddingCat(false); setNewCatInput(''); }} className="text-muted-foreground hover:text-foreground transition-colors shrink-0"><X size={12} /></button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setAddingCat(true)}
+                  className="flex items-center gap-1 font-sans text-xs text-muted-foreground hover:text-foreground transition-colors mt-1"
+                >
+                  <Plus size={11} /> Add category
+                </button>
+              )}
+            </div>
           </AdminField>
           <AdminField label="Location">
             <LocationSelect value={editing.location} onChange={(v) => set('location', v)} />
