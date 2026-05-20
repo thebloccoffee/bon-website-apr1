@@ -14,7 +14,7 @@ export default function HeroSection() {
           alt="Jon Bon standing on a frozen lake in Banff"
           className="w-full h-full object-cover object-[65%_center] md:object-center"
         />
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
       </div>
 
       {/* Content */}

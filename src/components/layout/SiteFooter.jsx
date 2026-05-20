@@ -6,7 +6,7 @@ export default function SiteFooter() {
     <footer className="relative py-16 md:py-32 px-6 md:px-16 overflow-hidden">
       {/* Large background text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <span className="font-sans text-[15vw] font-bold uppercase tracking-wider text-foreground/[0.03] leading-none">
+        <span className="font-sans text-[15vw] font-bold uppercase tracking-wider text-foreground/[0.04] leading-none">
           Travel
         </span>
       </div>

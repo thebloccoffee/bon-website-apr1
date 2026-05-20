@@ -17,11 +17,11 @@ export default function PortfolioPreview({ projects }) {
   if (!projects || projects.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32 bg-foreground text-primary-foreground">
+    <section className="py-24 md:py-32 bg-card text-foreground">
       <div className="px-6 md:px-16 mb-16">
         <div className="max-w-6xl mx-auto flex items-center gap-6">
           <div className="w-12 h-px bg-primary-foreground/30" />
-          <span className="font-sans text-xs tracking-[0.3em] uppercase text-primary-foreground/60">
+          <span className="font-sans text-xs tracking-[0.3em] uppercase text-foreground/60">
             Selected Works
           </span>
         </div>
@@ -55,17 +55,17 @@ export default function PortfolioPreview({ projects }) {
               </div>
               <div className="mt-4 flex items-start justify-between">
                 <div>
-                  <h3 className="font-sans text-sm font-light tracking-wide text-primary-foreground">
+                  <h3 className="font-sans text-sm font-light tracking-wide text-foreground">
                     {project.title}
                   </h3>
                   {project.location && (
-                    <p className="font-sans text-xs text-primary-foreground/40 mt-1">
+                    <p className="font-sans text-xs text-foreground/40 mt-1">
                       {project.location}
                     </p>
                   )}
                 </div>
                 {project.year && (
-                  <span className="font-sans text-xs text-primary-foreground/30">
+                  <span className="font-sans text-xs text-foreground/30">
                     {project.year}
                   </span>
                 )}
@@ -79,7 +79,7 @@ export default function PortfolioPreview({ projects }) {
         <div className="max-w-6xl mx-auto text-center">
           <Link
             to="/portfolio"
-            className="font-sans text-xs tracking-[0.25em] uppercase text-primary-foreground/50 hover:text-primary-foreground transition-colors duration-300 border-b border-primary-foreground/20 pb-1"
+            className="font-sans text-xs tracking-[0.25em] uppercase text-foreground/50 hover:text-foreground transition-colors duration-300 border-b border-primary-foreground/20 pb-1"
           >
             View full reel
           </Link>

@@ -97,8 +97,8 @@ export default function Destinations() {
                 onClick={() => setActiveContinent(c)}
                 className={`font-sans text-xs tracking-[0.15em] uppercase px-4 py-2 border transition-all duration-300 ${
                   activeContinent === c
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
+                    ? 'border-accent bg-accent/10 text-accent'
+                    : 'border-border text-muted-foreground hover:border-accent/50 hover:text-foreground'
                 }`}
               >
                 {c}

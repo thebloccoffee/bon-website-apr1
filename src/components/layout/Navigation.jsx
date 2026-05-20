@@ -39,9 +39,7 @@ export default function Navigation() {
             <img
               src="/logo.png"
               alt="Jon Bon"
-              className={`h-10 md:h-14 w-auto transition-all duration-500 ${
-                scrolled || !isHome ? 'brightness-0' : 'brightness-0 invert'
-              }`}
+              className="h-10 md:h-14 w-auto brightness-0 invert transition-all duration-500"
             />
           </Link>
 
@@ -51,9 +49,7 @@ export default function Navigation() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:opacity-60 ${
-                  scrolled || !isHome ? 'text-foreground' : 'text-white'
-                } ${location.pathname === link.path ? 'opacity-60' : ''}`}
+                className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:opacity-60 text-white ${location.pathname === link.path ? 'opacity-60' : ''}`}
               >
                 {link.label}
               </Link>
@@ -63,9 +59,7 @@ export default function Navigation() {
           {/* Mobile toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`md:hidden relative z-50 transition-colors duration-300 ${
-              isOpen ? 'text-foreground' : scrolled || !isHome ? 'text-foreground' : 'text-white'
-            }`}
+            className="md:hidden relative z-50 text-white transition-colors duration-300"
           >
             {isOpen ? <X size={20} /> : <Menu size={20} />}
           </button>

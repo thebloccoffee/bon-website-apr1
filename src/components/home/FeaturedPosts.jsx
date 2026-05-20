@@ -11,7 +11,7 @@ export default function FeaturedPosts({ posts }) {
       <div className="max-w-6xl mx-auto">
         {/* Section header */}
         <div className="flex items-center gap-6 mb-16">
-          <div className="w-12 h-px bg-accent" />
+          <div className="w-12 h-px bg-accent/60" />
           <span className="font-sans text-xs tracking-[0.3em] uppercase text-muted-foreground">
             Recent dispatches
           </span>
