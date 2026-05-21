@@ -117,4 +117,5 @@
 .ql-content em { font-style: italic; }
 .ql-content .ql-video-wrap { margin: 2rem 0; }
 .ql-content .ql-video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
-.ql-content p[style*="text-align: center"] { font-family: var(--font-sans); font-size: 0.8rem; font-style: italic; color: hsl(var(--muted-foreground)); margin-top: -1rem; margin-bottom: 1.5rem; }
+.ql-content p.ql-align-center { font-family: var(--font-sans); font-size: 0.8rem; font-style: italic; color: hsl(var(--muted-foreground)); text-align: center; margin-top: -1.25rem; margin-bottom: 2rem; }
+.ql-content img + p.ql-align-center, .ql-content img + p[style*="text-align: center"] { margin-top: -1.25rem; }

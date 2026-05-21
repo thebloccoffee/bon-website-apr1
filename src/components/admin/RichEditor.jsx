@@ -263,8 +263,7 @@ export default function RichEditor({ value, onChange, placeholder }) {
         .rich-editor-wrap .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: hsl(var(--primary)); }
         .rich-editor-wrap .ql-editor .ql-video-wrap { margin: 1.5rem 0; }
         .rich-editor-wrap .ql-editor .ql-video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
-        .rich-editor-wrap .ql-editor p[style*="text-align: center"],
-        .rich-editor-wrap .ql-editor .ql-align-center { font-size: 0.8rem; font-style: italic; }
+        .rich-editor-wrap .ql-editor .ql-align-center { font-size: 0.8rem; font-style: italic; color: #888; margin-top: -1.25rem !important; }
       `}</style>
       <ReactQuill
         ref={quillRef}
