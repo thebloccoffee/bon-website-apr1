@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
 
 const navLinks = [
   { label: 'Journal', path: '/journal' },
@@ -12,6 +13,7 @@ const navLinks = [
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { isDark, toggle } = useTheme();
   const location = useLocation();
   const isHome = location.pathname === '/';
 
@@ -24,6 +26,12 @@ export default function Navigation() {
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
+
+  // On hero: always white. On scroll/inner pages: white if dark, dark if light.
+  const onHero = isHome && !scrolled;
+  const linkColor = onHero || isDark ? 'text-white' : 'text-foreground';
+  const iconColor = onHero || isDark ? 'text-white' : 'text-foreground';
+  const logoInvert = onHero || isDark ? 'brightness-0 invert' : 'brightness-0';
 
   return (
     <>
@@ -39,30 +47,46 @@ export default function Navigation() {
             <img
               src="/logo.png"
               alt="Jon Bon"
-              className="h-10 md:h-14 w-auto brightness-0 invert transition-all duration-500"
+              className={`h-10 md:h-14 w-auto transition-all duration-500 ${logoInvert}`}
             />
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-12">
+          <div className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:opacity-60 text-white ${location.pathname === link.path ? 'opacity-60' : ''}`}
+                className={`font-sans text-xs tracking-[0.2em] uppercase transition-all duration-300 hover:opacity-60 ${linkColor} ${location.pathname === link.path ? 'opacity-60' : ''}`}
               >
                 {link.label}
               </Link>
             ))}
+            <button
+              onClick={toggle}
+              aria-label="Toggle theme"
+              className={`transition-all duration-300 hover:opacity-60 ${iconColor}`}
+            >
+              {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
           </div>
 
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden relative z-50 text-white transition-colors duration-300"
-          >
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          {/* Mobile right side */}
+          <div className="md:hidden flex items-center gap-4 relative z-50">
+            <button
+              onClick={toggle}
+              aria-label="Toggle theme"
+              className={`transition-colors duration-300 ${isOpen ? 'text-foreground' : iconColor}`}
+            >
+              {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className={`transition-colors duration-300 ${isOpen ? 'text-foreground' : iconColor}`}
+            >
+              {isOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </nav>
       </header>
 
