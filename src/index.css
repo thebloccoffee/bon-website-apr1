@@ -22,13 +22,13 @@
     --secondary-foreground: 0 0% 100%;
     --muted: 256 10% 12%;
     --muted-foreground: 0 0% 55%;
-    --accent: 258 100% 90%;
-    --accent-foreground: 256 13% 26%;
+    --accent: 0 0% 65%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 11%;
-    --input: 0 0% 11%;
-    --ring: 258 100% 90%;
+    --border: 0 0% 13%;
+    --input: 0 0% 13%;
+    --ring: 0 0% 65%;
     --radius: 0.5rem;
     --sidebar-background: 0 0% 0%;
     --sidebar-foreground: 0 0% 100%;
@@ -37,7 +37,7 @@
     --sidebar-accent: 256 10% 12%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 11%;
-    --sidebar-ring: 258 100% 90%;
+    --sidebar-ring: 0 0% 65%;
   }
 
   .light {
