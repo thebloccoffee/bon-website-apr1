@@ -103,7 +103,13 @@ const SIZES = [
   { label: 'Full', width: '100%' },
 ];
 
-function useImageResizer() {
+const BTN_STYLE = `
+  color:#fff; font-size:11px; font-family:sans-serif; background:transparent;
+  border:1px solid rgba(255,255,255,0.3); border-radius:3px; padding:2px 8px;
+  cursor:pointer; letter-spacing:0.05em;
+`;
+
+function useImageResizer(quillRef) {
   useEffect(() => {
     const removeToolbar = () => {
       document.querySelectorAll('.img-resize-toolbar').forEach(t => t.remove());
@@ -123,11 +129,7 @@ function useImageResizer() {
         const btn = document.createElement('button');
         btn.textContent = label;
         btn.type = 'button';
-        btn.style.cssText = `
-          color:#fff; font-size:11px; font-family:sans-serif; background:transparent;
-          border:1px solid rgba(255,255,255,0.3); border-radius:3px; padding:2px 8px;
-          cursor:pointer; letter-spacing:0.05em;
-        `;
+        btn.style.cssText = BTN_STYLE;
         btn.onmouseenter = () => btn.style.background = 'rgba(255,255,255,0.2)';
         btn.onmouseleave = () => btn.style.background = 'transparent';
         btn.onclick = (e) => {
@@ -139,6 +141,32 @@ function useImageResizer() {
         };
         toolbar.appendChild(btn);
       });
+
+      // Caption button
+      const sep = document.createElement('div');
+      sep.style.cssText = 'width:1px; background:rgba(255,255,255,0.2); margin:2px 2px;';
+      toolbar.appendChild(sep);
+
+      const captionBtn = document.createElement('button');
+      captionBtn.textContent = '+ Caption';
+      captionBtn.type = 'button';
+      captionBtn.style.cssText = BTN_STYLE + 'border-color:rgba(255,255,255,0.5);';
+      captionBtn.onmouseenter = () => captionBtn.style.background = 'rgba(255,255,255,0.2)';
+      captionBtn.onmouseleave = () => captionBtn.style.background = 'transparent';
+      captionBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const quill = quillRef.current?.getEditor();
+        if (!quill) return;
+        const blot = Quill.find(img);
+        if (!blot) return;
+        const idx = quill.getIndex(blot);
+        // Insert a new line after the image with caption formatting
+        quill.insertText(idx + 1, 'Caption here', { italic: true, align: 'center', color: '#888888' }, 'user');
+        quill.setSelection(idx + 1, 12); // select "Caption here" so user can type over it
+        removeToolbar();
+      };
+      toolbar.appendChild(captionBtn);
 
       document.body.appendChild(toolbar);
       const rect = img.getBoundingClientRect();
@@ -161,19 +189,20 @@ function useImageResizer() {
       document.removeEventListener('click', handleClick);
       removeToolbar();
     };
-  }, []);
+  }, [quillRef]);
 }
 
 const FORMATS = [
   'header', 'bold', 'italic', 'underline', 'blockquote',
   'list', 'indent', 'link', 'image', 'width', 'style', 'video-embed',
+  'align', 'color',
 ];
 
 export default function RichEditor({ value, onChange, placeholder }) {
   const quillRef = useRef(null);
   const imageHandler = useImageHandler(quillRef);
   const videoHandler = useVideoHandler(quillRef);
-  useImageResizer();
+  useImageResizer(quillRef);
 
   const modules = {
     toolbar: {
@@ -234,6 +263,8 @@ export default function RichEditor({ value, onChange, placeholder }) {
         .rich-editor-wrap .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: hsl(var(--primary)); }
         .rich-editor-wrap .ql-editor .ql-video-wrap { margin: 1.5rem 0; }
         .rich-editor-wrap .ql-editor .ql-video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+        .rich-editor-wrap .ql-editor p[style*="text-align: center"],
+        .rich-editor-wrap .ql-editor .ql-align-center { font-size: 0.8rem; font-style: italic; }
       `}</style>
       <ReactQuill
         ref={quillRef}
