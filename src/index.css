@@ -5,7 +5,61 @@
 @tailwind utilities;
 
 @layer base {
+  /* ──────────────────────────────────────────────────────────────
+     DESIGN.md token layer.
+     Primitives below are the single source of truth for type,
+     spacing, radius and motion. Never write a raw value in a
+     component — reach for a tk-* utility instead.
+     ────────────────────────────────────────────────────────────── */
   :root {
+    /* type scale */
+    --font-size-xs: 10.5px;
+    --font-size-sm: 11px;
+    --font-size-md: 12px;
+    --font-size-lg: 13px;
+    --font-size-xl: 14px;
+    --font-size-2xl: 15px;
+    --font-size-3xl: 18px;
+    --font-size-4xl: 24px;
+    --font-lineHeight-base: 22.5px;
+
+    /* Documented extension to the DESIGN.md scale. The doc caps at
+       24px, which cannot carry a full-bleed hero wordmark. Declared
+       as a token so it stays systematic rather than a one-off. */
+    --font-size-display: clamp(3rem, 11vw, 8rem);
+
+    /* spacing scale */
+    --space-1: 4px;
+    --space-2: 6px;
+    --space-3: 10px;
+    --space-4: 14px;
+    --space-5: 16px;
+    --space-6: 20px;
+    --space-7: 24px;
+    --space-8: 28px;
+
+    /* radius */
+    --radius-xs: 6px;
+    --radius-pill: 9999px;
+
+    /* motion */
+    --motion-duration-instant: 150ms;
+    --motion-duration-fast: 200ms;
+    --motion-duration-normal: 450ms;
+
+    /* semantic colour — dark theme (site default).
+       Light-theme values in `.light` below are the literal
+       DESIGN.md palette; these are its inverted counterpart so the
+       existing theme toggle keeps working. */
+    --color-text-primary: #fafafa;
+    --color-text-secondary: #a3a3a3;
+    --color-text-tertiary: #737373;
+    --color-text-inverse: #0a0a0a;
+    --color-surface-base: #ffffff;
+    --color-surface-muted: #000000;
+    --color-surface-raised: #171717;
+    --color-border-default: #262626;
+
     --font-serif: 'Newsreader', Georgia, serif;
     --font-sans: 'Inter', system-ui, sans-serif;
 
@@ -41,6 +95,16 @@
   }
 
   .light {
+    /* literal DESIGN.md palette */
+    --color-text-primary: #0a0a0a;
+    --color-text-secondary: #737373;
+    --color-text-tertiary: #a3a3a3;
+    --color-text-inverse: #3a3a3a;
+    --color-surface-base: #000000;
+    --color-surface-muted: #ffffff;
+    --color-surface-raised: #f5f5f5;
+    --color-border-default: #e9e9e9;
+
     --background: 30 14% 94%;
     --foreground: 0 0% 7%;
     --card: 30 14% 94%;
@@ -70,6 +134,25 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* DESIGN.md: focus indicators must never be hidden. */
+  :focus-visible {
+    outline: 2px solid var(--color-text-primary);
+    outline-offset: var(--space-1);
+    border-radius: var(--radius-xs);
+  }
+}
+
+/* DESIGN.md: motion must respect user preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
