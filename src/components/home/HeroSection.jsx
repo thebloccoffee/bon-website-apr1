@@ -18,38 +18,42 @@ export default function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-tk-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-center"
         >
-          <h1 className="font-sans font-light text-white text-[11vw] md:text-[5vw] leading-[1.1] tracking-[-0.02em]">
+          <h1 className="font-sans font-light text-white text-tk-display tracking-[-0.02em]">
             Jon Bon
           </h1>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
-            className="mt-6"
+            className="mt-tk-6"
           >
-            <p className="font-sans text-white/70 text-[10px] md:text-xs tracking-[0.25em] md:tracking-[0.4em] uppercase">
-              Travel narratives & cinematic storytelling
+            <p className="font-sans text-white/70 text-tk-xs md:text-tk-md tracking-[0.25em] md:tracking-[0.4em] uppercase">
+              Travel narratives &amp; cinematic storytelling
             </p>
           </motion.div>
         </motion.div>
 
-        {/* Corner navigation hints */}
+        {/* Corner navigation hint */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-12 left-0 right-0 flex justify-center"
+          className="absolute bottom-tk-8 left-0 right-0 flex justify-center"
         >
           <Link
             to="/journal"
-            className="font-sans text-white/50 text-xs tracking-[0.3em] uppercase hover:text-white/80 transition-colors duration-500"
+            className="font-sans text-white/60 text-tk-md tracking-[0.3em] uppercase
+                       px-tk-4 py-tk-3 rounded-tk-xs
+                       transition-colors duration-normal
+                       hover:text-white active:text-white/80
+                       focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           >
             Explore the journal ↓
           </Link>
