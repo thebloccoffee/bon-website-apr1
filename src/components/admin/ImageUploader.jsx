@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { supabase } from '@/api/supabaseClient';
+import { adminApi } from '@/api/adminClient';
 import { Upload, X, Loader2 } from 'lucide-react';
 
 export default function ImageUploader({ label, value, onChange, multiple = false }) {
@@ -10,13 +10,12 @@ export default function ImageUploader({ label, value, onChange, multiple = false
     setUploading(true);
     const urls = [];
     for (const file of files) {
-      const ext = file.name.split('.').pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from('media').upload(path, file, { contentType: file.type, upsert: true });
-      if (error) { console.error('Upload error:', JSON.stringify(error)); }
-      if (!error) {
-        const { data } = supabase.storage.from('media').getPublicUrl(path);
-        urls.push(data.publicUrl);
+      try {
+        const { url } = await adminApi.upload(file);
+        urls.push(url);
+      } catch (err) {
+        console.error('Upload error:', err.message);
+        alert('Upload failed: ' + err.message);
       }
     }
     setUploading(false);

@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import { supabase } from '@/api/supabaseClient';
+import { adminApi } from '@/api/adminClient';
 
 // Video embed blot — renders as a responsive iframe wrapper
 const BlockEmbed = Quill.import('blots/block/embed');
@@ -82,14 +82,17 @@ function useImageHandler(quillRef) {
     input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;
-      const ext = file.name.split('.').pop();
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      await supabase.storage.from('media').upload(path, file, { contentType: file.type, upsert: true });
-      const { data } = supabase.storage.from('media').getPublicUrl(path);
+      let uploaded;
+      try {
+        uploaded = await adminApi.upload(file);
+      } catch (err) {
+        alert('Upload failed: ' + err.message);
+        return;
+      }
       const quill = quillRef.current?.getEditor();
       if (quill) {
         const range = quill.getSelection(true);
-        quill.insertEmbed(range.index, 'image', data.publicUrl);
+        quill.insertEmbed(range.index, 'image', uploaded.url);
         quill.setSelection(range.index + 1);
       }
     };

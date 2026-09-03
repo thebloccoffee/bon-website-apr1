@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '@/api/supabaseClient';
+import { adminApi } from '@/api/adminClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import ImageUploader from './ImageUploader';
@@ -24,13 +24,7 @@ export default function DestinationsEditor() {
 
   const { data: destinations, isLoading } = useQuery({
     queryKey: ['admin-destinations'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('destinations')
-        .select('*')
-        .order('order', { ascending: true });
-      return data || [];
-    },
+    queryFn: () => adminApi.list('destinations', 'order=order.asc'),
     initialData: [],
   });
 
@@ -38,11 +32,9 @@ export default function DestinationsEditor() {
     mutationFn: async (data) => {
       const payload = { ...data, order: Number(data.order) || 0 };
       if (isNew) {
-        const { error } = await supabase.from('destinations').insert(payload);
-        if (error) throw error;
+        await adminApi.insert('destinations', payload);
       } else {
-        const { error } = await supabase.from('destinations').update(payload).eq('id', editing.id);
-        if (error) throw error;
+        await adminApi.update('destinations', editing.id, payload);
       }
     },
     onSuccess: () => {
@@ -53,10 +45,7 @@ export default function DestinationsEditor() {
   });
 
   const remove = useMutation({
-    mutationFn: async (id) => {
-      const { error } = await supabase.from('destinations').delete().eq('id', id);
-      if (error) throw error;
-    },
+    mutationFn: (id) => adminApi.remove('destinations', id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-destinations'] }),
   });
 

@@ -1,29 +1,40 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { adminApi } from '@/api/adminClient';
 
 const AuthContext = createContext();
 
-const SESSION_KEY = 'admin_authed';
-
 export const AuthProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(() => sessionStorage.getItem(SESSION_KEY) === '1');
+  const [isAdmin, setIsAdmin] = useState(false);
+  // Until the server has answered, we do not know — render neither the login
+  // form nor the studio, or the page flickers on every refresh.
+  const [checking, setChecking] = useState(true);
 
-  const login = (password) => {
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-    if (password === adminPassword) {
-      sessionStorage.setItem(SESSION_KEY, '1');
-      setIsAdmin(true);
-      return true;
-    }
-    return false;
-  };
+  useEffect(() => {
+    let cancelled = false;
+    adminApi
+      .session()
+      .then(({ authed }) => !cancelled && setIsAdmin(!!authed))
+      .catch(() => !cancelled && setIsAdmin(false))
+      .finally(() => !cancelled && setChecking(false));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const logout = () => {
-    sessionStorage.removeItem(SESSION_KEY);
+  // Throws with the server's message (wrong password, rate limited) so the
+  // form can show why it failed.
+  const login = useCallback(async (password) => {
+    await adminApi.login(password);
+    setIsAdmin(true);
+  }, []);
+
+  const logout = useCallback(async () => {
+    await adminApi.logout().catch(() => {});
     setIsAdmin(false);
-  };
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ isAdmin, checking, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '@/api/supabaseClient';
+import { adminApi } from '@/api/adminClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import ImageUploader from './ImageUploader';
@@ -24,13 +24,7 @@ export default function BlogPostEditor() {
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ['admin-blog-posts'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
-      return data || [];
-    },
+    queryFn: () => adminApi.list('blog_posts', 'order=created_at.desc'),
     initialData: [],
   });
 
@@ -46,11 +40,9 @@ export default function BlogPostEditor() {
       WRITABLE_FIELDS.forEach((k) => { payload[k] = data[k] ?? null; });
       payload.date_traveled = payload.date_traveled || null;
       if (isNew) {
-        const { error } = await supabase.from('blog_posts').insert(payload);
-        if (error) throw error;
+        await adminApi.insert('blog_posts', payload);
       } else {
-        const { error } = await supabase.from('blog_posts').update(payload).eq('id', data.id);
-        if (error) throw error;
+        await adminApi.update('blog_posts', data.id, payload);
       }
     },
     onSuccess: () => {
@@ -63,10 +55,7 @@ export default function BlogPostEditor() {
   });
 
   const remove = useMutation({
-    mutationFn: async (id) => {
-      const { error } = await supabase.from('blog_posts').delete().eq('id', id);
-      if (error) throw error;
-    },
+    mutationFn: (id) => adminApi.remove('blog_posts', id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-blog-posts'] }),
   });
 
