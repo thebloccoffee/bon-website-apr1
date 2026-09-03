@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /shop/success
+Disallow: /api/
+
+Sitemap: https://www.tabasjonbon.com/sitemap.xml

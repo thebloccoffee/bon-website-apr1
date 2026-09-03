@@ -3,18 +3,30 @@ import { useAuth } from '@/lib/AuthContext';
 import BlogPostEditor from '../components/admin/BlogPostEditor';
 import PortfolioEditor from '../components/admin/PortfolioEditor';
 import DestinationsEditor from '../components/admin/DestinationsEditor';
+import ShopEditor from '../components/admin/ShopEditor';
 
 const TABS = [
   { key: 'blog', label: 'Blog Posts' },
   { key: 'portfolio', label: 'Portfolio' },
   { key: 'destinations', label: 'Destinations' },
+  { key: 'shop', label: 'Shop' },
 ];
 
 export default function Admin() {
-  const { isAdmin, login, logout } = useAuth();
+  const { isAdmin, checking, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('blog');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // The session lives in an httpOnly cookie, so only the server can confirm it.
+  if (checking) {
+    return (
+      <div className="pt-28 pb-24 min-h-screen flex items-center justify-center">
+        <p className="font-serif text-muted-foreground text-sm">Checking session…</p>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (
@@ -25,10 +37,18 @@ export default function Admin() {
             <p className="font-serif text-muted-foreground mt-2 text-sm">Enter your password to continue.</p>
           </div>
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              const ok = login(password);
-              if (!ok) setError('Incorrect password.');
+              setSubmitting(true);
+              setError('');
+              try {
+                await login(password);
+              } catch (err) {
+                setError(err.message);
+              } finally {
+                setSubmitting(false);
+                setPassword('');
+              }
             }}
             className="space-y-6"
           >
@@ -42,9 +62,10 @@ export default function Admin() {
             {error && <p className="font-sans text-xs text-destructive">{error}</p>}
             <button
               type="submit"
-              className="font-sans text-xs tracking-[0.3em] uppercase border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-all duration-300"
+              disabled={submitting}
+              className="font-sans text-xs tracking-[0.3em] uppercase border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-all duration-300 disabled:opacity-40"
             >
-              Enter
+              {submitting ? 'Checking…' : 'Enter'}
             </button>
           </form>
         </div>
@@ -87,6 +108,7 @@ export default function Admin() {
         {activeTab === 'blog' && <BlogPostEditor />}
         {activeTab === 'portfolio' && <PortfolioEditor />}
         {activeTab === 'destinations' && <DestinationsEditor />}
+        {activeTab === 'shop' && <ShopEditor />}
       </div>
     </div>
   );

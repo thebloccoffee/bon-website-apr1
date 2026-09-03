@@ -13,6 +13,9 @@ const BlogPostPage = lazy(() => import('./pages/BlogPost'));
 const Portfolio = lazy(() => import('./pages/Portfolio'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Admin = lazy(() => import('./pages/Admin'));
+const Shop = lazy(() => import('./pages/Shop'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const PurchaseSuccess = lazy(() => import('./pages/PurchaseSuccess'));
 
 function App() {
   return (
@@ -25,6 +28,9 @@ function App() {
               <Route path="/journal" element={<Suspense fallback={null}><Journal /></Suspense>} />
               <Route path="/journal/:slug" element={<Suspense fallback={null}><BlogPostPage /></Suspense>} />
               <Route path="/portfolio" element={<Suspense fallback={null}><Portfolio /></Suspense>} />
+              <Route path="/shop" element={<Suspense fallback={null}><Shop /></Suspense>} />
+              <Route path="/shop/success" element={<Suspense fallback={null}><PurchaseSuccess /></Suspense>} />
+              <Route path="/shop/:slug" element={<Suspense fallback={null}><ProductDetail /></Suspense>} />
               <Route path="/contact" element={<Suspense fallback={null}><Contact /></Suspense>} />
               <Route path="/admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
             </Route>

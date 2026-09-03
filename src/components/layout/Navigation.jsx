@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/use-theme';
 const navLinks = [
   { label: 'Journal', path: '/journal' },
   { label: 'Works', path: '/portfolio' },
+  { label: 'Shop', path: '/shop' },
   { label: 'Inquiry', path: '/contact' },
 ];
 
