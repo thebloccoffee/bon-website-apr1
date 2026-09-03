@@ -1,8 +1,9 @@
 import React from 'react';
-import { buildCheckoutUrl } from '@/hooks/use-lemonsqueezy';
 
+// A Stripe Payment Link is just a URL, so checkout needs no SDK and no script
+// tag — the fastest possible path from click to a payment form.
 export default function BuyButton({ product, className = '', children }) {
-  const href = buildCheckoutUrl(product);
+  const href = product?.checkout_url;
 
   if (!href) {
     return (
@@ -15,7 +16,7 @@ export default function BuyButton({ product, className = '', children }) {
   return (
     <a
       href={href}
-      className={`lemonsqueezy-button inline-block font-sans text-xs tracking-[0.2em] uppercase bg-foreground text-background px-8 py-4 transition-opacity duration-300 hover:opacity-80 ${className}`}
+      className={`inline-block font-sans text-xs tracking-[0.2em] uppercase bg-foreground text-background px-8 py-4 transition-opacity duration-300 hover:opacity-80 ${className}`}
     >
       {children ?? `Buy — ${product.price_formatted ?? ''}`}
     </a>

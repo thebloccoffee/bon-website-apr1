@@ -18,14 +18,14 @@ create table if not exists shop_products (
   subtitle text,
   description text,
   category text default 'lut',           -- lut | preset | guide | bundle
-  price_formatted text,                   -- display only, e.g. "$29" — LS is the real price
+  price_formatted text,                   -- display only, e.g. "$29" — Stripe holds the real price
   cover_image text,
   gallery text[],
   before_image text,                      -- LUT/preset before-after slider
   after_image text,
   features text[],                        -- "12 .cube files", "Rec.709 + LOG", ...
-  ls_variant_id text,                     -- Lemon Squeezy variant id
-  ls_buy_url text,                        -- https://STORE.lemonsqueezy.com/buy/VARIANT_UUID
+  stripe_price_id text,                   -- price_1ABC... — what the webhook matches on
+  checkout_url text,                      -- https://buy.stripe.com/... (Payment Link)
   status text default 'published',
   "order" integer default 0
 );
@@ -43,21 +43,23 @@ create table if not exists shop_product_files (
 create table if not exists shop_orders (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz default now(),
-  ls_order_id text not null unique,       -- webhook data.id — dedupes retries
-  identifier text not null,               -- LS order uuid, used as the receipt key
-  order_number integer,
+  stripe_session_id text not null unique, -- cs_live_... — dedupes webhook retries
+  payment_intent text,                    -- pi_... — how refunds find the order
+  identifier text,                        -- spare bearer key, not currently used
+  order_number text,                      -- short human-readable code
   email text,
   name text,
   total_cents integer,
   currency text,
   status text,
-  variant_id text,
+  price_id text,
   product_id uuid references shop_products(id),
   test_mode boolean default false,
   raw jsonb
 );
 
-create index if not exists shop_orders_identifier_idx on shop_orders(identifier);
+create index if not exists shop_orders_session_idx on shop_orders(stripe_session_id);
+create index if not exists shop_orders_intent_idx  on shop_orders(payment_intent);
 
 create table if not exists shop_grants (
   id uuid primary key default gen_random_uuid(),
@@ -90,3 +92,33 @@ insert into storage.buckets (id, name, public)
 values ('shop-files', 'shop-files', false)
 on conflict (id) do update set public = false;
 -- No storage policies either: only the service role signs URLs for this bucket.
+
+-- ---------------------------------------------------------------------------
+-- Migration, only if you already ran an earlier Lemon Squeezy version of this
+-- file. Safe to run on a fresh database: every branch is guarded.
+-- ---------------------------------------------------------------------------
+
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+             where table_name='shop_products' and column_name='ls_variant_id') then
+    alter table shop_products rename column ls_variant_id to stripe_price_id;
+  end if;
+  if exists (select 1 from information_schema.columns
+             where table_name='shop_products' and column_name='ls_buy_url') then
+    alter table shop_products rename column ls_buy_url to checkout_url;
+  end if;
+  if exists (select 1 from information_schema.columns
+             where table_name='shop_orders' and column_name='ls_order_id') then
+    alter table shop_orders rename column ls_order_id to stripe_session_id;
+  end if;
+  if exists (select 1 from information_schema.columns
+             where table_name='shop_orders' and column_name='variant_id') then
+    alter table shop_orders rename column variant_id to price_id;
+  end if;
+
+  alter table shop_orders add column if not exists payment_intent text;
+  -- order_number was an LS integer; Stripe codes are alphanumeric.
+  alter table shop_orders alter column order_number type text using order_number::text;
+  alter table shop_orders alter column identifier drop not null;
+end $$;

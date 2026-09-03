@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/api/supabaseClient';
-import { useLemonSqueezy } from '@/hooks/use-lemonsqueezy';
 
 const CATEGORY_LABELS = {
   lut: 'LUTs',
@@ -14,7 +13,6 @@ const CATEGORY_LABELS = {
 
 export default function Shop() {
   const [activeCategory, setActiveCategory] = useState('all');
-  useLemonSqueezy();
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['shop-products'],

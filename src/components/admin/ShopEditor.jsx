@@ -8,7 +8,7 @@ import AdminField from './AdminField';
 const EMPTY = {
   title: '', slug: '', subtitle: '', description: '', category: 'lut',
   price_formatted: '', cover_image: '', gallery: [], before_image: '', after_image: '',
-  features: [], ls_variant_id: '', ls_buy_url: '', status: 'published', order: 0,
+  features: [], stripe_price_id: '', checkout_url: '', status: 'published', order: 0,
 };
 
 const CATEGORIES = [
@@ -128,7 +128,7 @@ export default function ShopEditor() {
   const WRITABLE = [
     'title', 'slug', 'subtitle', 'description', 'category', 'price_formatted',
     'cover_image', 'gallery', 'before_image', 'after_image', 'features',
-    'ls_variant_id', 'ls_buy_url', 'status',
+    'stripe_price_id', 'checkout_url', 'status',
   ];
 
   const save = useMutation({
@@ -235,13 +235,13 @@ export default function ShopEditor() {
 
         <div className="border border-border p-6 space-y-6">
           <p className="font-sans text-xs tracking-[0.15em] uppercase text-muted-foreground">
-            Lemon Squeezy — the real price lives there, not here
+            Stripe — the real price lives there, not here
           </p>
-          <AdminField label="Buy link">
-            <input className={inputClass} placeholder="https://yourstore.lemonsqueezy.com/buy/uuid" value={editing.ls_buy_url || ''} onChange={(e) => set('ls_buy_url', e.target.value)} />
+          <AdminField label="Payment Link URL">
+            <input className={inputClass} placeholder="https://buy.stripe.com/..." value={editing.checkout_url || ''} onChange={(e) => set('checkout_url', e.target.value)} />
           </AdminField>
-          <AdminField label="Variant ID">
-            <input className={inputClass} placeholder="123456" value={editing.ls_variant_id || ''} onChange={(e) => set('ls_variant_id', e.target.value)} />
+          <AdminField label="Price ID">
+            <input className={inputClass} placeholder="price_1ABC..." value={editing.stripe_price_id || ''} onChange={(e) => set('stripe_price_id', e.target.value)} />
           </AdminField>
         </div>
 
@@ -335,7 +335,7 @@ export default function ShopEditor() {
                 <p className="font-sans text-xs text-muted-foreground mt-1">
                   {p.price_formatted} · {p.category}
                   {p.status !== 'published' && ' · draft'}
-                  {!p.ls_buy_url && ' · no buy link'}
+                  {!p.checkout_url && ' · no buy link'}
                 </p>
               </div>
               <button onClick={() => { setEditing({ ...p }); setIsNew(false); }}>

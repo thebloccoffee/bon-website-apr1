@@ -4,13 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Check, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/api/supabaseClient';
-import { useLemonSqueezy } from '@/hooks/use-lemonsqueezy';
 import BuyButton from '@/components/shop/BuyButton';
 import BeforeAfter from '@/components/shop/BeforeAfter';
 
 export default function ProductDetail() {
   const { slug } = useParams();
-  useLemonSqueezy();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['shop-product', slug],

@@ -1,17 +1,18 @@
-// Success page lookup. The LS order `identifier` is a v4 UUID and acts as the
-// bearer for the receipt — the same model Lemon Squeezy uses for its own
-// receipt URLs. Download tokens are separate and independently revocable.
+// Success page lookup. Stripe's checkout session id (cs_live_...) is long and
+// unguessable, and Stripe itself puts it in the return URL — so it acts as the
+// bearer for the receipt. Download tokens are separate and independently
+// revocable, so leaking a receipt link does not hand over permanent access.
 
 import { db, json } from './_shop-lib.js';
 
 export const config = { runtime: 'edge' };
 
 export default async function handler(request) {
-  const identifier = new URL(request.url).searchParams.get('identifier');
-  if (!identifier || identifier.length < 20) return json({ error: 'Bad request' }, 400);
+  const sessionId = new URL(request.url).searchParams.get('session_id');
+  if (!sessionId || sessionId.length < 20) return json({ error: 'Bad request' }, 400);
 
   const rows = await db(
-    `shop_orders?identifier=eq.${encodeURIComponent(identifier)}` +
+    `shop_orders?stripe_session_id=eq.${encodeURIComponent(sessionId)}` +
       `&select=id,order_number,name,status,shop_products(title,slug,cover_image)`
   );
   const order = rows?.[0];

@@ -3,26 +3,27 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Download, Loader2 } from 'lucide-react';
 
-// The overlay closes before the webhook necessarily lands, so poll briefly
-// rather than showing an error the moment the order is not there yet.
+// Stripe redirects back the moment the payment succeeds, which can beat the
+// webhook that actually grants the downloads. Poll briefly rather than showing
+// an error the moment the order is not there yet.
 const POLL_MS = 1500;
 const MAX_POLLS = 20;
 
 export default function PurchaseSuccess() {
   const [params] = useSearchParams();
-  const identifier = params.get('order');
+  const sessionId = params.get('session_id');
   const [order, setOrder] = useState(null);
-  const [state, setState] = useState(identifier ? 'loading' : 'missing');
+  const [state, setState] = useState(sessionId ? 'loading' : 'missing');
 
   useEffect(() => {
-    if (!identifier) return;
+    if (!sessionId) return;
     let tries = 0;
     let cancelled = false;
 
     const poll = async () => {
       if (cancelled) return;
       try {
-        const res = await fetch(`/api/order?identifier=${encodeURIComponent(identifier)}`);
+        const res = await fetch(`/api/order?session_id=${encodeURIComponent(sessionId)}`);
         if (res.ok) {
           setOrder(await res.json());
           setState('ready');
@@ -46,7 +47,7 @@ export default function PurchaseSuccess() {
     return () => {
       cancelled = true;
     };
-  }, [identifier]);
+  }, [sessionId]);
 
   return (
     <div className="pt-40 pb-32 px-6 md:px-16">
