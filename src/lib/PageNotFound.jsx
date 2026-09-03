@@ -1,4 +1,16 @@
+import { useEffect } from 'react';
+
 export default function PageNotFound() {
+    // The SPA rewrite makes every unknown path return HTTP 200, so without this
+    // Google would happily index an unlimited number of soft-404s.
+    useEffect(() => {
+        const meta = document.createElement('meta');
+        meta.name = 'robots';
+        meta.content = 'noindex, nofollow';
+        document.head.appendChild(meta);
+        return () => meta.remove();
+    }, []);
+
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
             <div className="max-w-md w-full">
