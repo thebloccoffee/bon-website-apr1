@@ -11,10 +11,19 @@ const TABS = [
 ];
 
 export default function Admin() {
-  const { isAdmin, login, logout } = useAuth();
+  const { isAdmin, checking, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('blog');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  if (checking) {
+    return (
+      <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen flex items-center justify-center">
+        <p className="font-sans text-xs tracking-[0.3em] uppercase text-muted-foreground">Loading…</p>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (
@@ -25,10 +34,17 @@ export default function Admin() {
             <p className="font-serif text-muted-foreground mt-2 text-sm">Enter your password to continue.</p>
           </div>
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              const ok = login(password);
-              if (!ok) setError('Incorrect password.');
+              setSubmitting(true);
+              setError('');
+              const res = await login(password);
+              setSubmitting(false);
+              if (res.locked) {
+                setError(`Too many attempts. Try again in ${Math.ceil(res.retryAfterSec / 60)} minutes.`);
+              } else if (!res.ok) {
+                setError(res.error || 'Incorrect password.');
+              }
             }}
             className="space-y-6"
           >
@@ -42,9 +58,10 @@ export default function Admin() {
             {error && <p className="font-sans text-xs text-destructive">{error}</p>}
             <button
               type="submit"
-              className="font-sans text-xs tracking-[0.3em] uppercase border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-all duration-300"
+              disabled={submitting}
+              className="font-sans text-xs tracking-[0.3em] uppercase border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-all duration-300 disabled:opacity-50"
             >
-              Enter
+              {submitting ? 'Checking…' : 'Enter'}
             </button>
           </form>
         </div>

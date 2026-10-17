@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '@/api/supabaseClient';
+import { adminList, adminCreate, adminUpdate, adminDelete } from '@/api/adminApi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import ImageUploader from './ImageUploader';
@@ -56,11 +56,7 @@ export default function PortfolioEditor() {
   const { data: projects, isLoading } = useQuery({
     queryKey: ['admin-portfolio'],
     queryFn: async () => {
-      const { data } = await supabase
-        .from('portfolio_projects')
-        .select('*')
-        .order('order', { ascending: true });
-      return data || [];
+      return adminList('portfolio_projects', { column: 'order', ascending: true });
     },
     initialData: [],
   });
@@ -68,11 +64,9 @@ export default function PortfolioEditor() {
   const save = useMutation({
     mutationFn: async (data) => {
       if (isNew) {
-        const { error } = await supabase.from('portfolio_projects').insert(data);
-        if (error) throw error;
+        await adminCreate('portfolio_projects', data);
       } else {
-        const { error } = await supabase.from('portfolio_projects').update(data).eq('id', editing.id);
-        if (error) throw error;
+        await adminUpdate('portfolio_projects', editing.id, data);
       }
     },
     onSuccess: () => {
@@ -85,8 +79,7 @@ export default function PortfolioEditor() {
 
   const remove = useMutation({
     mutationFn: async (id) => {
-      const { error } = await supabase.from('portfolio_projects').delete().eq('id', id);
-      if (error) throw error;
+      await adminDelete('portfolio_projects', id);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-portfolio'] }),
   });
