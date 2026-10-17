@@ -69,7 +69,7 @@ export default function ImageUploader({ label, value, onChange, multiple = false
             )}
           </div>
         )}
-        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFiles(Array.from(e.target.files))} />
+        <input ref={inputRef} type="file" accept="image/*,video/*" className="hidden" onChange={(e) => handleFiles(Array.from(e.target.files))} />
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function ImageUploader({ label, value, onChange, multiple = false
           )}
         </div>
       </div>
-      <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFiles(Array.from(e.target.files))} />
+      <input ref={inputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={(e) => handleFiles(Array.from(e.target.files))} />
     </div>
   );
 }

@@ -8,7 +8,7 @@
  */
 import { requireAdmin, getServiceClient } from '../server-lib/adminAuth.js';
 
-const ALLOWED_EXT = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif']);
+const ALLOWED_EXT = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'mp4', 'mov', 'webm', 'm4v']);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
