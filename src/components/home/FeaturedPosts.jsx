@@ -14,7 +14,7 @@ function SectionLabel({ children }) {
   );
 }
 
-export default function FeaturedPosts({ posts }) {
+export default function FeaturedPosts({ posts, isLoading }) {
   const hasPosts = posts && posts.length > 0;
 
   return (
@@ -28,14 +28,31 @@ export default function FeaturedPosts({ posts }) {
         </h2>
         <SectionLabel>Recent dispatches</SectionLabel>
 
-        {/* Empty state — nothing published yet, or the fetch came back bare */}
-        {!hasPosts && (
-          <p className="border border-dashed border-tk-border rounded-tk-xs
-                        py-tk-8 px-tk-6 text-center
-                        font-sans text-tk-lg text-tk-text-tertiary">
-            No dispatches published yet. New entries land here first.
-          </p>
-        )}
+        {/* Skeleton loaders while posts are fetching — never flash the empty state */}
+        {isLoading ? (
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-tk-8 md:gap-12"
+            aria-hidden="true"
+          >
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-[3/2] rounded-tk-xs mb-tk-6 bg-tk-surface-raised" />
+                <div className="h-3 rounded w-24 mb-tk-3 bg-tk-surface-raised" />
+                <div className="h-6 rounded w-3/4 mb-tk-3 bg-tk-surface-raised" />
+                <div className="h-4 rounded w-full bg-tk-surface-raised" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Empty state — nothing published yet, or the fetch came back bare */}
+            {!hasPosts && (
+              <p className="border border-dashed border-tk-border rounded-tk-xs
+                            py-tk-8 px-tk-6 text-center
+                            font-sans text-tk-lg text-tk-text-tertiary">
+                No dispatches published yet. New entries land here first.
+              </p>
+            )}
 
         {hasPosts && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-tk-8 md:gap-12">
@@ -115,21 +132,23 @@ export default function FeaturedPosts({ posts }) {
           </div>
         )}
 
-        {/* View all */}
-        <div className="mt-tk-8 text-center">
-          <Link
-            to="/journal"
-            className="inline-block font-sans text-tk-md tracking-[0.25em] uppercase
-                       text-tk-text-secondary border-b border-tk-border
-                       px-tk-2 pb-tk-1 rounded-tk-xs
-                       transition-colors duration-fast
-                       hover:text-tk-text-primary active:text-tk-text-secondary
-                       focus-visible:outline-2 focus-visible:outline-tk-text-primary
-                       focus-visible:outline-offset-4"
-          >
-            View all entries
-          </Link>
-        </div>
+          {/* View all */}
+          <div className="mt-tk-8 text-center">
+            <Link
+              to="/journal"
+              className="inline-block font-sans text-tk-md tracking-[0.25em] uppercase
+                         text-tk-text-secondary border-b border-tk-border
+                         px-tk-2 pb-tk-1 rounded-tk-xs
+                         transition-colors duration-fast
+                         hover:text-tk-text-primary active:text-tk-text-secondary
+                         focus-visible:outline-2 focus-visible:outline-tk-text-primary
+                         focus-visible:outline-offset-4"
+            >
+              View all entries
+            </Link>
+          </div>
+          </>
+        )}
       </div>
     </section>
   );

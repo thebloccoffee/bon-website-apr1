@@ -1,8 +1,40 @@
 import nodemailer from 'nodemailer';
 
+// Best-effort in-memory rate limit (per serverless instance).
+// Keyed by client IP: max 5 submissions per 10 minutes.
+const hits = new Map();
+const WINDOW_MS = 10 * 60 * 1000;
+const MAX_HITS = 5;
+
+function isRateLimited(ip) {
+  if (!ip) return false;
+  const now = Date.now();
+  const times = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  times.push(now);
+  hits.set(ip, times);
+  // Trim the map so it can't grow forever
+  if (hits.size > 1000) {
+    const oldest = [...hits.entries()].sort((a, b) => a[1][0] - b[1][0])[0];
+    hits.delete(oldest[0]);
+  }
+  return times.length > MAX_HITS;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { name, email, project_type, location, when, message, website } = req.body || {};
+
+  // Honeypot: bots fill the hidden `website` field. Silently accept, send nothing.
+  if (website) {
+    return res.status(200).json({ ok: true });
+  }
+
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress;
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
   }
 
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
@@ -10,7 +42,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Email service not configured' });
   }
 
-  const { name, email, project_type, location, when, message } = req.body;
   if (!name || !email) {
     return res.status(400).json({ error: 'Name and email are required' });
   }

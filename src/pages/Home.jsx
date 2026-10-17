@@ -6,7 +6,7 @@ import FeaturedPosts from '../components/home/FeaturedPosts';
 import PortfolioPreview from '../components/home/PortfolioPreview';
 
 export default function Home() {
-  const { data: posts = [] } = useQuery({
+  const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ['blog-posts-featured'],
     queryFn: async () => {
       const { data } = await supabase
@@ -35,7 +35,7 @@ export default function Home() {
   return (
     <>
       <HeroSection />
-      <FeaturedPosts posts={posts} />
+      <FeaturedPosts posts={posts} isLoading={postsLoading} />
       <PortfolioPreview projects={projects} />
     </>
   );

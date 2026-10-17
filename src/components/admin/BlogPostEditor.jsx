@@ -36,7 +36,7 @@ export default function BlogPostEditor() {
 
   const WRITABLE_FIELDS = [
     'title', 'slug', 'excerpt', 'content', 'cover_image',
-    'gallery', 'gallery_captions', 'location', 'coordinates',
+    'gallery', 'gallery_captions', 'location', 'city', 'coordinates',
     'date_traveled', 'status', 'tags',
   ];
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import BlogPostEditor from '../components/admin/BlogPostEditor';
 import PortfolioEditor from '../components/admin/PortfolioEditor';
@@ -10,13 +10,54 @@ const TABS = [
   { key: 'destinations', label: 'Destinations' },
 ];
 
+function formatLockout(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(s / 60);
+  const rest = s % 60;
+  return `${m}:${String(rest).padStart(2, '0')}`;
+}
+
 export default function Admin() {
-  const { isAdmin, login, logout } = useAuth();
+  const { isAdmin, login, logout, lockoutRemainingMs } = useAuth();
   const [activeTab, setActiveTab] = useState('blog');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [lockedMs, setLockedMs] = useState(0);
+
+  // Pick up an existing lockout (e.g. after a page refresh)
+  useEffect(() => {
+    setLockedMs(lockoutRemainingMs());
+  }, [lockoutRemainingMs]);
+
+  // Tick the countdown while locked
+  useEffect(() => {
+    if (lockedMs <= 0) return undefined;
+    const id = setInterval(() => {
+      setLockedMs(lockoutRemainingMs());
+    }, 1000);
+    return () => clearInterval(id);
+  }, [lockedMs, lockoutRemainingMs]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const res = login(password);
+    if (res.ok) {
+      setError('');
+      setPassword('');
+      return;
+    }
+    if (res.locked) {
+      setLockedMs(res.remainingMs);
+      setError(`Too many failed attempts. Try again in ${formatLockout(res.remainingMs)}.`);
+    } else {
+      setError(
+        `Incorrect password.${res.attemptsLeft > 0 ? ` ${res.attemptsLeft} attempt${res.attemptsLeft === 1 ? '' : 's'} left before a 15-minute lockout.` : ''}`
+      );
+    }
+  };
 
   if (!isAdmin) {
+    const locked = lockedMs > 0;
     return (
       <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen flex items-center justify-center">
         <div className="w-full max-w-sm space-y-8">
@@ -24,25 +65,25 @@ export default function Admin() {
             <h1 className="font-sans text-3xl font-light tracking-[-0.02em]">Admin</h1>
             <p className="font-serif text-muted-foreground mt-2 text-sm">Enter your password to continue.</p>
           </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const ok = login(password);
-              if (!ok) setError('Incorrect password.');
-            }}
-            className="space-y-6"
-          >
+          <form onSubmit={handleLogin} className="space-y-6">
             <input
               type="password"
               value={password}
               onChange={(e) => { setPassword(e.target.value); setError(''); }}
               placeholder="Password"
-              className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm"
+              disabled={locked}
+              className="w-full bg-transparent border-b border-border focus:border-foreground outline-none py-2 font-sans text-sm disabled:opacity-40"
             />
             {error && <p className="font-sans text-xs text-destructive">{error}</p>}
+            {locked && (
+              <p className="font-sans text-xs text-muted-foreground">
+                Locked for {formatLockout(lockedMs)}.
+              </p>
+            )}
             <button
               type="submit"
-              className="font-sans text-xs tracking-[0.3em] uppercase border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-all duration-300"
+              disabled={locked}
+              className="font-sans text-xs tracking-[0.3em] uppercase border border-foreground px-8 py-3 hover:bg-foreground hover:text-background transition-all duration-300 disabled:opacity-40"
             >
               Enter
             </button>
