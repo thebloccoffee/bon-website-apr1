@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navigation from './Navigation';
 import SiteFooter from './SiteFooter';
+import CookieBanner from '../CookieBanner';
 
 export default function SiteLayout() {
   return (
@@ -11,6 +12,7 @@ export default function SiteLayout() {
         <Outlet />
       </main>
       <SiteFooter />
+      <CookieBanner />
     </div>
   );
 }

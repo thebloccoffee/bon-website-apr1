@@ -3,8 +3,13 @@ import { supabase } from '@/api/supabaseClient';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
+const RATE_LIMIT_KEY = 'inquiry_last_submit';
+const RATE_LIMIT_MS = 60 * 1000; // one submission per 60 seconds
+
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', project_type: '', location: '', when: '', message: '' });
+  // `website` is a honeypot: visually hidden from humans, but bots fill it.
+  // It is stripped out before saving to Supabase (no such column exists).
+  const [form, setForm] = useState({ name: '', email: '', project_type: '', location: '', when: '', message: '', website: '' });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -14,18 +19,43 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Honeypot tripwire — pretend it worked, send nothing.
+    if (form.website) {
+      setSubmitted(true);
+      return;
+    }
+
     if (!form.name || !form.email) {
       toast.error('Please fill in your name and email.');
       return;
     }
+
+    // Client-side rate limit: one submission per 60 seconds.
+    try {
+      const last = Number(localStorage.getItem(RATE_LIMIT_KEY) || 0);
+      if (Date.now() - last < RATE_LIMIT_MS) {
+        toast.error('Please wait a moment before sending another inquiry.');
+        return;
+      }
+    } catch {
+      // storage unavailable — continue without rate limiting
+    }
+
     setSubmitting(true);
     try {
-      await supabase.from('contact_inquiries').insert(form);
+      const { website, ...payload } = form;
+      await supabase.from('contact_inquiries').insert(payload);
       await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...payload, website: form.website }),
       });
+      try {
+        localStorage.setItem(RATE_LIMIT_KEY, String(Date.now()));
+      } catch {
+        // ignore
+      }
     } catch (err) {
       console.error(err);
     }
@@ -83,6 +113,7 @@ export default function Contact() {
                 value={form.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="your name"
+                autoComplete="name"
                 className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-48 md:w-64 pb-1"
               />
             </label>
@@ -135,7 +166,26 @@ export default function Contact() {
                 value={form.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="your@email.com"
+                autoComplete="email"
                 className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-48 md:w-72 pb-1"
+              />
+            </label>
+          </div>
+
+          {/* Honeypot — hidden from humans, bots fill it. */}
+          <div
+            aria-hidden="true"
+            style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
+          >
+            <label>
+              Website
+              <input
+                type="text"
+                name="website"
+                value={form.website}
+                onChange={(e) => handleChange('website', e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
               />
             </label>
           </div>
