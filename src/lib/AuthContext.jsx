@@ -1,112 +1,79 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
-const SESSION_KEY = 'admin_authed';
-const ATTEMPTS_KEY = 'admin_login_attempts';
-const LOCKOUT_KEY = 'admin_login_lockout_until';
-
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
-
-// NOTE ON SECURITY: the admin password is compared client-side against
-// import.meta.env.VITE_ADMIN_PASSWORD, which is baked into the public JS
-// bundle at build time. Anyone can read it from the shipped code, so this
-// gate is obfuscation, not authentication. The rate limiting below only
-// slows down guessing; it does not fix that. The real fix is a
-// server-side check (e.g. a /api/admin-login endpoint that sets an
-// httpOnly session cookie). Flagged for the site owner.
-
-function readAttempts() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '[]');
-    const now = Date.now();
-    return Array.isArray(raw) ? raw.filter((t) => now - t < LOCKOUT_MS) : [];
-  } catch {
-    return [];
-  }
-}
-
-function getLockoutRemainingMs() {
-  try {
-    const until = Number(localStorage.getItem(LOCKOUT_KEY) || 0);
-    return Math.max(0, until - Date.now());
-  } catch {
-    return 0;
-  }
-}
-
-function recordFailedAttempt() {
-  const attempts = readAttempts();
-  attempts.push(Date.now());
-  try {
-    localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(attempts));
-    if (attempts.length >= MAX_ATTEMPTS) {
-      localStorage.setItem(LOCKOUT_KEY, String(Date.now() + LOCKOUT_MS));
-    }
-  } catch {
-    // storage unavailable — fail open on tracking, the password gate still applies
-  }
-  return attempts.length;
-}
-
-function clearAttempts() {
-  try {
-    localStorage.removeItem(ATTEMPTS_KEY);
-    localStorage.removeItem(LOCKOUT_KEY);
-  } catch {
-    // ignore
-  }
-}
-
+/**
+ * Server-backed admin auth.
+ *
+ * The password is NEVER compared in the browser. login() POSTs to
+ * /api/admin-login, which verifies against the server-side ADMIN_PASSWORD
+ * env var and sets an httpOnly session cookie. isAdmin is restored on
+ * mount via /api/admin-check.
+ */
 export const AuthProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(() => {
-    try {
-      return sessionStorage.getItem(SESSION_KEY) === '1';
-    } catch {
-      return false;
-    }
-  });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [lockedUntil, setLockedUntil] = useState(0);
 
-  const lockoutRemainingMs = useCallback(() => getLockoutRemainingMs(), []);
-
-  const login = useCallback((password) => {
-    const remaining = getLockoutRemainingMs();
-    if (remaining > 0) {
-      return { ok: false, locked: true, remainingMs: remaining, attemptsLeft: 0 };
-    }
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-    if (password === adminPassword) {
-      clearAttempts();
+  useEffect(() => {
+    (async () => {
       try {
-        sessionStorage.setItem(SESSION_KEY, '1');
+        const res = await fetch('/api/admin-check', { credentials: 'include' });
+        const json = await res.json();
+        setIsAdmin(!!json.authenticated);
       } catch {
-        // ignore
+        // Fail closed: stay logged out if the check can't run.
       }
-      setIsAdmin(true);
-      return { ok: true, locked: false, remainingMs: 0, attemptsLeft: MAX_ATTEMPTS };
-    }
-    const count = recordFailedAttempt();
-    const lockedMs = getLockoutRemainingMs();
-    return {
-      ok: false,
-      locked: lockedMs > 0,
-      remainingMs: lockedMs,
-      attemptsLeft: Math.max(0, MAX_ATTEMPTS - count),
-    };
+      setChecking(false);
+    })();
   }, []);
 
-  const logout = () => {
+  const login = useCallback(
+    async (password) => {
+      if (Date.now() < lockedUntil) {
+        return {
+          ok: false,
+          locked: true,
+          retryAfterSec: Math.ceil((lockedUntil - Date.now()) / 1000),
+        };
+      }
+      try {
+        const res = await fetch('/api/admin-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ password }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (res.ok && json.ok) {
+          setIsAdmin(true);
+          setLockedUntil(0);
+          return { ok: true };
+        }
+        if (res.status === 429) {
+          const retry = json.retryAfterSec || 900;
+          setLockedUntil(Date.now() + retry * 1000);
+          return { ok: false, locked: true, retryAfterSec: retry };
+        }
+        return { ok: false, error: json.error || 'Incorrect password.' };
+      } catch {
+        return { ok: false, error: 'Login failed. Check your connection and try again.' };
+      }
+    },
+    [lockedUntil]
+  );
+
+  const logout = useCallback(async () => {
     try {
-      sessionStorage.removeItem(SESSION_KEY);
+      await fetch('/api/admin-logout', { method: 'POST', credentials: 'include' });
     } catch {
-      // ignore
+      // Ignore network errors on logout; clear local state regardless.
     }
     setIsAdmin(false);
-  };
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isAdmin, login, logout, lockoutRemainingMs }}>
+    <AuthContext.Provider value={{ isAdmin, checking, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
