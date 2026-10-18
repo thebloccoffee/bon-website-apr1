@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { shareToInstagramStory } from '../utils/shareStory';
 
 const XIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -31,7 +32,7 @@ const LinkIcon = () => (
   </svg>
 );
 
-export default function FloatingShareSidebar({ title }) {
+export default function FloatingShareSidebar({ title, image }) {
   const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -46,11 +47,12 @@ export default function FloatingShareSidebar({ title }) {
   const fb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
   const pin = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&description=${encodeURIComponent(title)}`;
 
-  const handleIG = () => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile && navigator.share) {
-      navigator.share({ title, url }).catch(() => {});
-    } else {
+  const handleIG = async () => {
+    // Shares the cover image as a file so Instagram opens the Story
+    // composer with it pre-loaded. Falls back to the text share, then
+    // to copy-link on desktop.
+    const result = await shareToInstagramStory({ imageUrl: image, title, url });
+    if (result === 'unsupported') {
       navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

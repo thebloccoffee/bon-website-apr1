@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link2, Check } from 'lucide-react';
+import { shareToInstagramStory } from '../utils/shareStory';
 
 const IGModal = ({ url, onClose }) => (
   <div
@@ -21,7 +22,7 @@ const IGModal = ({ url, onClose }) => (
       </svg>
       <h3 className="font-semibold text-sm mb-2">Share to Instagram Story</h3>
       <p className="text-xs text-white/50 mb-4 leading-relaxed">
-        Instagram doesn't support direct web sharing. Copy the link, open Instagram, create a Story, and add a <strong className="text-white/70">Link sticker</strong>.
+        Instagram doesn't support direct web sharing. Copy the link, open Instagram, create a Story, and add a <strong className="text-white/70">link sticker</strong> in Stories to link your article.
       </p>
       <div className="bg-black border border-white/10 rounded-lg px-3 py-2.5 text-xs text-white/40 break-all mb-4 select-all">{url}</div>
       <div className="flex gap-2 justify-center">
@@ -124,11 +125,12 @@ export default function ShareBar({ title, image }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleInstagram = () => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile && navigator.share) {
-      navigator.share({ title, url }).catch(() => {});
-    } else {
+  const handleInstagram = async () => {
+    // Shares the cover image as a file so Instagram opens the Story
+    // composer with it pre-loaded. Falls back to the text share, then
+    // to the copy-link modal on desktop.
+    const result = await shareToInstagramStory({ imageUrl: image, title, url });
+    if (result === 'unsupported') {
       setIgModal(true);
     }
   };
