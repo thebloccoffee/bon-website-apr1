@@ -2,6 +2,12 @@ import React, { useRef, useState } from 'react';
 import { adminUpload } from '@/api/adminApi';
 import { Upload, X, Loader2 } from 'lucide-react';
 
+// Case-insensitive check: does this URL point to a video file?
+function isVideo(url) {
+  if (!url) return false;
+  return /\.(mp4|mov|webm|m4v)(\?|$)/i.test(url);
+}
+
 export default function ImageUploader({ label, value, onChange, multiple = false }) {
   const inputRef = useRef();
   const [uploading, setUploading] = useState(false);
@@ -44,7 +50,11 @@ export default function ImageUploader({ label, value, onChange, multiple = false
         <p className="font-sans text-xs tracking-[0.15em] uppercase text-muted-foreground">{label}</p>
         {value ? (
           <div className="relative group aspect-[3/1] overflow-hidden bg-muted">
-            <img src={value} alt="" className="w-full h-full object-cover" />
+            {isVideo(value) ? (
+              <video src={value} controls className="w-full h-full object-cover" />
+            ) : (
+              <img src={value} alt="" className="w-full h-full object-cover" />
+            )}
             <button
               onClick={() => removeImage()}
               className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -80,7 +90,11 @@ export default function ImageUploader({ label, value, onChange, multiple = false
       <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
         {(value || []).map((url, i) => (
           <div key={i} className="relative group aspect-square overflow-hidden bg-muted">
-            <img src={url} alt="" className="w-full h-full object-cover" />
+            {isVideo(url) ? (
+              <video src={url} controls className="w-full h-full object-cover" />
+            ) : (
+              <img src={url} alt="" className="w-full h-full object-cover" />
+            )}
             <button
               onClick={() => removeImage(i)}
               className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
