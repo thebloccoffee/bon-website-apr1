@@ -69,7 +69,7 @@ export default function BlogPost() {
 
   return (
     <div className="pt-28 pb-24">
-      <FloatingShareSidebar title={post.title} />
+      <FloatingShareSidebar title={post.title} image={post.cover_image} />
 
       {/* Back link */}
       <div className="px-6 md:px-16 mb-10">
