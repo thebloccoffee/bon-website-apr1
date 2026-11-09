@@ -1,5 +1,7 @@
 # Shop setup
 
+> **Current setup (2026-11-08): checkout on Stan Store.** The site is the shop window: product pages live on tabasjonbon.com and the Buy button opens the product's Stan link (paste it in /admin → Products → Buy link). Stan handles payment, delivery, email capture and upsells. Nothing below needs setting up unless a product uses a Stripe Payment Link instead; the Stripe flow is built and tested but dormant.
+
 Products sell through Stripe Payment Links. Stripe takes the payment, then sends the buyer back to `/shop/thanks` on this site, where the files download from a private Supabase bucket.
 
 ## How an order flows

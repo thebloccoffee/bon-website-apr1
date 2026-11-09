@@ -5,6 +5,7 @@ import { Check, ArrowLeft } from 'lucide-react';
 import { getProduct } from '@/api/content';
 import Seo from '@/components/shared/Seo';
 import BuyButton from '@/components/shop/BuyButton';
+import { checkoutProvider } from '@/components/shop/checkoutProvider';
 import BeforeAfter from '@/components/shop/BeforeAfter';
 import Markdown from '@/components/shop/Markdown';
 import ProductFaq, { faqJsonLd } from '@/components/shop/ProductFaq';
@@ -23,6 +24,13 @@ function productJsonLd(product) {
       ? { offers: { '@type': 'Offer', price: amount.toFixed(2), priceCurrency: 'CAD', availability: 'https://schema.org/InStock' } }
       : {}),
   };
+}
+
+function checkoutNote(url) {
+  const p = url ? checkoutProvider(url) : null;
+  if (!p) return 'Instant download';
+  if (p.key === 'stripe') return 'Instant download · Secure checkout by Stripe · Taxes shown at checkout';
+  return `Instant download · Checkout and delivery by ${p.name}`;
 }
 
 export default function Product() {
@@ -109,7 +117,7 @@ export default function Product() {
             <div className="mt-tk-6">
               <BuyButton product={product} className="w-full sm:w-auto" />
               <p className="font-sans text-tk-xs tracking-[0.1em] uppercase text-muted-foreground mt-tk-4">
-                Instant download · Secure checkout by Stripe · Taxes shown at checkout
+                {checkoutNote(product.checkout_url)}
               </p>
             </div>
 

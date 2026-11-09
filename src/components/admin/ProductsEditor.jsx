@@ -374,12 +374,12 @@ export default function ProductsEditor() {
 
         <div className="border border-border p-6 space-y-6">
           <p className="font-sans text-xs tracking-[0.15em] uppercase text-muted-foreground">
-            Stripe. The real price lives there, so change it in both places.
+            Checkout. Paste the Stan Store product link (or a Gumroad / Stripe Payment Link). The real price lives there, so change it in both places.
           </p>
-          <AdminField label="Payment Link URL">
-            <input className={inputClass} placeholder="https://buy.stripe.com/..." value={editing.checkout_url || ''} onChange={(e) => set('checkout_url', e.target.value)} />
+          <AdminField label="Buy link (Stan, Gumroad or Stripe)">
+            <input className={inputClass} placeholder="https://stan.store/..." value={editing.checkout_url || ''} onChange={(e) => set('checkout_url', e.target.value)} />
           </AdminField>
-          <AdminField label="Price ID (what the webhook matches)">
+          <AdminField label="Stripe Price ID (only for Stripe links; leave empty for Stan)">
             <input className={inputClass} placeholder="price_1ABC..." value={editing.stripe_price_id || ''} onChange={(e) => set('stripe_price_id', e.target.value)} />
           </AdminField>
         </div>
