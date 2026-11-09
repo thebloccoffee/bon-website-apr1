@@ -3,19 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, Search } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
+import { STORIES_PATHS } from '@/components/shared/StoriesTabs';
 import { useHasProducts, withoutShop } from '@/hooks/use-has-products';
 
 // jooonbon is the main site. bon.points has its own header (BonpointsHeader.jsx).
 const allNavLinks = [
   { label: 'Work', path: '/portfolio' },
-  { label: 'Films', path: '/videos' },
-  { label: 'Destinations', path: '/travel' },
-  { label: 'Journal', path: '/journal' },
+  { label: 'Stories', path: '/stories', also: STORIES_PATHS },
   { label: 'Shop', path: '/shop' },
   { label: 'About', path: '/about' },
 ];
 
-const isActive = (pathname, path) => pathname === path || pathname.startsWith(`${path}/`);
+const isActive = (pathname, path, also = [path]) =>
+  [path, ...also].some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,8 +67,8 @@ export default function Navigation() {
               <Link
                 key={link.path}
                 to={link.path}
-                aria-current={isActive(location.pathname, link.path) ? 'page' : undefined}
-                className={`font-sans text-xs transition-all duration-300 hover:opacity-60 tracking-[0.2em] uppercase ${linkColor} ${isActive(location.pathname, link.path) ? 'opacity-60' : ''}`}
+                aria-current={isActive(location.pathname, link.path, link.also) ? 'page' : undefined}
+                className={`font-sans text-xs transition-all duration-300 hover:opacity-60 tracking-[0.2em] uppercase ${linkColor} ${isActive(location.pathname, link.path, link.also) ? 'opacity-60' : ''}`}
               >
                 {link.label}
               </Link>

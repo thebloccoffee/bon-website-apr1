@@ -19,6 +19,7 @@ const BonpointsVideos = lazy(() => import('./pages/BonpointsVideos'));
 const Destinations = lazy(() => import('./pages/Destinations'));
 const TravelDestination = lazy(() => import('./pages/TravelDestination'));
 const Videos = lazy(() => import('./pages/Videos'));
+const Stories = lazy(() => import('./pages/Stories'));
 const Shop = lazy(() => import('./pages/Shop'));
 const Product = lazy(() => import('./pages/Product'));
 const ShopThanks = lazy(() => import('./pages/ShopThanks'));
@@ -42,6 +43,7 @@ const routes = [
   ['/journal', Journal],
   ['/journal/:slug', BlogPostPage],
   ['/videos', Videos],
+  ['/stories', Stories],
   ['/shop', Shop],
   ['/shop/thanks', ShopThanks],
   ['/shop/:slug', Product],

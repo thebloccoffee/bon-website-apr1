@@ -53,6 +53,11 @@ export const STATIC_ROUTES = {
     description: 'Travel stories and guides by Jon Bon Tabas.',
     sitemap: { priority: '0.9', changefreq: 'weekly' },
   },
+  '/stories': {
+    title: 'Stories',
+    description: 'Travel films, journal posts and destinations by Jon Bon Tabas.',
+    sitemap: { priority: '0.9', changefreq: 'weekly' },
+  },
   '/videos': {
     title: 'Films',
     description: 'Travel films and shorts by jooonbon, Jon Bon Tabas.',
