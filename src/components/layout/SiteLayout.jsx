@@ -6,11 +6,14 @@ import BonpointsHeader from './BonpointsHeader';
 import BonpointsFooter from './BonpointsFooter';
 import CookieBanner from '../CookieBanner';
 import { RouteSeo } from '../shared/Seo';
+import { findPlace } from '@/lib/places';
 
 // jooonbon is the main site. Everything under /bonpoints gets bon.points'
 // own header, footer and colour scope.
 export default function SiteLayout() {
   const { pathname, hash } = useLocation();
+  const travelSlug = pathname.match(/^\/travel\/([^/]+)\/?$/i)?.[1];
+  const isMonitor = pathname === '/' || Boolean(travelSlug && findPlace(decodeURIComponent(travelSlug)));
   const isBonpoints = pathname.toLowerCase() === '/bonpoints' || pathname.toLowerCase().startsWith('/bonpoints/');
 
   // Support links like /bonpoints#newsletter after client-side navigation.
@@ -37,7 +40,7 @@ export default function SiteLayout() {
   return (
     <div className="min-h-screen bg-background">
       <RouteSeo />
-      <Navigation />
+      {!isMonitor && <Navigation />}
       <main>
         <Outlet />
       </main>

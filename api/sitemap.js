@@ -3,6 +3,7 @@
 // without a redeploy. Anon key: RLS returns published rows only.
 import { STATIC_ROUTES, canonicalUrl } from '../src/lib/seo-routes.js';
 import { supabaseSelectColumns, escapeXml, CACHE_CONTROL } from '../server-lib/seo.js';
+import { allPlaceRoutes } from '../src/lib/places.js';
 
 function day(value) {
   if (!value) return null;
@@ -58,9 +59,14 @@ export async function buildSitemap() {
     ...products.map((p) =>
       entry({ path: `/shop/${encodeURIComponent(p.slug)}`, lastmod: day(p.updated_at || p.created_at), changefreq: 'monthly', priority: '0.7' })
     ),
-    ...destinations.map((d) =>
-      entry({ path: `/travel/${encodeURIComponent(d.slug)}`, lastmod: day(d.updated_at || d.created_at), changefreq: 'monthly', priority: '0.6' })
+    ...allPlaceRoutes().map((p) =>
+      entry({ path: `/travel/${encodeURIComponent(p.slug)}`, lastmod: sectionLastmod['/'], changefreq: 'weekly', priority: p.kind === 'country' ? '0.7' : '0.6' })
     ),
+    ...destinations
+      .filter((d) => !allPlaceRoutes().some((p) => p.slug === d.slug))
+      .map((d) =>
+        entry({ path: `/travel/${encodeURIComponent(d.slug)}`, lastmod: day(d.updated_at || d.created_at), changefreq: 'monthly', priority: '0.6' })
+      ),
   ];
 
   return `<?xml version="1.0" encoding="UTF-8"?>

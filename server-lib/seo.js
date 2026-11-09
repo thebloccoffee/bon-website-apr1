@@ -17,6 +17,7 @@ import {
   matchRoute,
 } from '../src/lib/seo-routes.js';
 import { BRANDS } from '../src/lib/brands.js';
+import { findPlace, countryOf } from '../src/lib/places.js';
 
 // Public values, same as src/api/supabaseClient.js. The anon key is public by
 // design (RLS limits it to published rows).
@@ -346,6 +347,24 @@ async function productSeo(path, slug, section) {
 }
 
 async function destinationSeo(path, slug, section) {
+  const place = findPlace(slug);
+  if (place) {
+    const country = place.kind === 'city' ? countryOf(place.country) : null;
+    const canonical = canonicalUrl(`/travel/${place.slug}`);
+    const out = baseMeta(path, {
+      title: `${place.name}: films and travel notes`,
+      description: `Travel films, shorts and notes from ${place.name}${country ? `, ${country.name}` : ''} by ${PERSON_NAME}.`,
+    });
+    out.canonical = canonical;
+    out.jsonLd = [
+      breadcrumbs([
+        ['Home', SITE_URL],
+        ...(country ? [[country.name, canonicalUrl(`/travel/${country.slug}`)]] : []),
+        [place.name, canonical],
+      ]),
+    ];
+    return out;
+  }
   const { ok, rows } = await supabaseSelect('destinations', {
     select: '*',
     slug: `eq.${slug}`,

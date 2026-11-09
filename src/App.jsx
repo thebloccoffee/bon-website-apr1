@@ -7,7 +7,8 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
 import SiteLayout from './components/layout/SiteLayout';
 
-const Home = lazy(() => import('./pages/Home'));
+const Home = lazy(() => import('./pages/MonitorHome'));
+const TravelSlug = lazy(() => import('./pages/TravelSlug'));
 const Journal = lazy(() => import('./pages/Journal'));
 const BlogPostPage = lazy(() => import('./pages/BlogPost'));
 const Portfolio = lazy(() => import('./pages/Portfolio'));
@@ -39,7 +40,7 @@ const routes = [
   ['/bonpoints/guides/:slug', BlogPostPage],
   ['/bonpoints/videos', BonpointsVideos],
   ['/travel', Destinations],
-  ['/travel/:slug', TravelDestination],
+  ['/travel/:slug', TravelSlug],
   ['/journal', Journal],
   ['/journal/:slug', BlogPostPage],
   ['/videos', Videos],
