@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { BRANDS } from '@/lib/brands';
 import { PostGrid } from '@/components/shared/PostCard';
@@ -54,68 +54,40 @@ export function BpButton({ to, href, children, glass = false, className = '' }) 
   );
 }
 
-/* ── Hero: rim-lit silhouette behind the glass lockup ─────────── */
+/* ── Hero: one screen, glass lockup, one line, two buttons ──── */
 export function BpHero() {
-  const ref = useRef(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-  const glow = useTransform(scrollYProgress, [0, 0.5], [1, reduce ? 1 : 0.45]);
-  const lift = useTransform(scrollYProgress, [0, 0.5], [0, reduce ? 0 : -60]);
-
   return (
-    <section ref={ref} className="relative h-[200vh] bg-[var(--bp-ink)]">
-      <div className="sticky top-0 h-screen overflow-hidden" aria-hidden="true">
-        <motion.div
-          style={{ opacity: glow }}
-          className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_42%,rgb(238_236_232/0.30),rgb(238_236_232/0.06)_45%,transparent_70%)]"
-        />
-        <motion.div style={{ y: lift }} className="absolute inset-x-0 bottom-0 flex flex-col items-center">
-          <div className="w-[clamp(9rem,22vw,15rem)] aspect-[4/5] rounded-[50%] bg-[var(--bp-ink)] shadow-[0_-18px_60px_-20px_rgb(238_236_232/0.35)] translate-y-[8%]" />
-          <div className="w-[clamp(22rem,52vw,40rem)] h-[38vh] rounded-t-[50%_60%] bg-[var(--bp-ink)] shadow-[0_-18px_70px_-24px_rgb(238_236_232/0.30)]" />
-        </motion.div>
-      </div>
-
-      <div className="absolute inset-0 flex flex-col">
-        <div className="h-screen flex flex-col items-center justify-center text-center px-tk-6 pb-[12vh]">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, filter: 'blur(12px)' }}
-            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-            transition={{ duration: 1.4, ease: EXPO }}
-            className="bp-glass rounded-full px-[clamp(1.5rem,4vw,3rem)] py-[clamp(1rem,2.6vw,2rem)]"
-          >
-            <h1 className="sr-only">bon.points</h1>
-            <img src="/brands/bonpoints/lockup-bone.svg" alt="" className="h-[clamp(2.25rem,6vw,4.5rem)] w-auto" />
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ delay: 0.5, duration: 1, ease: EXPO }}
-            className="mt-tk-8 font-sans text-xl md:text-2xl font-medium text-[var(--bp-bone)]"
-          >
-            {BP_HERO.line}
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 1 }}
-            className={`${label} mt-tk-4`}
-          >
-            {BP_HERO.eyebrow}
-          </motion.p>
-        </div>
-
-        <div className="h-screen flex items-center justify-center text-center px-tk-6">
-          <motion.div {...focusIn} viewport={{ amount: 0.6 }} className="max-w-4xl">
-            <p className="font-sans font-semibold tracking-[-0.03em] leading-[1.08] text-[var(--bp-bone)] text-[clamp(2rem,5.2vw,4.75rem)]">
-              {BP_HERO.statement}
-            </p>
-            <div className="mt-10 flex flex-wrap justify-center gap-tk-4">
-              <BpButton href={BRANDS.bonpoints.youtube}>Watch on YouTube</BpButton>
-              <BpButton href="#newsletter" glass>Get the newsletter</BpButton>
-            </div>
-          </motion.div>
-        </div>
-      </div>
+    <section className="relative min-h-[100svh] flex flex-col items-center justify-center text-center px-tk-6 bg-[var(--bp-ink)] overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_50%_45%_at_50%_45%,rgb(238_236_232/0.18),transparent_70%)]"
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, filter: 'blur(12px)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        transition={{ duration: 1.2, ease: EXPO }}
+        className="relative bp-glass rounded-full px-[clamp(1.5rem,4vw,3rem)] py-[clamp(1rem,2.6vw,2rem)]"
+      >
+        <h1 className="sr-only">bon.points</h1>
+        <img src="/brands/bonpoints/lockup-bone.svg" alt="" className="h-[clamp(2.25rem,6vw,4.5rem)] w-auto" />
+      </motion.div>
+      <motion.p
+        initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ delay: 0.4, duration: 1, ease: EXPO }}
+        className="relative mt-tk-8 font-sans text-xl md:text-2xl font-medium text-[var(--bp-bone)]"
+      >
+        {BP_HERO.line}
+      </motion.p>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.8 }}
+        className="relative mt-10 flex flex-wrap justify-center gap-tk-4"
+      >
+        <BpButton href={BRANDS.bonpoints.youtube}>Watch on YouTube</BpButton>
+        <BpButton href="#newsletter" glass>Get the newsletter</BpButton>
+      </motion.div>
     </section>
   );
 }
