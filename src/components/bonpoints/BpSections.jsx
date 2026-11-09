@@ -6,7 +6,7 @@ import { BRANDS } from '@/lib/brands';
 import { PostGrid } from '@/components/shared/PostCard';
 import Disclosure from '@/components/shared/Disclosure';
 import NewsletterForm from '@/components/shared/NewsletterForm';
-import { BP_HERO, BP_TOPICS, BP_PILLARS, BP_NEWSLETTER } from './content';
+import { BP_TOPICS, BP_PILLARS, BP_NEWSLETTER } from './content';
 
 // bon.points v2 motion: "come into focus" = 24px up + blur 12 → 0, expo out.
 const EXPO = [0.16, 1, 0.3, 1];
@@ -54,36 +54,20 @@ export function BpButton({ to, href, children, glass = false, className = '' }) 
   );
 }
 
-/* ── Hero: one screen, glass lockup, one line, two buttons ──── */
+/* ── Hero: glow + two buttons (logo and intro line removed for now) ── */
 export function BpHero() {
   return (
-    <section className="relative min-h-[100svh] flex flex-col items-center justify-center text-center px-tk-6 bg-[var(--bp-ink)] overflow-hidden">
+    <section className="relative min-h-[70svh] pt-[104px] flex flex-col items-center justify-center text-center px-tk-6 bg-[var(--bp-ink)] overflow-hidden">
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(ellipse_50%_45%_at_50%_45%,rgb(238_236_232/0.18),transparent_70%)]"
       />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, filter: 'blur(12px)' }}
-        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-        transition={{ duration: 1.2, ease: EXPO }}
-        className="relative bp-glass rounded-full px-[clamp(1.5rem,4vw,3rem)] py-[clamp(1rem,2.6vw,2rem)]"
-      >
-        <h1 className="sr-only">bon.points</h1>
-        <img src="/brands/bonpoints/lockup-bone.svg" alt="" className="h-[clamp(2.25rem,6vw,4.5rem)] w-auto" />
-      </motion.div>
-      <motion.p
-        initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        transition={{ delay: 0.4, duration: 1, ease: EXPO }}
-        className="relative mt-tk-8 font-sans text-xl md:text-2xl font-medium text-[var(--bp-bone)]"
-      >
-        {BP_HERO.line}
-      </motion.p>
+      <h1 className="sr-only">bon.points</h1>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.8 }}
-        className="relative mt-10 flex flex-wrap justify-center gap-tk-4"
+        transition={{ delay: 0.2, duration: 0.8 }}
+        className="relative flex flex-wrap justify-center gap-tk-4"
       >
         <BpButton href={BRANDS.bonpoints.youtube}>Watch on YouTube</BpButton>
         <BpButton href="#newsletter" glass>Get the newsletter</BpButton>
