@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import Navigation from './Navigation';
+import MonitorHeader from '../monitor/MonitorHeader';
+import '../monitor/monitor.css';
 import SiteFooter from './SiteFooter';
 import BonpointsHeader from './BonpointsHeader';
 import BonpointsFooter from './BonpointsFooter';
@@ -38,9 +39,15 @@ export default function SiteLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="jb min-h-screen bg-background text-foreground">
       <RouteSeo />
-      {!isMonitor && <Navigation />}
+      {/* Same camera-monitor header everywhere on jooonbon. The map pages
+          place it in their own layout; every other page gets it pinned on top. */}
+      {!isMonitor && (
+        <div className="monitor fixed top-0 inset-x-0 z-50 px-4 md:px-6 pt-4 pb-3 border-b" style={{ borderColor: 'var(--m-line)' }}>
+          <MonitorHeader />
+        </div>
+      )}
       <main>
         <Outlet />
       </main>
