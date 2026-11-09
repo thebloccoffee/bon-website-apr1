@@ -1,10 +1,21 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import BrandPage from '@/components/home/BrandPage';
 
-// STUB from phase-2/foundation. Owner: Agent A. Replace the body; keep the default export name.
 export default function Jooonbon() {
   return (
-    <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen max-w-5xl mx-auto">
-      <h1 className="font-sans text-3xl font-light tracking-[-0.02em]">jooonbon</h1>
-    </div>
+    <BrandPage
+      brand="jooonbon"
+      title={<span className="font-sans font-light tracking-[-0.02em]">jooonbon</span>}
+      intro={
+        <>
+          <p>I recreate famous movie scenes in the places they were filmed, then share them as reels and longer YouTube videos.</p>
+          <p className="text-tk-xl">
+            Client films and past work are in the{' '}
+            <Link to="/portfolio" className="underline underline-offset-4 hover:text-tk-text-primary">portfolio</Link>.
+          </p>
+        </>
+      }
+    />
   );
 }
