@@ -3,19 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Home page head. api/page.js swaps everything between the seo markers per route.
+         Generated from server-lib/seo.js renderHead(staticSeo('/')); tests/seo.test.mjs fails if it drifts. -->
+    <!-- seo:start -->
     <title>Jon Bon Tabas</title>
-    <meta name="description" content="Travel narratives and cinematic storytelling by Jon Bon Tabas." />
+    <meta name="description" content="Jon Bon Tabas is a Filipino-Canadian creator based in Vancouver. He makes travel films as jooonbon and covers credit cards, points and travel tips as bon.points." />
+    <link rel="canonical" href="https://www.tabasjonbon.com" />
+    <meta property="og:site_name" content="Jon Bon Tabas" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Jon Bon Tabas" />
+    <meta property="og:description" content="Jon Bon Tabas is a Filipino-Canadian creator based in Vancouver. He makes travel films as jooonbon and covers credit cards, points and travel tips as bon.points." />
+    <meta property="og:url" content="https://www.tabasjonbon.com" />
+    <meta property="og:image" content="https://www.tabasjonbon.com/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Jon Bon Tabas" />
+    <meta name="twitter:description" content="Jon Bon Tabas is a Filipino-Canadian creator based in Vancouver. He makes travel films as jooonbon and covers credit cards, points and travel tips as bon.points." />
+    <meta name="twitter:image" content="https://www.tabasjonbon.com/og-image.png" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://www.tabasjonbon.com/#person","name":"Jon Bon Tabas","url":"https://www.tabasjonbon.com","image":"https://www.tabasjonbon.com/og-image.png","description":"Jon Bon Tabas is a Filipino-Canadian creator based in Vancouver. He makes travel films as jooonbon and covers credit cards, points and travel tips as bon.points.","homeLocation":{"@type":"Place","name":"Vancouver, British Columbia, Canada"},"sameAs":["https://instagram.com/jooonbon","https://youtube.com/jonbontabas","https://instagram.com/bonpoints","https://youtube.com/@bonpoints"]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://www.tabasjonbon.com/#website","name":"Jon Bon Tabas","url":"https://www.tabasjonbon.com","publisher":{"@id":"https://www.tabasjonbon.com/#person"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://www.tabasjonbon.com/search?q={search_term_string}"},"query-input":"required name=search_term_string"}}</script>
+    <!-- seo:end -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#ffffff" />
-    <meta property="og:site_name" content="Jon Bon Tabas" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Jon Bon Tabas" />
-    <meta property="og:description" content="Travel narratives and cinematic storytelling." />
-    <meta property="og:image" content="/og-image.png" />
     <link rel="preload" as="image" href="/hero.jpg" />
   </head>
   <body>

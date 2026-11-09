@@ -1,6 +1,10 @@
+import Seo from '@/components/shared/Seo';
+
 export default function PageNotFound() {
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+            {/* Unknown paths already get a 404 from api/page.js; this covers in-app navigation. */}
+            <Seo title="Page not found" description="This page does not exist." noindex />
             <div className="max-w-md w-full">
                 <div className="text-center space-y-6">
                     <div className="space-y-2">
