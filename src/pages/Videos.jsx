@@ -5,6 +5,7 @@ import { getVideos } from '@/api/content';
 import { BRANDS, BRAND_KEYS } from '@/lib/brands';
 import VideoCard from '@/components/shared/VideoCard';
 import Seo from '@/components/shared/Seo';
+import StoriesTabs from '@/components/shared/StoriesTabs';
 
 const FORMATS = [
   { key: 'long', label: 'Videos' },
@@ -83,6 +84,7 @@ export default function Videos({ lockedBrand = 'jooonbon' }) {
   return (
     <div className="pt-28 pb-24 min-h-screen" data-brand={brand === 'bonpoints' ? 'bonpoints' : undefined}>
       <Seo title={copy.title} description={copy.seo} />
+      {!lockedBrand || lockedBrand === 'jooonbon' ? <StoriesTabs /> : null}
 
       <header className="px-6 md:px-16 mb-10 md:mb-14">
         <p className="font-sans text-tk-xs uppercase tracking-[0.3em] text-muted-foreground mb-tk-4">{copy.eyebrow}</p>

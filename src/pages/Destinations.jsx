@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getDestinations } from '@/api/content';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import StoriesTabs from '@/components/shared/StoriesTabs';
 
 export default function Destinations() {
   const [activeContinent, setActiveContinent] = useState('All');
@@ -28,6 +29,7 @@ export default function Destinations() {
 
   return (
     <div className="pt-28 pb-24">
+      <StoriesTabs />
 
       {/* PAGE HEADER */}
       <div className="px-6 md:px-16 mb-20">

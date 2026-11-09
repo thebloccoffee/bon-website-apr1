@@ -4,6 +4,7 @@ import { fetchPosts } from '@/components/home/postsQuery';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
+import StoriesTabs from '@/components/shared/StoriesTabs';
 
 // Map location names → continent
 const CONTINENT_MAP = {
@@ -113,7 +114,6 @@ export default function Journal() {
   const clearFilter = () => {
     setActiveDestination(null);
     setActiveContinent('All');
-    setActiveBrand('all');
   };
 
   const pillCls = (active) =>
@@ -125,6 +125,7 @@ export default function Journal() {
 
   return (
     <div className="pt-28 pb-24">
+      <StoriesTabs />
 
       {/* PAGE HEADER */}
       <div className="px-6 md:px-16 mb-16">

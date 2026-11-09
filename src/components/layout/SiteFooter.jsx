@@ -6,9 +6,10 @@ import NewsletterForm from '@/components/shared/NewsletterForm';
 
 const allSiteLinks = [
   { label: 'Work', to: '/portfolio' },
+  { label: 'Stories', to: '/stories' },
   { label: 'Films', to: '/videos' },
-  { label: 'Destinations', to: '/travel' },
   { label: 'Journal', to: '/journal' },
+  { label: 'Destinations', to: '/travel' },
   { label: 'Shop', to: '/shop' },
   { label: 'About', to: '/about' },
   { label: 'Book me', to: '/contact' },
