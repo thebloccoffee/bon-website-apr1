@@ -53,18 +53,12 @@ export const LABELS = {
   philippines: [842, 238], thailand: [728, 244],
 };
 
-// Trips in the order they happened, shown as clips on the homepage timeline.
-// Colours follow DaVinci Resolve clip colours.
-export const TRIPS = [
-  { label: 'NYC', to: 'new-york', when: 'Jan 2025', color: '#3E63B4', ink: '#F4F1EA' },
-  { label: 'Da Nang', to: 'da-nang', when: 'Apr 2025', color: '#2EA39B' },
-  { label: 'China', to: 'zhangjiajie', when: 'May 2025', color: '#E8822E' },
-  { label: 'Thailand', to: 'bangkok', when: 'Aug 2025', color: '#E6C243' },
-  { label: 'Hanoi', to: 'hanoi', when: 'New Year', color: '#8F6FD1', ink: '#F4F1EA' },
-  { label: 'Canada w/ parents', to: 'canada', when: 'Feb 2026', color: '#8E9B3C' },
-  { label: 'Rocky Mountaineer', to: 'banff', when: 'Apr 2026', color: '#B49A72' },
-  { label: 'Saigon', to: 'saigon', when: 'In the edit', status: 'edit' },
-];
+// Timeline clip colour per country (DaVinci Resolve clip colours).
+export const COUNTRY_COLORS = {
+  canada: ['#8E9B3C', '#111'], usa: ['#3E63B4', '#F4F1EA'], vietnam: ['#8F6FD1', '#F4F1EA'],
+  china: ['#E8822E', '#111'], philippines: ['#2EA39B', '#111'], thailand: ['#E6C243', '#111'],
+  indonesia: ['#B49A72', '#111'], 'south-korea': ['#C9567F', '#F4F1EA'], taiwan: ['#5B8DB8', '#111'], japan: ['#D9D2C3', '#111'],
+};
 
 // Equal Earth projection fitted to public/world-map.json (1000 x 520 viewBox).
 const SCALE = 184.48932215280678;

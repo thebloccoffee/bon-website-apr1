@@ -75,6 +75,10 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
   color: var(--m-dim); border: 1px dashed var(--m-line-2);
 }
 
+/* focus brackets glide from pin to pin */
+.m-focus { transition: left 0.28s cubic-bezier(0.22, 1, 0.36, 1), top 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+.m-zoom.is-dragging .m-focus { transition: none; }
+
 /* gestures */
 .m-zoom.is-dragging { transition: none; }
 .m-map .land.tappable { cursor: pointer; }
