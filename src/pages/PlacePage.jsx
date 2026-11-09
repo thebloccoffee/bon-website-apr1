@@ -88,7 +88,7 @@ export default function PlacePage({ place }) {
             </dl>
           </div>
           <figure className="relative flex-[1_1_300px] max-w-[440px] m-0 border overflow-hidden" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)' }}>
-            <WorldMap focus={focusCity} counts={countryCounts} zoom={zoom} center={center} showLabels={false} />
+            <WorldMap focus={focusCity} counts={countryCounts} view={center ? { k: zoom, cx: center[0], cy: center[1] } : undefined} showLabels={false} />
             <span aria-hidden="true" className="absolute pointer-events-none" style={{ inset: 8 }}>
               <span className="m-br tl" /><span className="m-br tr" /><span className="m-br bl" /><span className="m-br brr" />
             </span>
