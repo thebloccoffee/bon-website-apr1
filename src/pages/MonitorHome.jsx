@@ -6,6 +6,7 @@ import { useMapContent } from '@/components/monitor/useMapContent';
 import FocusCard from '@/components/monitor/FocusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { COUNTRIES, PLACES, COUNTRY_COLORS, MAP_W, MAP_H, findPlace, itemsFor, countryOf, citiesIn, project } from '@/lib/places';
+import MapLegend, { CoachMarks } from '@/components/monitor/MapLegend';
 import '@/components/monitor/monitor.css';
 
 const MAP_ASPECT = MAP_W / MAP_H;
@@ -115,7 +116,26 @@ export default function MonitorHome() {
     <div className="monitor md:min-h-screen flex flex-col gap-3 px-4 md:px-6 pt-4 pb-5">
       <MonitorHeader />
 
-      <h1 className="sr-only">jooonbon: every place Jon Bon Tabas has filmed, on one map</h1>
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+        <div className="min-w-0">
+          <h1 className="font-semibold tracking-tight leading-tight" style={{ fontSize: 'clamp(18px, 2.4vw, 26px)' }}>
+            Travel films by Jon Bon Tabas. Every place I've filmed, on one map.
+          </h1>
+          <p className="m-mono mt-1" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--m-dim)' }}>
+            PICK A PIN OR A COUNTRY TO SEE ITS FILMS, STORIES AND GUIDES
+          </p>
+        </div>
+        <a
+          href="https://youtube.com/jonbontabas"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="m-mono shrink-0 inline-flex items-center gap-2 min-h-[44px] px-4 border"
+          style={{ fontSize: 11, letterSpacing: '0.12em', borderColor: 'var(--m-rec)', color: 'var(--m-text)' }}
+        >
+          <span className="inline-block w-2 h-2 rounded-full" style={{ background: 'var(--m-rec)' }} />
+          SUBSCRIBE ON YOUTUBE ↗
+        </a>
+      </div>
 
       {/* the frame */}
       <section ref={mapRef} aria-label="World map" className="relative md:flex-1 flex items-center justify-center overflow-hidden border md:min-h-[300px]" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)' }}>
@@ -159,12 +179,10 @@ export default function MonitorHome() {
         {/* desktop: what's in focus */}
         <FocusCard item={card} className="absolute hidden md:block" style={{ right: 76, bottom: '11%', width: 380 }} />
 
-        <span className="m-mono absolute left-4 hidden md:flex items-center gap-4 pointer-events-none" style={{ bottom: zoomed ? 'calc(11% + 56px)' : '11%', fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-dim)' }}>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full" style={{ background: 'var(--m-rec)' }} />FILMED</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full border" style={{ borderColor: 'var(--m-rec)' }} />IN THE EDIT</span>
-          <span>{COUNTRIES.length} COUNTRIES · {all.length || '—'} STORIES</span>
-        </span>
+        <CoachMarks />
       </section>
+
+      <MapLegend countries={Object.keys(countryCounts).length} stories={all.length} />
 
       {/* phone: card for the selected place */}
       <FocusCard item={card || { key: 'empty', label: '▸ TAP A PIN OR A COUNTRY', name: 'Explore the map', muted: true }} size="md" className="md:hidden" />
@@ -173,7 +191,7 @@ export default function MonitorHome() {
       <section aria-label="Places" className="flex">
         <div className="flex-1 min-w-0 border" style={{ borderColor: 'var(--m-line)', background: 'var(--m-panel)' }}>
           <div className="m-mono flex justify-between px-3 py-1.5" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-faint)', borderBottom: '1px solid var(--m-line)' }}>
-            <span>V1 · PLACES</span><span>FIRST → LATEST</span>
+            <span>V1 · PLACES · COLOUR = COUNTRY · STRIPED = IN THE EDIT</span><span>FIRST → LATEST</span>
           </div>
           <div className="flex overflow-x-auto p-2 snap-x snap-mandatory md:snap-none">
             {clips.map((p) => {
@@ -193,9 +211,9 @@ export default function MonitorHome() {
                   onMouseEnter={() => setHover(p.slug)}
                   onFocus={() => setHover(p.slug)}
                   onClick={tap}
-                  title={`${p.name}, ${countryOf(p.country)?.name}`}
+                  title={`${p.name}, ${countryOf(p.country)?.name}${edit ? ' (in the edit)' : ''}`}
                 >
-                  {p.name.toUpperCase()}{edit ? ' · IN THE EDIT' : ''}
+                  <span className="m-clip-label">{p.name.toUpperCase()}</span>
                 </Link>
               );
             })}
@@ -205,7 +223,7 @@ export default function MonitorHome() {
 
       {/* countries: tap to fly the map there */}
       <nav aria-label="Countries" className="m-mono flex gap-2 overflow-x-auto md:flex-wrap pb-1 -mx-4 px-4 md:mx-0 md:px-0" style={{ fontSize: 11, letterSpacing: '0.08em' }}>
-        {COUNTRIES.map((c) => (
+        {COUNTRIES.filter((c) => c.status !== 'soon').map((c) => (
           <button
             key={c.slug}
             type="button"

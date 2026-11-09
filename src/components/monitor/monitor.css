@@ -91,3 +91,6 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
 @media (prefers-reduced-motion: reduce) {
   .m-zoom { transition: none; }
 }
+
+.m-clip-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.m-clip { min-width: 96px; }
