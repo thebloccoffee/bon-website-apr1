@@ -13,7 +13,7 @@ export default function BonpointsGuides() {
   });
 
   return (
-    <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen">
+    <div className="pt-36 pb-24 px-6 md:px-16 min-h-screen">
       <Seo title="Guides" description="Credit card, points and travel money guides from bon.points." />
       <div className="max-w-6xl mx-auto">
         <p className="font-sans text-tk-xs uppercase tracking-[0.3em] text-muted-foreground mb-tk-4">bon.points</p>
