@@ -28,8 +28,7 @@ export default function SiteLayout() {
     return (
       <div data-brand="bonpoints" className="min-h-screen bg-background text-foreground font-sans">
         <RouteSeo />
-        {/* Landing page runs header-free for now; guides and videos keep it. */}
-        {pathname.toLowerCase().replace(/\/$/, '') !== '/bonpoints' && <BonpointsHeader />}
+        <BonpointsHeader />
         <main>
           <Outlet />
         </main>
