@@ -1,9 +1,9 @@
 -- ============================================================================
 -- HUB SCHEMA (Phase 1)
--- Run AFTER supabase-migration-rls-lockdown.sql (see docs/AUDIT.md finding 1).
+-- Run AFTER supabase-migration-rls-lockdown.sql and 20261108_1_shop.sql.
 -- Supabase Dashboard → SQL Editor → paste → Run. Safe to re-run.
 --
--- Adds: brand on blog_posts, videos, products, email_signups,
+-- Adds: brand on blog_posts, videos, shop_products extras, email_signups,
 --       full-text search columns + search_site() RPC.
 -- Every table has RLS on. Public can only read published rows.
 -- All writes go through /api/* functions using the service_role key.
@@ -70,33 +70,22 @@ create index if not exists videos_tags_idx   on videos using gin (tags);
 create index if not exists videos_brand_idx  on videos (brand, status, published_at desc);
 
 -- ---------------------------------------------------------------------------
--- 3. products (digital goods; checkout is hosted by the payment provider)
+-- 3. shop_products (created by 20261108_1_shop.sql, the Stripe shop).
+--    Add brand, FAQ, featured flag and search. Checkout = Stripe Payment Link.
 -- ---------------------------------------------------------------------------
-create table if not exists products (
-  id             uuid primary key default gen_random_uuid(),
-  created_at     timestamptz default now(),
-  updated_at     timestamptz default now(),
-  slug           text not null unique,
-  name           text not null,
-  tagline        text,
-  description    text,                      -- markdown
-  brand          text not null default 'jooonbon' check (brand in ('jooonbon','bonpoints')),
-  price_cents    integer not null check (price_cents >= 0),
-  currency       text not null default 'CAD',
-  compare_at_cents integer,
-  images         text[] default '{}',
-  faq            jsonb default '[]',        -- [{ "q": "...", "a": "..." }]
-  checkout_url   text,                      -- Stripe Payment Link / Lemon Squeezy / Stan URL
-  provider       text check (provider in ('stripe','lemonsqueezy','stan','gumroad')),
-  featured       boolean default false,
-  status         text not null default 'draft' check (status in ('draft','published')),
-  "order"        integer default 0,
-  search tsvector generated always as (
-    setweight(to_tsvector('english', coalesce(name, '')), 'A') ||
-    setweight(to_tsvector('english', coalesce(tagline, '') || ' ' || coalesce(description, '')), 'B')
-  ) stored
-);
-create index if not exists products_search_idx on products using gin (search);
+alter table shop_products add column if not exists brand    text not null default 'jooonbon';
+alter table shop_products add column if not exists faq      jsonb default '[]';   -- [{ "q": "...", "a": "..." }]
+alter table shop_products add column if not exists featured boolean default false;
+do $$ begin
+  alter table shop_products add constraint shop_products_brand_chk check (brand in ('jooonbon','bonpoints'));
+exception when duplicate_object then null; end $$;
+-- New products start hidden until Jon publishes them.
+alter table shop_products alter column status set default 'draft';
+alter table shop_products add column if not exists search tsvector generated always as (
+  setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+  setweight(to_tsvector('english', coalesce(subtitle, '') || ' ' || coalesce(description, '')), 'B')
+) stored;
+create index if not exists shop_products_search_idx on shop_products using gin (search);
 
 -- ---------------------------------------------------------------------------
 -- 4. email_signups (CASL: explicit consent recorded with wording + time)
@@ -120,16 +109,11 @@ create unique index if not exists email_signups_email_brand_uq on email_signups 
 -- 5. RLS
 -- ---------------------------------------------------------------------------
 alter table videos        enable row level security;
-alter table products      enable row level security;
 alter table email_signups enable row level security;
 
 drop policy if exists "Public can read published videos" on videos;
 create policy "Public can read published videos"
   on videos for select using (status = 'published');
-
-drop policy if exists "Public can read published products" on products;
-create policy "Public can read published products"
-  on products for select using (status = 'published');
 
 -- email_signups: intentionally no policies (service_role only).
 
@@ -153,8 +137,8 @@ as $$
       from videos v, query
      where v.status = 'published' and v.search @@ query.tsq
     union all
-    select 'product', pr.slug, pr.name, pr.tagline, pr.images[1], pr.brand, ts_rank(pr.search, query.tsq)
-      from products pr, query
+    select 'product', pr.slug, pr.title, pr.subtitle, pr.cover_image, pr.brand, ts_rank(pr.search, query.tsq)
+      from shop_products pr, query
      where pr.status = 'published' and pr.search @@ query.tsq
   ) r(kind, slug, title, summary, image, brand, rank)
   where brand_filter is null or r.brand = brand_filter

@@ -50,7 +50,7 @@ export function getVideos({ brand, format, featured, tag, destination, limit } =
 
 export function getProducts({ brand, featured, limit } = {}) {
   let q = supabase
-    .from('products')
+    .from('shop_products')
     .select('*')
     .eq('status', 'published')
     .order('order', { ascending: true });
@@ -62,7 +62,7 @@ export function getProducts({ brand, featured, limit } = {}) {
 
 export function getProduct(slug) {
   return safe(
-    supabase.from('products').select('*').eq('slug', slug).eq('status', 'published').maybeSingle(),
+    supabase.from('shop_products').select('*').eq('slug', slug).eq('status', 'published').maybeSingle(),
     null
   );
 }

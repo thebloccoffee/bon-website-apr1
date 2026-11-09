@@ -4,14 +4,14 @@
  * admin session cookie and then uses the service_role key (bypasses RLS).
  *
  * POST /api/admin-data
- *   { table: 'blog_posts' | 'portfolio_projects' | 'destinations' | 'videos' | 'products' | 'email_signups' (list only),
+ *   { table: 'blog_posts' | 'portfolio_projects' | 'destinations' | 'videos' | 'shop_products' | 'email_signups' (list only),
  *     op: 'list' | 'create' | 'update' | 'delete',
  *     id?: string, payload?: object,
  *     order?: { column: string, ascending: boolean } }
  */
 import { requireAdmin, getServiceClient } from '../server-lib/adminAuth.js';
 
-const TABLES = new Set(['blog_posts', 'portfolio_projects', 'destinations', 'videos', 'products', 'email_signups']);
+const TABLES = new Set(['blog_posts', 'portfolio_projects', 'destinations', 'videos', 'shop_products', 'email_signups']);
 // email_signups is read-only from the admin UI (list only).
 const READ_ONLY = new Set(['email_signups']);
 const DEFAULT_ORDER = {
@@ -19,7 +19,7 @@ const DEFAULT_ORDER = {
   portfolio_projects: { column: 'order', ascending: true },
   destinations: { column: 'order', ascending: true },
   videos: { column: 'published_at', ascending: false },
-  products: { column: 'order', ascending: true },
+  shop_products: { column: 'order', ascending: true },
   email_signups: { column: 'created_at', ascending: false },
 };
 // Never allow the client to overwrite these columns.
