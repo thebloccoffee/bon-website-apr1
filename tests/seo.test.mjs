@@ -97,7 +97,7 @@ const { default: og } = await import('../api/og.js');
 const seo = await import('../server-lib/seo.js');
 
 async function get(p, query) {
-  const req = { url: `/api/page?path=${encodeURIComponent(p)}`, query: query || { path: p.replace(/^\//, '') }, headers: { host: 'www.tabasjonbon.com' } };
+  const req = { url: `/api/page?path=${encodeURIComponent(p)}`, query: query || { path: p.replace(/^\//, '') }, headers: { host: 'www.jooonbon.com' } };
   const res = mockRes();
   await page(req, res);
   return res;
@@ -134,13 +134,13 @@ await test('home: 200, Person + WebSite SearchAction', async () => {
   assert.equal(res.statusCode, 200);
   assert.match(res.headers['cache-control'], /s-maxage=300, stale-while-revalidate=86400/);
   assert.match(res.body, /<title>Jon Bon Tabas<\/title>/);
-  assert.match(res.body, /<link rel="canonical" href="https:\/\/www\.tabasjonbon\.com" \/>/);
+  assert.match(res.body, /<link rel="canonical" href="https:\/\/www\.jooonbon\.com" \/>/);
   const ld = ldBlocks(res.body);
   const person = ld.find((x) => x['@type'] === 'Person');
   assert.ok(person.sameAs.includes('https://instagram.com/jooonbon'));
   assert.ok(person.sameAs.includes('https://youtube.com/@bonpoints'));
   const site = ld.find((x) => x['@type'] === 'WebSite');
-  assert.equal(site.potentialAction.target.urlTemplate, 'https://www.tabasjonbon.com/search?q={search_term_string}');
+  assert.equal(site.potentialAction.target.urlTemplate, 'https://www.jooonbon.com/search?q={search_term_string}');
   assert.ok(res.body.includes('<div id="root"></div>'));
   assert.equal((res.body.match(/<title>/g) || []).length, 1);
 });
@@ -151,7 +151,7 @@ await test('/journal/natural-bridge: Article + BreadcrumbList, description from 
   assert.equal(res.statusCode, 200);
   assert.match(res.body, /<title>The Natural Bridge \| Jon Bon Tabas<\/title>/);
   assert.match(res.body, /<meta property="og:type" content="article" \/>/);
-  assert.match(res.body, /href="https:\/\/www\.tabasjonbon\.com\/journal\/natural-bridge"/);
+  assert.match(res.body, /href="https:\/\/www\.jooonbon\.com\/journal\/natural-bridge"/);
   assert.match(res.body, /content="We hiked out to the Natural Bridge on a cold morning\."/);
   const ld = ldBlocks(res.body);
   const article = ld.find((x) => x['@type'] === 'Article');
@@ -166,7 +166,7 @@ await test('/journal/natural-bridge: Article + BreadcrumbList, description from 
 await test('trailing slash and case: canonical is clean', async () => {
   const res = await get('/Journal/', { path: 'Journal/' });
   assert.equal(res.statusCode, 200);
-  assert.match(res.body, /<link rel="canonical" href="https:\/\/www\.tabasjonbon\.com\/journal" \/>/);
+  assert.match(res.body, /<link rel="canonical" href="https:\/\/www\.jooonbon\.com\/journal" \/>/);
 });
 
 await test('unknown journal slug: 404, noindex, SPA shell still served', async () => {
@@ -255,7 +255,7 @@ await test('Supabase timeout: 200 with section copy, never a false 404', async (
     assert.ok(Date.now() - t0 < 3500);
     assert.equal(res.statusCode, 200);
     assert.match(res.body, /<title>Journal \| Jon Bon Tabas<\/title>/);
-    assert.match(res.body, /href="https:\/\/www\.tabasjonbon\.com\/journal\/natural-bridge"/);
+    assert.match(res.body, /href="https:\/\/www\.jooonbon\.com\/journal\/natural-bridge"/);
   } finally {
     supabaseMode = 'ok';
   }
@@ -317,7 +317,7 @@ await test('/videos: tolerates missing table, ItemList when rows exist', async (
 
 await test('handler without rewrite query falls back to "/"', async () => {
   const res = mockRes();
-  await page({ url: '/api/page', query: {}, headers: { host: 'www.tabasjonbon.com' } }, res);
+  await page({ url: '/api/page', query: {}, headers: { host: 'www.jooonbon.com' } }, res);
   assert.equal(res.statusCode, 200);
   assert.match(res.body, /<title>Jon Bon Tabas<\/title>/);
 });
@@ -335,10 +335,10 @@ await test('sitemap: well-formed XML, static + DB rows, noindex routes left out'
   assert.match(res.headers['content-type'], /application\/xml/);
   const xml = res.body;
   for (const p of ['', '/journal', '/bonpoints', '/bonpoints/guides', '/travel', '/shop', '/about', '/journal/natural-bridge', '/journal/evil', '/travel/lisbon', '/travel/hanoi']) {
-    assert.ok(xml.includes(`<loc>https://www.tabasjonbon.com${p}</loc>`), `missing ${p}`);
+    assert.ok(xml.includes(`<loc>https://www.jooonbon.com${p}</loc>`), `missing ${p}`);
   }
   for (const p of ['/admin', '/search', '/shop/thanks']) {
-    assert.ok(!xml.includes(`<loc>https://www.tabasjonbon.com${p}</loc>`), `should not list ${p}`);
+    assert.ok(!xml.includes(`<loc>https://www.jooonbon.com${p}</loc>`), `should not list ${p}`);
   }
   assert.ok(xml.includes('<lastmod>2026-05-04</lastmod>'));
   // Well-formedness: xmllint when available, plus a tag-balance check.

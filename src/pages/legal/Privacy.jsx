@@ -17,7 +17,7 @@ const sections = [
     body: (
       <>
         <p>
-          This site (tabasjonbon.com) is run by Jon Bon Tabas, a creator based in Vancouver, British Columbia,
+          This site (jooonbon.com) is run by Jon Bon Tabas, a creator based in Vancouver, British Columbia,
           Canada. It covers two brands: jooonbon (travel films) and bon.points (credit cards, points and travel
           tips). In this policy, "I" and "me" mean Jon Bon Tabas.
         </p>
