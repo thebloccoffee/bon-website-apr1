@@ -22,7 +22,7 @@ const safe = async (query, fallback) => {
 export function getPosts({ brand, kind, tag, location, limit } = {}) {
   let q = supabase
     .from('blog_posts')
-    .select('id,title,slug,excerpt,cover_image,location,city,coordinates,date_traveled,tags,brand,kind,created_at')
+    .select('*') // '*' so it works before and after the hub migration adds brand/kind
     .eq('status', 'published')
     .order('date_traveled', { ascending: false, nullsFirst: false });
   if (brand) q = q.eq('brand', brand);
