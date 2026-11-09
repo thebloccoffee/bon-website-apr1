@@ -3,6 +3,8 @@
 // vercel.json rewrites every non-file, non-/api path here as /api/page?path=...
 // "/" itself is served straight from the static index.html, whose default
 // head block is the home page's (kept in sync by tests/seo.test.mjs).
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { resolveSeo, injectHead, CACHE_CONTROL, CACHE_CONTROL_404 } from '../server-lib/seo.js';
 
 const SHELL_TTL_MS = 60 * 1000;
@@ -17,7 +19,25 @@ function shellOrigin(req) {
   return `${local ? 'http' : 'https'}://${host}`;
 }
 
+// Built index.html bundled with the function (vercel.json includeFiles).
+// Read once per instance; avoids an HTTP round trip and works behind
+// preview Deployment Protection.
+let diskShell;
+async function readShellFromDisk() {
+  if (!process.env.VERCEL) return null; // local dev/tests serve the live shell
+  if (diskShell !== undefined) return diskShell;
+  try {
+    const html = await readFile(join(process.cwd(), 'dist', 'index.html'), 'utf8');
+    diskShell = html.includes('<div id="root">') ? html : null;
+  } catch {
+    diskShell = null;
+  }
+  return diskShell;
+}
+
 async function fetchShell(origin) {
+  const local = await readShellFromDisk();
+  if (local) return local;
   const now = Date.now();
   if (shellCache.html && shellCache.origin === origin && now - shellCache.at < SHELL_TTL_MS) {
     return shellCache.html;

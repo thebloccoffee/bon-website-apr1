@@ -32,3 +32,5 @@ dist-ssr
 
 # Claude Code worktrees
 .claude/
+.vercel
+.env*

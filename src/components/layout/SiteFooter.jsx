@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BRANDS } from '@/lib/brands';
+import { useHasProducts, withoutShop } from '@/hooks/use-has-products';
 import NewsletterForm from '@/components/shared/NewsletterForm';
 
-const siteLinks = [
+const allSiteLinks = [
   { label: 'Work', to: '/portfolio' },
   { label: 'Films', to: '/videos' },
   { label: 'Destinations', to: '/travel' },
@@ -25,6 +26,7 @@ const linkCls = 'font-sans text-xs tracking-[0.15em] uppercase text-muted-foregr
 const socialCls = 'font-sans text-xs text-muted-foreground hover:text-foreground transition-colors';
 
 export default function SiteFooter() {
+  const siteLinks = withoutShop(allSiteLinks, useHasProducts());
   return (
     <footer className="relative py-16 md:py-32 px-6 md:px-16 overflow-hidden">
       {/* Large background text */}

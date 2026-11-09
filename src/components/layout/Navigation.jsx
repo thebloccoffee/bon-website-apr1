@@ -3,9 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, Search } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
+import { useHasProducts, withoutShop } from '@/hooks/use-has-products';
 
 // jooonbon is the main site. bon.points has its own header (BonpointsHeader.jsx).
-const navLinks = [
+const allNavLinks = [
   { label: 'Work', path: '/portfolio' },
   { label: 'Films', path: '/videos' },
   { label: 'Destinations', path: '/travel' },
@@ -21,6 +22,7 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const { isDark, toggle } = useTheme();
   const location = useLocation();
+  const navLinks = withoutShop(allNavLinks, useHasProducts());
   const isHome = location.pathname === '/';
 
   useEffect(() => {
