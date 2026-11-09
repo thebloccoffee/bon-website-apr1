@@ -21,15 +21,15 @@ export const COUNTRIES = [
 // status: 'filmed' (default) | 'edit' (footage in the edit) | 'soon' (visited, nothing published yet)
 export const PLACES = [
   { slug: 'vancouver', name: 'Vancouver', country: 'canada', lat: 49.28, lng: -123.12, match: /vancouver|seymour|pump peak|squamish|north van|shipyards|coquitlam|lafarge|gastown|stanley park|britann?ia|deep cove|alpine meadows/i },
-  { slug: 'hope-bc', name: 'Hope, BC', country: 'canada', lat: 49.38, lng: -121.44, match: /othello|hope, bc|kawkawa/i },
+  { slug: 'hope-bc', name: 'Hope, BC', country: 'canada', lat: 49.38, lng: -121.44, labelK: 12, match: /othello|hope, bc|kawkawa/i },
   { slug: 'wells-gray', name: 'Wells Gray', country: 'canada', lat: 51.9, lng: -120.0, match: /wells gray/i },
   { slug: 'yoho', name: 'Yoho National Park', country: 'canada', lat: 51.38, lng: -116.53, match: /yoho|natural bridge|emerald lake/i },
-  { slug: 'banff', name: 'Banff', country: 'canada', lat: 51.18, lng: -115.57, match: /banff|rocky mountaineer|lake louise/i },
+  { slug: 'banff', name: 'Banff', country: 'canada', lat: 51.18, lng: -115.57, labelK: 16, match: /banff|rocky mountaineer|lake louise/i },
   { slug: 'new-york', name: 'New York', country: 'usa', lat: 40.71, lng: -74.0, match: /new york|\bnyc\b|manhattan|brooklyn/i },
   { slug: 'hanoi', name: 'Hanoi', country: 'vietnam', lat: 21.03, lng: 105.85, match: /hanoi|hà nội/i },
   { slug: 'sapa', name: 'Sapa', country: 'vietnam', lat: 22.34, lng: 103.84, match: /sapa|cat cat/i },
   { slug: 'da-nang', name: 'Da Nang', country: 'vietnam', lat: 16.05, lng: 108.22, match: /da ?nang/i },
-  { slug: 'hoi-an', name: 'Hoi An', country: 'vietnam', lat: 15.88, lng: 108.33, match: /hoi an|hội an|coconut forest|bay mau/i },
+  { slug: 'hoi-an', name: 'Hoi An', country: 'vietnam', lat: 15.88, lng: 108.33, labelK: 14, match: /hoi an|hội an|coconut forest|bay mau/i },
   { slug: 'nha-trang', name: 'Nha Trang', country: 'vietnam', lat: 12.24, lng: 109.19, match: /nha trang/i, status: 'edit' },
   { slug: 'saigon', name: 'Saigon', country: 'vietnam', lat: 10.76, lng: 106.66, match: /saigon|ho chi minh|bui vien/i, status: 'edit' },
   { slug: 'xiamen', name: 'Xiamen', country: 'china', lat: 24.48, lng: 118.09, match: /xiamen/i },
@@ -38,7 +38,7 @@ export const PLACES = [
   { slug: 'bangkok', name: 'Bangkok', country: 'thailand', lat: 13.75, lng: 100.5, match: /bangkok/i },
   { slug: 'bali', name: 'Bali', country: 'indonesia', lat: -8.41, lng: 115.19, match: /\bbali\b/i, status: 'soon' },
   { slug: 'seoul', name: 'Seoul', country: 'south-korea', lat: 37.57, lng: 126.98, match: /seoul/i, status: 'soon' },
-  { slug: 'taipei', name: 'Taipei', country: 'taiwan', lat: 25.03, lng: 121.56, match: /taipei/i, status: 'soon' },
+  { slug: 'taipei', name: 'Taipei', country: 'taiwan', lat: 25.03, lng: 121.56, labelK: 12, match: /taipei/i, status: 'soon' },
 ];
 
 // Dashed trip routes drawn on the map, as ordered city slugs.
@@ -111,7 +111,13 @@ export function itemsFor(place, items) {
     place.kind === 'country'
       ? [place.match, ...citiesIn(place.slug).map((c) => c.match)]
       : [place.match];
+  // An item tagged with a place in the admin (videos.destination) counts for
+  // that place, its country, and nothing else.
+  const own = place.kind === 'country' ? new Set([place.slug, ...citiesIn(place.slug).map((c) => c.slug)]) : new Set([place.slug]);
+  const placeSlugs = new Set([...COUNTRIES.map((c) => c.slug), ...PLACES.map((p) => p.slug)]);
   return items.filter((it) => {
+    const d = typeof it.destination === 'string' ? it.destination.toLowerCase() : '';
+    if (d && placeSlugs.has(d)) return own.has(d);
     const t = textOf(it);
     return patterns.some((re) => re.test(t));
   });

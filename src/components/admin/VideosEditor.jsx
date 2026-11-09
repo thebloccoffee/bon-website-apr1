@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, X, Star } from 'lucide-react';
 import { adminList, adminCreate, adminUpdate, adminDelete } from '@/api/adminApi';
 import { BRANDS, BRAND_KEYS } from '@/lib/brands';
 import AdminField from './AdminField';
+import { PLACES, COUNTRIES, countryOf } from '@/lib/places';
 
 const ID_RE = /^[A-Za-z0-9_-]{11}$/;
 
@@ -225,13 +226,27 @@ export default function VideosEditor() {
               <option value="short">Short (9:16)</option>
             </select>
           </AdminField>
-          <AdminField label="Destination">
+          <AdminField label="Place on the map">
             <select className={selectCls} value={editing.destination || ''} onChange={(e) => set('destination', e.target.value)}>
-              <option value="">None</option>
-              {destinations.map((d) => (
-                <option key={d.id || d.slug} value={d.slug}>{d.name || d.slug}</option>
-              ))}
-              {editing.destination && !destinations.some((d) => d.slug === editing.destination) && (
+              <option value="">None (or matched from the title)</option>
+              <optgroup label="Cities">
+                {PLACES.map((p) => (
+                  <option key={p.slug} value={p.slug}>{p.name} · {countryOf(p.country)?.name}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Countries">
+                {COUNTRIES.map((c) => (
+                  <option key={c.slug} value={c.slug}>{c.name}</option>
+                ))}
+              </optgroup>
+              {destinations.filter((d) => !PLACES.some((p) => p.slug === d.slug) && !COUNTRIES.some((c) => c.slug === d.slug)).length > 0 && (
+                <optgroup label="Older destinations">
+                  {destinations.filter((d) => !PLACES.some((p) => p.slug === d.slug) && !COUNTRIES.some((c) => c.slug === d.slug)).map((d) => (
+                    <option key={d.id || d.slug} value={d.slug}>{d.name || d.slug}</option>
+                  ))}
+                </optgroup>
+              )}
+              {editing.destination && !destinations.some((d) => d.slug === editing.destination) && !PLACES.some((p) => p.slug === editing.destination) && !COUNTRIES.some((c) => c.slug === editing.destination) && (
                 <option value={editing.destination}>{editing.destination}</option>
               )}
             </select>
