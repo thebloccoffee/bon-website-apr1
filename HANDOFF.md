@@ -7,12 +7,12 @@
 - `docs/SITEMAP.md`: target structure, nav, data source per page
 - `docs/URL-MAP.md`: all 35 live URLs. None move, so no breaking redirects
 - `docs/DESIGN-SYSTEM.md`: existing tk-* tokens, `data-brand` scopes (bon.points v2), shared component list
-- `supabase/migrations/20261108_hub_schema.sql`: brand/kind on blog_posts, `videos`, `products`, `email_signups`, full-text search + `search_site()` RPC, RLS on all. Tested on Postgres 16 (PGlite) together with the three existing SQL files: idempotent, search returns posts/videos/products, consent=false rejected
+- `supabase/migrations/20261108_1_shop.sql then 20261108_2_hub_schema.sql`: brand/kind on blog_posts, `videos`, `products`, `email_signups`, full-text search + `search_site()` RPC, RLS on all. Tested on Postgres 16 (PGlite) together with the three existing SQL files: idempotent, search returns posts/videos/products, consent=false rejected
 
 ### Owner actions before Phase 2
 1. **Now:** run `supabase-migration-rls-lockdown.sql` in Supabase SQL editor (contact inquiries are publicly readable today), run its verify query, fix `media` bucket storage policies
-2. Run `supabase/migrations/20261108_hub_schema.sql`
-3. Pick payment provider (AUDIT D3)
+2. Run `supabase/migrations/20261108_1_shop.sql then 20261108_2_hub_schema.sql`
+3. Payment provider: DECIDED Stripe Payment Links (Sept 3 commit 1639f6c, GCash support for PH buyers). Shop ported from branch shop-and-security-fix
 4. Turn on 2FA: GitHub, Vercel, Supabase, payment provider
 
 ### Phase 2 notes for agents

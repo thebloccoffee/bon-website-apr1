@@ -1,30 +1,92 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STORAGE_KEY = 'cookie_consent';
+const ACCEPTED = 'accepted';
+const DECLINED = 'declined';
+
+const METRICOOL_SRC = 'https://tracker.metricool.com/resources/be.js';
+const METRICOOL_HASH = 'fa9e7713158783b01bdad4ca2ebef935';
+
+/*
+ * Metricool's be.js sets no cookies or storage; it sends a tracking pixel with
+ * the page URL, referrer and screen size. We still load it only after the
+ * visitor accepts, so nothing goes to a third party without consent.
+ * The old value 'dismissed' (pre-consent banner) counts as no answer.
+ */
+let metricoolLoaded = false;
+export function loadMetricool() {
+  if (metricoolLoaded || typeof document === 'undefined') return;
+  metricoolLoaded = true;
+  const s = document.createElement('script');
+  s.src = METRICOOL_SRC;
+  s.async = true;
+  s.onload = () => {
+    try {
+      window.beTracker?.t({ hash: METRICOOL_HASH });
+    } catch {
+      // tracker failed; ignore
+    }
+  };
+  document.head.appendChild(s);
+}
+
+function readConsent() {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return undefined; // storage blocked
+  }
+}
+
+function writeConsent(value) {
+  try {
+    localStorage.setItem(STORAGE_KEY, value);
+  } catch {
+    // ignore
+  }
+}
+
+/** Clears the stored choice so the banner shows again (e.g. from the Privacy page). */
+export function resetCookieConsent() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+  window.dispatchEvent(new Event('cookie-consent-reset'));
+}
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let stored = null;
-    try {
-      stored = localStorage.getItem(STORAGE_KEY);
-    } catch {
-      // storage unavailable — don't nag
+    const stored = readConsent();
+    if (stored === undefined) return undefined; // storage unavailable: no tracking, no nagging
+    if (stored === ACCEPTED) {
+      loadMetricool();
       return undefined;
     }
-    if (stored) return undefined;
-    const t = setTimeout(() => setVisible(true), 1200);
-    return () => clearTimeout(t);
+    let t;
+    const show = () => { t = setTimeout(() => setVisible(true), 1200); };
+    if (stored !== DECLINED) show();
+    const onReset = () => setVisible(true);
+    window.addEventListener('cookie-consent-reset', onReset);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('cookie-consent-reset', onReset);
+    };
   }, []);
 
-  const dismiss = () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, 'dismissed');
-    } catch {
-      // ignore
-    }
+  const accept = () => {
+    writeConsent(ACCEPTED);
+    loadMetricool();
+    setVisible(false);
+  };
+
+  const decline = () => {
+    writeConsent(DECLINED);
     setVisible(false);
   };
 
@@ -38,20 +100,27 @@ export default function CookieBanner() {
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           role="dialog"
           aria-live="polite"
-          aria-label="Cookie notice"
+          aria-label="Analytics consent"
           className="fixed bottom-4 inset-x-4 md:inset-x-auto md:left-6 md:bottom-6 md:max-w-sm z-[60] bg-card text-card-foreground border border-border shadow-xl p-5"
         >
           <p className="font-serif text-sm leading-relaxed text-muted-foreground">
-            This site uses a lightweight analytics tracker (Metricool) to understand visits.
-            No ads, no data sold.
+            Can I count your visit with Metricool analytics? It sees the page you're on, where you came from and your
+            screen size. No ads, and nothing is sold. <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground">Privacy Policy</Link>
           </p>
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex justify-end gap-3">
             <button
               type="button"
-              onClick={dismiss}
-              className="font-sans text-xs tracking-[0.25em] uppercase border border-foreground px-6 py-2.5 hover:bg-foreground hover:text-background transition-all duration-300"
+              onClick={decline}
+              className="font-sans text-xs tracking-[0.25em] uppercase border border-border px-5 py-2.5 text-muted-foreground hover:text-foreground hover:border-foreground transition-all duration-300"
             >
-              Got it
+              No thanks
+            </button>
+            <button
+              type="button"
+              onClick={accept}
+              className="font-sans text-xs tracking-[0.25em] uppercase border border-foreground px-5 py-2.5 hover:bg-foreground hover:text-background transition-all duration-300"
+            >
+              Accept
             </button>
           </div>
         </motion.div>

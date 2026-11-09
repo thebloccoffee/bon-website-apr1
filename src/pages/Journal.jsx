@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/api/supabaseClient';
+import { fetchPosts } from '@/components/home/postsQuery';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
@@ -30,6 +30,7 @@ const CONTINENT_MAP = {
   'Australia': 'Oceania', 'New Zealand': 'Oceania', 'Fiji': 'Oceania',
 };
 
+
 function getContinent(location) {
   if (!location) return 'Other';
   // Try exact match first, then partial
@@ -43,19 +44,17 @@ function getContinent(location) {
 export default function Journal() {
   const [activeDestination, setActiveDestination] = useState(null);
   const [activeContinent, setActiveContinent] = useState('All');
+  const activeBrand = 'jooonbon'; // the Journal is jooonbon's; bon.points posts live in /bonpoints/guides
 
-  const { data: posts = [], isLoading, isError } = useQuery({
+  const { data: allPosts = [], isLoading, isError } = useQuery({
     queryKey: ['blog-posts-all'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('id,title,slug,excerpt,cover_image,location,coordinates,date_traveled,tags')
-        .eq('status', 'published')
-        .order('date_traveled', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => fetchPosts({ throwOnError: true }),
   });
+
+  const posts = useMemo(
+    () => (activeBrand === 'all' ? allPosts : allPosts.filter((p) => p.brand === activeBrand)),
+    [allPosts, activeBrand]
+  );
 
   // Build destination cards from unique locations in posts
   const destinations = useMemo(() => {
@@ -110,10 +109,19 @@ export default function Journal() {
     setActiveDestination(null);
   };
 
+
   const clearFilter = () => {
     setActiveDestination(null);
     setActiveContinent('All');
+    setActiveBrand('all');
   };
+
+  const pillCls = (active) =>
+    `font-sans text-xs tracking-[0.1em] md:tracking-[0.15em] px-3 md:px-4 py-2.5 md:py-2 border transition-all duration-300 ${
+      active
+        ? 'border-foreground bg-foreground text-background'
+        : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
+    }`;
 
   return (
     <div className="pt-28 pb-24">
@@ -146,11 +154,8 @@ export default function Journal() {
               <button
                 key={c}
                 onClick={() => handleContinentClick(c)}
-                className={`font-sans text-xs tracking-[0.1em] md:tracking-[0.15em] uppercase px-3 md:px-4 py-2.5 md:py-2 border transition-all duration-300 ${
-                  activeContinent === c && !activeDestination
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
-                }`}
+                aria-pressed={activeContinent === c && !activeDestination}
+                className={`${pillCls(activeContinent === c && !activeDestination)} uppercase`}
               >
                 {c}
               </button>
@@ -181,6 +186,9 @@ export default function Journal() {
                       <img
                         src={dest.coverImage}
                         alt={dest.location}
+                        width="400"
+                        height="300"
+                        decoding="async"
                         loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
@@ -267,7 +275,7 @@ export default function Journal() {
           </p>
         ) : filteredPosts.length === 0 ? (
           <p className="font-serif text-muted-foreground text-center py-24">
-            No entries for this destination yet.
+            No entries match this filter yet.
           </p>
         ) : (
           <div className="space-y-20">
@@ -290,6 +298,9 @@ export default function Journal() {
                         <img
                           src={post.cover_image}
                           alt={post.title}
+                          width="600"
+                          height="400"
+                          decoding="async"
                           loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
@@ -299,7 +310,7 @@ export default function Journal() {
                     </div>
 
                     <div className="flex-1 flex flex-col justify-center py-2">
-                      <div className="flex items-center gap-4 mb-4">
+                      <div className="flex items-center flex-wrap gap-4 mb-4">
                         {post.location && (
                           <span className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground">
                             {post.location}

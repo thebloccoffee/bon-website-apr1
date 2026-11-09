@@ -84,6 +84,7 @@ export default function Contact() {
   return (
     <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen">
       <div className="max-w-3xl mx-auto">
+        {/* Inline sentence form; inputs wrap on narrow screens. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -94,7 +95,7 @@ export default function Contact() {
             The Inquiry
           </h1>
           <p className="font-serif text-lg text-muted-foreground mt-4 max-w-lg">
-            Every great film begins with a conversation. Tell me about the story you'd like to capture.
+            Client films, brand collabs with jooonbon or bon.points, press, or a question. Tell me what you have in mind.
           </p>
         </motion.div>
 
@@ -114,7 +115,7 @@ export default function Contact() {
                 onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="your name"
                 autoComplete="name"
-                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-48 md:w-64 pb-1"
+                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-full sm:w-48 md:w-64 pb-1"
               />
             </label>
           </div>
@@ -126,7 +127,7 @@ export default function Contact() {
                 type="text"
                 value={form.project_type}
                 onChange={(e) => handleChange('project_type', e.target.value)}
-                placeholder="a wedding, a journey, a brand story..."
+                placeholder="a film, a brand collab, a question..."
                 className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-full md:w-96 pb-1"
               />
             </label>
@@ -140,7 +141,7 @@ export default function Contact() {
                 value={form.location}
                 onChange={(e) => handleChange('location', e.target.value)}
                 placeholder="a location or anywhere"
-                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-48 md:w-72 pb-1"
+                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-full sm:w-48 md:w-72 pb-1"
               />
             </label>
           </div>
@@ -153,7 +154,7 @@ export default function Contact() {
                 value={form.when}
                 onChange={(e) => handleChange('when', e.target.value)}
                 placeholder="a date, season, or timeframe"
-                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-64 md:w-80 pb-1"
+                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-full sm:w-64 md:w-80 pb-1"
               />
             </label>
           </div>
@@ -167,7 +168,7 @@ export default function Contact() {
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="your@email.com"
                 autoComplete="email"
-                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-48 md:w-72 pb-1"
+                className="bg-transparent border-b border-accent focus:border-foreground outline-none transition-colors duration-300 text-foreground font-serif text-xl md:text-2xl placeholder:text-accent/60 w-full sm:w-48 md:w-72 pb-1"
               />
             </label>
           </div>

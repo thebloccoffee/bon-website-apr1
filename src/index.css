@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -202,3 +201,33 @@
 .ql-content .ql-video-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
 .ql-content p.ql-align-center { font-family: var(--font-sans); font-size: 0.8rem; font-style: italic; color: hsl(var(--muted-foreground)); text-align: center; margin-top: -1.25rem; margin-bottom: 2rem; }
 .ql-content img + p.ql-align-center, .ql-content img + p[style*="text-align: center"] { margin-top: -1.25rem; }
+
+/* ── Brand scope: bon.points (v2 bible). Wrap a section in data-brand="bonpoints". ── */
+@layer base {
+  [data-brand="bonpoints"] {
+    --bp-ink: #0B0B0C;
+    --bp-graphite: #1A1A1C;
+    --bp-ash: #2C2B29;
+    --bp-smoke: #8E8C88;
+    --bp-stone: #C9C6C0;
+    --bp-bone: #EEECE8;
+    --font-serif: 'Inter', system-ui, sans-serif;
+    --background: 240 4% 4%;
+    --foreground: 40 13% 92%;
+    --muted-foreground: 40 2% 55%;
+    --border: 40 3% 17%;
+    --card: 240 4% 11%;
+    --color-text-primary: var(--bp-bone);
+    --color-text-secondary: var(--bp-stone);
+    --color-text-tertiary: var(--bp-smoke);
+    --color-surface-raised: var(--bp-graphite);
+    --color-border-default: var(--bp-ash);
+  }
+  .bp-glass {
+    background: rgb(255 255 255 / 0.12);
+    backdrop-filter: blur(26px);
+    -webkit-backdrop-filter: blur(26px);
+    border: 1.5px solid rgb(255 255 255 / 0.28);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35);
+  }
+}

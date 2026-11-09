@@ -29,3 +29,8 @@ dist-ssr
 
 .env
 .vite
+
+# Claude Code worktrees
+.claude/
+.vercel
+.env*

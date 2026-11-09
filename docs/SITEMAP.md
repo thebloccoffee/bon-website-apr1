@@ -1,5 +1,7 @@
 # Sitemap (target)
 
+> **Updated 2026-11-08:** jooonbon is the main site (`/` = jooonbon home, `/jooonbon` redirects there). Main nav: Work (/portfolio) · Films (/videos) · Destinations · Journal · Shop · About · [bon.points ↗]. Everything under `/bonpoints` has its own header/footer: Guides (`/bonpoints/guides`, posts `/bonpoints/guides/:slug`) · Videos (`/bonpoints/videos`) · Newsletter. The tree below is the original plan.
+
 One hub, two brands (jooonbon = Travel Filmmaker, bon.points = credit cards, finance and travel tips), one shop. Existing URLs are unchanged (see URL-MAP.md).
 
 ```
