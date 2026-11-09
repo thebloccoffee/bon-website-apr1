@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const HERO_IMAGE = '/hero.jpg';
+// Lowercase on purpose: React 18 does not recognise fetchPriority.
+const LCP_HINT = { fetchpriority: 'high' };
 
 export default function HeroSection() {
   return (
@@ -12,6 +14,9 @@ export default function HeroSection() {
         <img
           src={HERO_IMAGE}
           alt="Jon Bon standing on a frozen lake in Banff"
+          width="1920"
+          height="1080"
+          {...LCP_HINT}
           className="w-full h-full object-cover object-[65%_center] md:object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
@@ -35,7 +40,7 @@ export default function HeroSection() {
             className="mt-tk-6"
           >
             <p className="font-sans text-white/70 text-tk-xs md:text-tk-md tracking-[0.25em] md:tracking-[0.4em] uppercase">
-              Travel narratives &amp; cinematic storytelling
+              Travel films &amp; travel on points
             </p>
           </motion.div>
         </motion.div>

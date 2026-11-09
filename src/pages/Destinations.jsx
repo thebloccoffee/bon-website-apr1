@@ -1,26 +1,17 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/api/supabaseClient';
+import { getDestinations } from '@/api/content';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const CONTINENTS = ['All', 'Asia', 'Europe', 'Americas', 'Africa', 'Oceania'];
 
 export default function Destinations() {
   const [activeContinent, setActiveContinent] = useState('All');
 
-  const { data: destinations, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['destinations-all'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('destinations')
-        .select('*')
-        .eq('status', 'published')
-        .order('order', { ascending: true });
-      return data || [];
-    },
-    initialData: [],
+    queryFn: getDestinations,
   });
+  const destinations = data || [];
 
   const featured = destinations.filter((d) => d.featured).slice(0, 3);
   const continentsPresent = ['All', ...new Set(destinations.map((d) => d.continent))];
@@ -50,7 +41,7 @@ export default function Destinations() {
             Where To Next?
           </h1>
           <p className="font-serif text-lg text-muted-foreground max-w-lg">
-            Every place I've filmed, explored, and gotten completely lost in.
+            Places I've been. Each one gathers the posts and videos from jooonbon and bon.points.
           </p>
         </motion.div>
       </div>
@@ -160,10 +151,6 @@ export default function Destinations() {
 
 /* ── Featured Card ─────────────────────────────────────────────────────────── */
 function FeaturedCard({ dest, index }) {
-  const Tag = dest.href && dest.href !== '#' ? 'a' : 'div';
-  const props = dest.href && dest.href !== '#'
-    ? { href: dest.href, target: '_blank', rel: 'noopener noreferrer' }
-    : {};
 
   return (
     <motion.div
@@ -171,14 +158,17 @@ function FeaturedCard({ dest, index }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.12, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Tag
-        {...props}
-        className="group block relative overflow-hidden aspect-[3/4] cursor-pointer"
+      <Link
+        to={`/travel/${dest.slug}`}
+        className="group block relative overflow-hidden aspect-[3/4]"
       >
         {dest.cover_image ? (
           <img
             src={dest.cover_image}
             alt={dest.name}
+            width="600"
+            height="800"
+            decoding="async"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
@@ -199,17 +189,13 @@ function FeaturedCard({ dest, index }) {
             </p>
           )}
         </div>
-      </Tag>
+      </Link>
     </motion.div>
   );
 }
 
 /* ── Destination Card ──────────────────────────────────────────────────────── */
 function DestCard({ dest, index }) {
-  const Tag = dest.href && dest.href !== '#' ? 'a' : 'div';
-  const props = dest.href && dest.href !== '#'
-    ? { href: dest.href, target: '_blank', rel: 'noopener noreferrer' }
-    : {};
 
   return (
     <motion.div
@@ -220,12 +206,16 @@ function DestCard({ dest, index }) {
       layout
       exit={{ opacity: 0, scale: 0.95 }}
     >
-      <Tag {...props} className="group block cursor-pointer">
+      <Link to={`/travel/${dest.slug}`} className="group block">
         <div className="aspect-[4/3] overflow-hidden mb-5">
           {dest.cover_image ? (
             <img
               src={dest.cover_image}
               alt={dest.name}
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
           ) : (
@@ -269,7 +259,7 @@ function DestCard({ dest, index }) {
             </div>
           )}
         </div>
-      </Tag>
+      </Link>
     </motion.div>
   );
 }
