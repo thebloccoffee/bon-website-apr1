@@ -6,7 +6,7 @@ import NewsletterForm from '@/components/shared/NewsletterForm';
 
 export default function Bonpoints() {
   return (
-    <div data-brand="bonpoints" className="bg-background text-foreground font-sans">
+    <div className="bg-background text-foreground font-sans">
       <BrandPage
         brand="bonpoints"
         glass
@@ -26,7 +26,7 @@ export default function Bonpoints() {
           </div>
         }
         bottom={
-          <section className="px-tk-6 md:px-16 py-16 md:py-24" aria-labelledby="bp-newsletter-heading">
+          <section id="newsletter" className="px-tk-6 md:px-16 py-16 md:py-24 scroll-mt-24" aria-labelledby="bp-newsletter-heading">
             <div className="max-w-6xl mx-auto">
               <div className="bp-glass rounded-tk-xs p-tk-7 md:p-12 max-w-2xl">
                 <p className="font-sans text-tk-md tracking-[0.3em] uppercase text-tk-text-tertiary mb-tk-4">

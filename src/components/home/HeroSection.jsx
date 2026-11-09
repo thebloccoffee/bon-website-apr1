@@ -40,7 +40,7 @@ export default function HeroSection() {
             className="mt-tk-6"
           >
             <p className="font-sans text-white/70 text-tk-xs md:text-tk-md tracking-[0.25em] md:tracking-[0.4em] uppercase">
-              Travel films &amp; travel on points
+              Travel filmmaker · Vancouver
             </p>
           </motion.div>
         </motion.div>
@@ -53,14 +53,14 @@ export default function HeroSection() {
           className="absolute bottom-tk-8 left-0 right-0 flex justify-center"
         >
           <Link
-            to="/journal"
+            to="/portfolio"
             className="font-sans text-white/60 text-tk-md tracking-[0.3em] uppercase
                        px-tk-4 py-tk-3 rounded-tk-xs
                        transition-colors duration-normal
                        hover:text-white active:text-white/80
                        focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           >
-            Explore the journal ↓
+            See my work ↓
           </Link>
         </motion.div>
       </div>

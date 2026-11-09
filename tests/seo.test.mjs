@@ -318,7 +318,7 @@ await test('sitemap: well-formed XML, static + DB rows, noindex routes left out'
   assert.equal(res.statusCode, 200);
   assert.match(res.headers['content-type'], /application\/xml/);
   const xml = res.body;
-  for (const p of ['', '/journal', '/bonpoints', '/jooonbon', '/travel', '/shop', '/about', '/journal/natural-bridge', '/journal/evil', '/travel/xiamen']) {
+  for (const p of ['', '/journal', '/bonpoints', '/bonpoints/guides', '/travel', '/shop', '/about', '/journal/natural-bridge', '/journal/evil', '/travel/xiamen']) {
     assert.ok(xml.includes(`<loc>https://www.tabasjonbon.com${p}</loc>`), `missing ${p}`);
   }
   for (const p of ['/admin', '/search', '/shop/thanks']) {

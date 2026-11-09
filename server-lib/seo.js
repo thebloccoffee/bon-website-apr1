@@ -250,7 +250,8 @@ async function postSeo(path, slug, section) {
   const post = rows[0];
   if (!post) return notFoundSeo(path);
 
-  const canonical = canonicalUrl(`/journal/${post.slug}`);
+  // Each brand keeps its own address (see postPath in src/lib/brands.js).
+  const canonical = canonicalUrl(`${post.brand === 'bonpoints' ? '/bonpoints/guides' : '/journal'}/${post.slug}`);
   const where = [post.city, post.location].filter(Boolean).join(', ');
   const description =
     plainText(post.excerpt) ||
@@ -283,7 +284,9 @@ async function postSeo(path, slug, section) {
     article,
     breadcrumbs([
       ['Home', SITE_URL],
-      ['Journal', canonicalUrl('/journal')],
+      ...(post.brand === 'bonpoints'
+        ? [['bon.points', canonicalUrl('/bonpoints')], ['Guides', canonicalUrl('/bonpoints/guides')]]
+        : [['Journal', canonicalUrl('/journal')]]),
       [post.title, canonical],
     ]),
   ];

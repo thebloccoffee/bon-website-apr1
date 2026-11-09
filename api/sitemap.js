@@ -25,10 +25,10 @@ function entry({ path, lastmod, changefreq, priority }) {
 
 const SLUG_OK = (s) => typeof s === 'string' && s.length > 0 && !s.includes('/');
 
-async function rows(table) {
+async function rows(table, extra = []) {
   const { rows: list } = await supabaseSelectColumns(
     table,
-    ['slug,created_at,updated_at', 'slug,created_at'],
+    [...extra, 'slug,created_at,updated_at', 'slug,created_at'],
     { status: 'eq.published', limit: 5000 }
   );
   return list.filter((r) => SLUG_OK(r.slug));
@@ -36,7 +36,7 @@ async function rows(table) {
 
 export async function buildSitemap() {
   const [posts, products, destinations] = await Promise.all([
-    rows('blog_posts'),
+    rows('blog_posts', ['slug,created_at,updated_at,brand']),
     rows('shop_products'),
     rows('destinations'),
   ]);
@@ -53,7 +53,7 @@ export async function buildSitemap() {
       .filter(([, meta]) => meta.sitemap && !meta.noindex)
       .map(([path, meta]) => entry({ path, lastmod: sectionLastmod[path], ...meta.sitemap })),
     ...posts.map((p) =>
-      entry({ path: `/journal/${encodeURIComponent(p.slug)}`, lastmod: day(p.updated_at || p.created_at), changefreq: 'monthly', priority: '0.7' })
+      entry({ path: `${p.brand === 'bonpoints' ? '/bonpoints/guides' : '/journal'}/${encodeURIComponent(p.slug)}`, lastmod: day(p.updated_at || p.created_at), changefreq: 'monthly', priority: '0.7' })
     ),
     ...products.map((p) =>
       entry({ path: `/shop/${encodeURIComponent(p.slug)}`, lastmod: day(p.updated_at || p.created_at), changefreq: 'monthly', priority: '0.7' })

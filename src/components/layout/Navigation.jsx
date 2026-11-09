@@ -4,13 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, Search } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 
-// Per docs/SITEMAP.md. Brand names keep their own casing (no uppercase).
+// jooonbon is the main site. bon.points has its own header (BonpointsHeader.jsx).
 const navLinks = [
-  { label: 'jooonbon', path: '/jooonbon', brand: true },
-  { label: 'bon.points', path: '/bonpoints', brand: true },
+  { label: 'Work', path: '/portfolio' },
+  { label: 'Films', path: '/videos' },
   { label: 'Destinations', path: '/travel' },
   { label: 'Journal', path: '/journal' },
   { label: 'Shop', path: '/shop' },
+  { label: 'About', path: '/about' },
 ];
 
 const isActive = (pathname, path) => pathname === path || pathname.startsWith(`${path}/`);
@@ -51,7 +52,7 @@ export default function Navigation() {
           <Link to="/" className="relative z-50">
             <img
               src="/logo.png"
-              alt="Jon Bon"
+              alt="jooonbon"
               width="1037"
               height="474"
               className={`h-10 md:h-14 w-auto transition-all duration-500 ${logoInvert}`}
@@ -59,13 +60,13 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-6 lg:gap-10">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-10">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 aria-current={isActive(location.pathname, link.path) ? 'page' : undefined}
-                className={`font-sans text-xs transition-all duration-300 hover:opacity-60 ${link.brand ? 'tracking-[0.05em]' : 'tracking-[0.2em] uppercase'} ${linkColor} ${isActive(location.pathname, link.path) ? 'opacity-60' : ''}`}
+                className={`font-sans text-xs transition-all duration-300 hover:opacity-60 tracking-[0.2em] uppercase ${linkColor} ${isActive(location.pathname, link.path) ? 'opacity-60' : ''}`}
               >
                 {link.label}
               </Link>
@@ -84,10 +85,16 @@ export default function Navigation() {
             >
               {isDark ? <Sun size={15} /> : <Moon size={15} />}
             </button>
+            <Link
+              to="/bonpoints"
+              className={`font-sans text-xs tracking-[0.05em] border rounded-tk-pill px-tk-4 py-tk-2 transition-opacity duration-300 hover:opacity-60 ${onHero || isDark ? 'border-white/40 text-white' : 'border-foreground/40 text-foreground'}`}
+            >
+              bon.points ↗
+            </Link>
           </div>
 
           {/* Mobile right side */}
-          <div className="md:hidden flex items-center gap-5 relative z-50">
+          <div className="lg:hidden flex items-center gap-5 relative z-50">
             <Link
               to="/search"
               aria-label="Search"
@@ -133,7 +140,7 @@ export default function Navigation() {
               >
                 <Link
                   to={link.path}
-                  className={`font-sans text-2xl text-foreground hover:text-accent transition-colors ${link.brand ? 'tracking-[0.02em]' : 'tracking-[0.2em] uppercase'}`}
+                  className={`font-sans text-2xl text-foreground hover:text-accent transition-colors tracking-[0.2em] uppercase`}
                 >
                   {link.label}
                 </Link>
@@ -145,8 +152,8 @@ export default function Navigation() {
               transition={{ delay: navLinks.length * 0.1, duration: 0.4 }}
               className="flex items-center gap-8 pt-4"
             >
-              <Link to="/about" className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors">About</Link>
-              <Link to="/contact" className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
+              <Link to="/contact" className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors">Book me</Link>
+              <Link to="/bonpoints" className="font-sans text-sm tracking-[0.05em] text-muted-foreground hover:text-foreground transition-colors">bon.points ↗</Link>
             </motion.div>
           </motion.div>
         )}

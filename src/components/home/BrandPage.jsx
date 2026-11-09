@@ -51,13 +51,13 @@ export default function BrandPage({ brand, title, intro, glass = false, top = nu
       {top}
 
       {videos.length > 0 && (
-        <Section id={`${brand}-videos`} label="Videos" action={{ to: '/videos', label: 'All videos' }}>
+        <Section id={`${brand}-videos`} label="Videos" action={{ to: brand === 'bonpoints' ? '/bonpoints/videos' : '/videos', label: 'All videos' }}>
           <VideoGrid videos={videos.slice(0, 9)} glass={glass} />
         </Section>
       )}
 
       {posts.length > 0 && (
-        <Section id={`${brand}-posts`} label={brand === 'bonpoints' ? 'Guides' : 'Journal'} action={{ to: '/journal', label: 'Journal' }}>
+        <Section id={`${brand}-posts`} label={brand === 'bonpoints' ? 'Guides' : 'Journal'} action={brand === 'bonpoints' ? { to: '/bonpoints/guides', label: 'All guides' } : { to: '/journal', label: 'Journal' }}>
           <PostGrid posts={posts.slice(0, 6)} glass={glass} />
         </Section>
       )}

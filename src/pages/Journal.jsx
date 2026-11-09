@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPosts } from '@/components/home/postsQuery';
-import { BrandLabel } from '@/components/home/Section';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
@@ -31,11 +30,6 @@ const CONTINENT_MAP = {
   'Australia': 'Oceania', 'New Zealand': 'Oceania', 'Fiji': 'Oceania',
 };
 
-const BRAND_FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'jooonbon', label: 'jooonbon' },
-  { key: 'bonpoints', label: 'bon.points' },
-];
 
 function getContinent(location) {
   if (!location) return 'Other';
@@ -50,7 +44,7 @@ function getContinent(location) {
 export default function Journal() {
   const [activeDestination, setActiveDestination] = useState(null);
   const [activeContinent, setActiveContinent] = useState('All');
-  const [activeBrand, setActiveBrand] = useState('all');
+  const activeBrand = 'jooonbon'; // the Journal is jooonbon's; bon.points posts live in /bonpoints/guides
 
   const { data: allPosts = [], isLoading, isError } = useQuery({
     queryKey: ['blog-posts-all'],
@@ -115,11 +109,6 @@ export default function Journal() {
     setActiveDestination(null);
   };
 
-  const handleBrandClick = (brand) => {
-    setActiveBrand(brand);
-    setActiveDestination(null);
-    setActiveContinent('All');
-  };
 
   const clearFilter = () => {
     setActiveDestination(null);
@@ -152,25 +141,6 @@ export default function Journal() {
           </p>
         </motion.div>
       </div>
-
-      {/* BRAND FILTER */}
-      {!isLoading && allPosts.length > 0 && (
-        <div className="px-6 md:px-16 mb-8 flex flex-wrap items-center gap-2 md:gap-3" role="group" aria-label="Filter by brand">
-          <span className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground w-full md:w-auto mb-1 md:mb-0 md:mr-2">
-            Channel
-          </span>
-          {BRAND_FILTERS.map((b) => (
-            <button
-              key={b.key}
-              onClick={() => handleBrandClick(b.key)}
-              aria-pressed={activeBrand === b.key}
-              className={`${pillCls(activeBrand === b.key)} ${b.key === 'all' ? 'uppercase' : ''}`}
-            >
-              {b.label}
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* DESTINATIONS SECTION */}
       {!isLoading && destinations.length > 0 && (
@@ -270,11 +240,11 @@ export default function Journal() {
               </div>
             ) : (
               <h2 className="font-sans text-2xl md:text-3xl font-light tracking-[-0.02em]">
-                {activeBrand === 'all' ? 'All Entries' : BRAND_FILTERS.find((b) => b.key === activeBrand)?.label}
+                All Entries
               </h2>
             )}
           </div>
-          {(activeDestination || activeContinent !== 'All' || activeBrand !== 'all') && (
+          {(activeDestination || activeContinent !== 'All') && (
             <button
               onClick={clearFilter}
               className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors"
@@ -341,7 +311,6 @@ export default function Journal() {
 
                     <div className="flex-1 flex flex-col justify-center py-2">
                       <div className="flex items-center flex-wrap gap-4 mb-4">
-                        <BrandLabel brand={post.brand} />
                         {post.location && (
                           <span className="font-sans text-xs tracking-[0.2em] uppercase text-muted-foreground">
                             {post.location}

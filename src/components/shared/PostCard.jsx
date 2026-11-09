@@ -1,3 +1,4 @@
+import { postPath } from '@/lib/brands';
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -21,7 +22,7 @@ export default function PostCard({ post, index = 0, showBrand = false, glass = f
       className={glass ? 'bp-glass rounded-tk-xs p-tk-4' : ''}
     >
       <Link
-        to={`/journal/${post.slug || post.id}`}
+        to={postPath(post)}
         className="group block rounded-tk-xs
                    focus-visible:outline-2 focus-visible:outline-tk-text-primary
                    focus-visible:outline-offset-4"

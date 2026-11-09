@@ -1,8 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Seo from '@/components/shared/Seo';
+import { postPath } from '@/lib/brands';
 import { supabase } from '@/api/supabaseClient';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
@@ -18,6 +19,7 @@ function readingTime(html) {
 
 export default function BlogPost() {
   const { slug } = useParams();
+  const location = useLocation();
 
   const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', slug],
@@ -63,6 +65,12 @@ export default function BlogPost() {
 
   const contentWithIds = injectIds(post.content || '');
   const minutes = readingTime(post.content || '');
+
+  // Each brand keeps its own address: jooonbon in /journal, bon.points in /bonpoints/guides.
+  const inGuides = location.pathname.toLowerCase().startsWith('/bonpoints/');
+  if ((post.brand === 'bonpoints') !== inGuides) {
+    return <Navigate to={postPath(post)} replace />;
+  }
 
   const postIndex = allPosts?.findIndex(p => p.slug === slug) ?? -1;
   const prevPost = postIndex > 0 ? allPosts[postIndex - 1] : null;

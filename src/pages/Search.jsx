@@ -1,3 +1,4 @@
+import { postPath } from '@/lib/brands';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
@@ -15,7 +16,7 @@ const KINDS = [
 const BRAND_CHIPS = [{ key: '', label: 'All' }, ...Object.values(BRANDS).map((b) => ({ key: b.key, label: b.name }))];
 
 const hrefFor = (r) => {
-  if (r.kind === 'post') return `/journal/${r.slug}`;
+  if (r.kind === 'post') return postPath(r);
   if (r.kind === 'video') return `/videos?v=${encodeURIComponent(r.slug)}`;
   return `/shop/${r.slug}`;
 };

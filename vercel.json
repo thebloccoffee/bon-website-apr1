@@ -2,6 +2,11 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/jooonbon",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/blog",
       "destination": "/journal",
       "permanent": true

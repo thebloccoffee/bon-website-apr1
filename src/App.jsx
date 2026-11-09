@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
@@ -13,8 +13,9 @@ const BlogPostPage = lazy(() => import('./pages/BlogPost'));
 const Portfolio = lazy(() => import('./pages/Portfolio'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Admin = lazy(() => import('./pages/Admin'));
-const Jooonbon = lazy(() => import('./pages/Jooonbon'));
 const Bonpoints = lazy(() => import('./pages/Bonpoints'));
+const BonpointsGuides = lazy(() => import('./pages/BonpointsGuides'));
+const BonpointsVideos = lazy(() => import('./pages/BonpointsVideos'));
 const Destinations = lazy(() => import('./pages/Destinations'));
 const TravelDestination = lazy(() => import('./pages/TravelDestination'));
 const Videos = lazy(() => import('./pages/Videos'));
@@ -32,8 +33,10 @@ const Disclosures = lazy(() => import('./pages/legal/Disclosures'));
 // injection) and api/sitemap.js mirror these paths; keep them in sync.
 const routes = [
   ['/', Home],
-  ['/jooonbon', Jooonbon],
   ['/bonpoints', Bonpoints],
+  ['/bonpoints/guides', BonpointsGuides],
+  ['/bonpoints/guides/:slug', BlogPostPage],
+  ['/bonpoints/videos', BonpointsVideos],
   ['/travel', Destinations],
   ['/travel/:slug', TravelDestination],
   ['/journal', Journal],
@@ -63,6 +66,8 @@ function App() {
               {routes.map(([path, Page]) => (
                 <Route key={path} path={path} element={<Suspense fallback={<div className="min-h-screen" />}><Page /></Suspense>} />
               ))}
+              {/* jooonbon is the main site now, so its old brand page points home. */}
+              <Route path="/jooonbon" element={<Navigate to="/" replace />} />
             </Route>
             <Route path="*" element={<PageNotFound />} />
           </Routes>

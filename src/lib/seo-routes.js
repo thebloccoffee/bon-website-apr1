@@ -23,21 +23,25 @@ export const STATIC_ROUTES = {
   '/': {
     title: 'Jon Bon Tabas',
     description:
-      'Jon Bon Tabas is a Filipino-Canadian creator based in Vancouver. He makes travel films as jooonbon and covers credit cards, points and travel tips as bon.points.',
+      'Jon Bon Tabas (jooonbon) is a Filipino-Canadian travel filmmaker in Vancouver who recreates famous movie scenes where they were filmed. Travel films, client work and journal.',
     type: 'website',
     sitemap: { priority: '1.0', changefreq: 'weekly' },
-  },
-  '/jooonbon': {
-    title: 'jooonbon, travel filmmaker',
-    description:
-      'Jon Bon recreates famous movie scenes in the places they were filmed. Travel films and stories from jooonbon.',
-    sitemap: { priority: '0.9', changefreq: 'weekly' },
   },
   '/bonpoints': {
     title: 'bon.points',
     description:
       'Credit cards, finance and travel tips from an accountant who travels on points, with a focus on Canadian Amex Membership Rewards.',
     sitemap: { priority: '0.9', changefreq: 'weekly' },
+  },
+  '/bonpoints/guides': {
+    title: 'bon.points guides',
+    description: 'Credit card, points and travel money guides from bon.points.',
+    sitemap: { priority: '0.8', changefreq: 'weekly' },
+  },
+  '/bonpoints/videos': {
+    title: 'bon.points videos',
+    description: 'Credit card, points and travel money videos from bon.points.',
+    sitemap: { priority: '0.7', changefreq: 'weekly' },
   },
   '/travel': {
     title: 'Travel destinations',
@@ -50,8 +54,8 @@ export const STATIC_ROUTES = {
     sitemap: { priority: '0.9', changefreq: 'weekly' },
   },
   '/videos': {
-    title: 'Videos',
-    description: 'Travel films from jooonbon and credit card and points videos from bon.points.',
+    title: 'Films',
+    description: 'Travel films and shorts by jooonbon, Jon Bon Tabas.',
     sitemap: { priority: '0.8', changefreq: 'weekly' },
   },
   '/shop': {
@@ -66,8 +70,8 @@ export const STATIC_ROUTES = {
     sitemap: false,
   },
   '/portfolio': {
-    title: 'Portfolio',
-    description: 'Selected film and video work by Jon Bon Tabas.',
+    title: 'Work',
+    description: 'Client video work by Jon Bon Tabas: event highlights, brand films and travel content. Available for bookings.',
     sitemap: { priority: '0.7', changefreq: 'monthly' },
   },
   '/about': {
@@ -119,6 +123,7 @@ export const STATIC_ROUTES = {
 // the fallback copy while (or if) the row can't be loaded.
 export const DYNAMIC_ROUTES = [
   { kind: 'post', prefix: '/journal/', section: '/journal' },
+  { kind: 'post', prefix: '/bonpoints/guides/', section: '/bonpoints/guides' },
   { kind: 'product', prefix: '/shop/', section: '/shop' },
   { kind: 'destination', prefix: '/travel/', section: '/travel' },
 ];

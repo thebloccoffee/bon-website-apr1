@@ -20,9 +20,26 @@ const chipClass = (active) =>
 
 const prettyTag = (t) => t.replace(/[-_]/g, ' ');
 
-export default function Videos() {
+// /videos = jooonbon "Films"; /bonpoints/videos reuses this with lockedBrand="bonpoints".
+const COPY = {
+  jooonbon: {
+    eyebrow: 'Watch',
+    title: 'Films',
+    intro: 'Travel films and shorts, including scenes recreated where the movies were made.',
+    seo: 'Travel films and shorts by jooonbon, Jon Bon Tabas.',
+  },
+  bonpoints: {
+    eyebrow: 'Watch',
+    title: 'Videos',
+    intro: 'Credit card, points and travel money videos from bon.points.',
+    seo: 'Credit card, points and travel money videos from bon.points.',
+  },
+};
+
+export default function Videos({ lockedBrand = 'jooonbon' }) {
   const [params, setParams] = useSearchParams();
-  const brand = BRAND_KEYS.includes(params.get('brand')) ? params.get('brand') : null;
+  const brand = lockedBrand || (BRAND_KEYS.includes(params.get('brand')) ? params.get('brand') : null);
+  const copy = COPY[lockedBrand] || COPY.jooonbon;
   const format = params.get('format') === 'short' ? 'short' : 'long';
   const tag = params.get('tag') || null;
 
@@ -65,21 +82,19 @@ export default function Videos() {
 
   return (
     <div className="pt-28 pb-24 min-h-screen" data-brand={brand === 'bonpoints' ? 'bonpoints' : undefined}>
-      <Seo
-        title="Videos"
-        description="Travel films and shorts from jooonbon, and credit card and points videos from bon.points."
-      />
+      <Seo title={copy.title} description={copy.seo} />
 
       <header className="px-6 md:px-16 mb-10 md:mb-14">
-        <p className="font-sans text-tk-xs uppercase tracking-[0.3em] text-muted-foreground mb-tk-4">Watch</p>
-        <h1 className="font-serif text-4xl md:text-6xl font-light tracking-[-0.02em] leading-[1.1]">Videos</h1>
+        <p className="font-sans text-tk-xs uppercase tracking-[0.3em] text-muted-foreground mb-tk-4">{copy.eyebrow}</p>
+        <h1 className="font-serif text-4xl md:text-6xl font-light tracking-[-0.02em] leading-[1.1]">{copy.title}</h1>
         <p className="font-serif text-lg text-muted-foreground mt-4 max-w-xl">
-          Travel films and shorts from jooonbon, plus credit card and points videos from bon.points.
+          {copy.intro}
         </p>
       </header>
 
       <div className="px-6 md:px-16 mb-10 space-y-tk-5">
         <div className="flex flex-wrap items-center gap-tk-3" role="group" aria-label="Filter by brand">
+          {!lockedBrand && (<>
           <button type="button" className={chipClass(!brand)} aria-pressed={!brand} onClick={() => update('brand', null)}>
             All
           </button>
@@ -96,6 +111,7 @@ export default function Videos() {
           ))}
 
           <span className="mx-tk-3 h-6 w-px bg-border hidden sm:block" aria-hidden="true" />
+          </>)}
 
           <div className="inline-flex border border-border" role="group" aria-label="Video length">
             {FORMATS.map((f) => (

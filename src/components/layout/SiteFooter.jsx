@@ -4,10 +4,13 @@ import { BRANDS } from '@/lib/brands';
 import NewsletterForm from '@/components/shared/NewsletterForm';
 
 const siteLinks = [
+  { label: 'Work', to: '/portfolio' },
+  { label: 'Films', to: '/videos' },
+  { label: 'Destinations', to: '/travel' },
+  { label: 'Journal', to: '/journal' },
+  { label: 'Shop', to: '/shop' },
   { label: 'About', to: '/about' },
-  { label: 'Contact', to: '/contact' },
-  { label: 'Videos', to: '/videos' },
-  { label: 'Portfolio', to: '/portfolio' },
+  { label: 'Book me', to: '/contact' },
 ];
 
 const legalLinks = [
@@ -36,9 +39,9 @@ export default function SiteFooter() {
 
         <div className="grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-12">
           <div className="col-span-2 md:col-span-5">
-            <p className={labelCls}>Jon Bon</p>
+            <p className={labelCls}>jooonbon</p>
             <p className="font-serif text-sm text-muted-foreground max-w-sm leading-relaxed">
-              Vancouver-based Filipino-Canadian creator. Travel films as jooonbon, credit cards and points as bon.points.
+              Travel films by Jon Bon Tabas, a Filipino-Canadian filmmaker in Vancouver.
             </p>
             <div className="mt-8 max-w-sm">
               <NewsletterForm source="footer" />
@@ -65,23 +68,15 @@ export default function SiteFooter() {
 
           <div className="col-span-2 md:col-span-3">
             <p className={labelCls}>Follow</p>
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-6">
-              {Object.values(BRANDS).map((b) => (
-                <div key={b.key}>
-                  <Link to={b.path} className="font-sans text-sm text-foreground hover:opacity-60 transition-opacity">
-                    {b.name}
-                  </Link>
-                  <div className="flex items-center gap-4 mt-2">
-                    <a href={b.instagram} target="_blank" rel="noopener noreferrer" className={socialCls} aria-label={`${b.name} on Instagram`}>
-                      Instagram
-                    </a>
-                    <a href={b.youtube} target="_blank" rel="noopener noreferrer" className={socialCls} aria-label={`${b.name} on YouTube`}>
-                      YouTube
-                    </a>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center gap-4">
+              <a href={BRANDS.jooonbon.instagram} target="_blank" rel="noopener noreferrer" className={socialCls}>Instagram</a>
+              <a href={BRANDS.jooonbon.youtube} target="_blank" rel="noopener noreferrer" className={socialCls}>YouTube</a>
             </div>
+            <p className={`${labelCls} mt-10`}>Also by Jon</p>
+            <Link to="/bonpoints" className="font-sans text-sm text-foreground hover:opacity-60 transition-opacity">
+              bon.points ↗
+            </Link>
+            <p className="font-sans text-xs text-muted-foreground mt-2">Credit cards, finance and travel tips</p>
           </div>
         </div>
 
