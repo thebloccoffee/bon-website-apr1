@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /shop/thanks
 
-Sitemap: https://www.tabasjonbon.com/sitemap.xml
+Sitemap: https://www.jooonbon.com/sitemap.xml
