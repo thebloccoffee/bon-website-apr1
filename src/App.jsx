@@ -61,7 +61,7 @@ function App() {
           <Routes>
             <Route element={<SiteLayout />}>
               {routes.map(([path, Page]) => (
-                <Route key={path} path={path} element={<Suspense fallback={null}><Page /></Suspense>} />
+                <Route key={path} path={path} element={<Suspense fallback={<div className="min-h-screen" />}><Page /></Suspense>} />
               ))}
             </Route>
             <Route path="*" element={<PageNotFound />} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import SmartImage from '@/components/shared/SmartImage';
 
 export default function GalleryLightbox({ images = [], captions = [] }) {
   const [selected, setSelected] = useState(null);
@@ -30,9 +31,11 @@ export default function GalleryLightbox({ images = [], captions = [] }) {
             className="aspect-[3/2] overflow-hidden cursor-zoom-in group relative"
             onClick={() => open(i)}
           >
-            <img
+            <SmartImage
               src={url}
               alt={captions[i] || ''}
+              width={1200}
+              height={800}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             {captions[i] && (
