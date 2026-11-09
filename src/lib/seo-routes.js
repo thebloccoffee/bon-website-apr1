@@ -23,7 +23,7 @@ export const STATIC_ROUTES = {
   '/': {
     title: 'Jon Bon Tabas',
     description:
-      'Jon Bon Tabas (jooonbon) is a Filipino-Canadian travel filmmaker in Vancouver who recreates famous movie scenes where they were filmed. Travel films, client work and journal.',
+      'Jon Bon Tabas (jooonbon) is a Filipino travel filmmaker in Vancouver who recreates famous movie scenes where they were filmed. Travel films, client work and journal.',
     type: 'website',
     sitemap: { priority: '1.0', changefreq: 'weekly' },
   },
@@ -82,7 +82,7 @@ export const STATIC_ROUTES = {
   '/about': {
     title: 'About Jon Bon Tabas',
     description:
-      'Jon Bon Tabas is a Filipino-Canadian creator in Vancouver. He runs jooonbon, a travel film channel, and bon.points, a channel about credit cards and points.',
+      'Jon Bon Tabas is a Filipino creator in Vancouver. He runs jooonbon, a travel film channel, and bon.points, a channel about credit cards and points.',
     sitemap: { priority: '0.7', changefreq: 'monthly' },
   },
   '/contact': {

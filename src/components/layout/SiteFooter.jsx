@@ -5,11 +5,10 @@ import { useHasProducts, withoutShop } from '@/hooks/use-has-products';
 import NewsletterForm from '@/components/shared/NewsletterForm';
 
 const allSiteLinks = [
-  { label: 'Work', to: '/portfolio' },
-  { label: 'Stories', to: '/stories' },
+  { label: 'Map', to: '/' },
   { label: 'Films', to: '/videos' },
   { label: 'Journal', to: '/journal' },
-  { label: 'Destinations', to: '/travel' },
+  { label: 'Work', to: '/portfolio' },
   { label: 'Shop', to: '/shop' },
   { label: 'About', to: '/about' },
   { label: 'Book me', to: '/contact' },
@@ -44,7 +43,7 @@ export default function SiteFooter() {
           <div className="col-span-2 md:col-span-5">
             <p className={labelCls}>jooonbon</p>
             <p className="font-serif text-sm text-muted-foreground max-w-sm leading-relaxed">
-              Travel films by Jon Bon Tabas, a Filipino-Canadian filmmaker in Vancouver.
+              Travel films by Jon Bon Tabas, a Filipino filmmaker in Vancouver.
             </p>
             <div className="mt-8 max-w-sm">
               <NewsletterForm source="footer" />

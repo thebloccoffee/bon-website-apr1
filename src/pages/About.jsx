@@ -21,7 +21,7 @@ export default function About() {
             Jon Bon Tabas
           </h1>
           <p className="font-serif text-tk-3xl text-tk-text-secondary leading-relaxed max-w-2xl">
-            I&apos;m a Filipino-Canadian creator based in Vancouver. I run two channels: jooonbon for travel films
+            I&apos;m a Filipino creator based in Vancouver. I run two channels: jooonbon for travel films
             and bon.points for credit cards and points.
           </p>
         </motion.div>
