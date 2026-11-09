@@ -2,7 +2,7 @@
 
 The token layer already exists in `src/index.css` (`--font-size-*`, `--space-*`, `--radius-*`, `--motion-*`, `--color-*`) and is exposed to Tailwind as `tk-*` utilities in `tailwind.config.js`. Build on it. Do not add raw hex, px or ms values in components.
 
-## Site-wide (hub + jooonbon + travel)
+## Site-wide (hub + jooonbon)
 
 | Token | Value |
 |---|---|

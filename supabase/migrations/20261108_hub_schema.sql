@@ -12,19 +12,20 @@
 -- ---------------------------------------------------------------------------
 -- 0. Brand values used everywhere
 -- ---------------------------------------------------------------------------
--- 'jooonbon'  cinematic travel filmmaking
--- 'bonpoints' travel hacking + card rewards
--- 'travel'    general travel journal (default for the 30 existing posts)
+-- Two brands only:
+-- 'jooonbon'  Travel Filmmaker (default; the 30 existing journal posts land here)
+-- 'bonpoints' Credit cards, finance and travel tips
+-- Places/destinations are a shared topic (tags, destination), not a brand.
 
 -- ---------------------------------------------------------------------------
 -- 1. blog_posts: brand + kind + search
 -- ---------------------------------------------------------------------------
-alter table blog_posts add column if not exists brand text not null default 'travel';
+alter table blog_posts add column if not exists brand text not null default 'jooonbon';
 alter table blog_posts add column if not exists kind  text not null default 'story';  -- story | guide
 alter table blog_posts add column if not exists updated_at timestamptz default now();
 
 do $$ begin
-  alter table blog_posts add constraint blog_posts_brand_chk check (brand in ('jooonbon','bonpoints','travel'));
+  alter table blog_posts add constraint blog_posts_brand_chk check (brand in ('jooonbon','bonpoints'));
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter table blog_posts add constraint blog_posts_kind_chk check (kind in ('story','guide'));
@@ -50,7 +51,7 @@ create table if not exists videos (
   slug          text not null unique,
   title         text not null,
   description   text,
-  brand         text not null default 'jooonbon' check (brand in ('jooonbon','bonpoints','travel')),
+  brand         text not null default 'jooonbon' check (brand in ('jooonbon','bonpoints')),
   format        text not null default 'long' check (format in ('long','short')),
   tags          text[] default '{}',
   destination   text,                       -- destinations.slug, loose link
@@ -79,7 +80,7 @@ create table if not exists products (
   name           text not null,
   tagline        text,
   description    text,                      -- markdown
-  brand          text not null default 'jooonbon' check (brand in ('jooonbon','bonpoints','travel')),
+  brand          text not null default 'jooonbon' check (brand in ('jooonbon','bonpoints')),
   price_cents    integer not null check (price_cents >= 0),
   currency       text not null default 'CAD',
   compare_at_cents integer,
@@ -106,7 +107,7 @@ create table if not exists email_signups (
   id               uuid primary key default gen_random_uuid(),
   created_at       timestamptz default now(),
   email            text not null check (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
-  brand            text not null default 'jooonbon' check (brand in ('jooonbon','bonpoints','travel')),
+  brand            text not null default 'jooonbon' check (brand in ('jooonbon','bonpoints')),
   source           text,                    -- page or lead magnet, e.g. 'bonpoints-mr-cheat-sheet'
   consent          boolean not null check (consent),
   consent_text     text not null,           -- exact checkbox wording shown

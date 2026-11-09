@@ -1,14 +1,14 @@
 # Sitemap (target)
 
-One hub, three brand sections, one shop. Existing URLs are unchanged (see URL-MAP.md).
+One hub, two brands (jooonbon = Travel Filmmaker, bon.points = credit cards, finance and travel tips), one shop. Existing URLs are unchanged (see URL-MAP.md).
 
 ```
-/                         Home hub: who Jon is, 3 brand doors, latest videos, featured product, newsletter
-├── /jooonbon             Cinematic travel filmmaking: recreation reels, YT videos, LUTs, client work link
-├── /bonpoints            Travel hacking + Canadian card rewards: guides, videos, MR cheat sheet signup,
+/                         Home hub: who Jon is, 2 brand doors, latest videos, featured product, newsletter
+├── /jooonbon             Travel Filmmaker: recreation reels, YT videos, LUTs, client work link
+├── /bonpoints            Credit cards, finance + travel tips: guides, videos, MR cheat sheet signup,
 │                         not-financial-advice note, affiliate disclosure
-├── /travel               Destinations index (wires up the unrouted Destinations page)
-│   └── /travel/:slug     One destination: its journal posts + videos
+├── /travel               Destinations index, shared by both brands (topic, not a brand)
+│   └── /travel/:slug     One destination: posts + videos from both brands
 ├── /journal              Blog / guides (existing). Filter by brand, destination, tag
 │   └── /journal/:slug    Post (existing)
 ├── /videos               All videos, filter by brand + tag (YouTube facade embeds)
@@ -30,7 +30,7 @@ Generated: `/sitemap.xml`, `/robots.txt`.
 
 ## Navigation
 
-Header: jooonbon · bon.points · Travel · Journal · Shop · search icon · theme toggle
+Header: jooonbon · bon.points · Destinations · Journal · Shop · search icon · theme toggle
 Footer: About · Contact · Videos · Portfolio · Privacy · Terms · Refunds · Disclosures · Instagram · YouTube (both channels) · newsletter form
 
 ## Content source per page

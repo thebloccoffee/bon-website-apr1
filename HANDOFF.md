@@ -19,5 +19,6 @@
 - No code changed in Phase 1. Production is untouched
 - `.env.local` needs `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`; server functions also need the vars in AUDIT.md (get them from Vercel → Settings → Environment Variables)
 - Agent D owns AUDIT D1 (head injection + sitemap) and must also fix `/api/og` escaping (finding 3)
-- Agent A wires `src/pages/Destinations.jsx` to `/travel`
+- Agent A wires `src/pages/Destinations.jsx` to `/travel` (a shared destinations topic, not a brand)
+- Two brands only: `jooonbon` (Travel Filmmaker) and `bonpoints` (credit cards, finance, travel tips). Brand filters show exactly these two
 - Newsletter writes go through a new `/api/subscribe`, never the anon key
