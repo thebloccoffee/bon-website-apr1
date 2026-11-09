@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import Seo from '@/components/shared/Seo';
 import { supabase } from '@/api/supabaseClient';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -69,6 +70,7 @@ export default function BlogPost() {
 
   return (
     <div className="pt-28 pb-24">
+      <Seo title={post.title} description={post.excerpt} image={post.cover_image} type="article" />
       <FloatingShareSidebar title={post.title} image={post.cover_image} />
 
       {/* Back link */}

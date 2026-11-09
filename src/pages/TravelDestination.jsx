@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import Seo from '@/components/shared/Seo';
 import { motion } from 'framer-motion';
 import { getDestination, getVideos } from '@/api/content';
 import { PostGrid } from '@/components/shared/PostCard';
@@ -70,6 +71,7 @@ export default function TravelDestination() {
 
   return (
     <div className="pt-28 pb-12">
+      <Seo title={dest.name} description={dest.tagline || dest.description} image={dest.cover_image} />
       <header className="px-tk-6 md:px-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

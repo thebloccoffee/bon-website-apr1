@@ -66,7 +66,7 @@ export default function Videos() {
   return (
     <div className="pt-28 pb-24 min-h-screen" data-brand={brand === 'bonpoints' ? 'bonpoints' : undefined}>
       <Seo
-        title="Videos | Jon Bon Tabas"
+        title="Videos"
         description="Travel films and shorts from jooonbon, and credit card and points videos from bon.points."
       />
 
