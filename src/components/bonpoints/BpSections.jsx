@@ -6,7 +6,7 @@ import { BRANDS } from '@/lib/brands';
 import { PostGrid } from '@/components/shared/PostCard';
 import Disclosure from '@/components/shared/Disclosure';
 import NewsletterForm from '@/components/shared/NewsletterForm';
-import { BP_TOPICS, BP_PILLARS, BP_NEWSLETTER } from './content';
+import { BP_PILLARS, BP_NEWSLETTER } from './content';
 
 // bon.points v2 motion: "come into focus" = 24px up + blur 12 → 0, expo out.
 const EXPO = [0.16, 1, 0.3, 1];
@@ -73,27 +73,6 @@ export function BpHero() {
         <BpButton href="#newsletter" glass>Get the newsletter</BpButton>
       </motion.div>
     </section>
-  );
-}
-
-/* ── Topics marquee ───────────────────────────────────────────── */
-export function BpTopics() {
-  const row = [...BP_TOPICS, ...BP_TOPICS];
-  return (
-    <div className="overflow-hidden border-y border-[var(--bp-ash)] bg-[var(--bp-ink)] py-tk-6" aria-label="Topics">
-      <div className="flex w-max animate-jb-marquee motion-reduce:animate-none">
-        {row.map((t, i) => (
-          <span
-            key={`${t}-${i}`}
-            aria-hidden={i >= BP_TOPICS.length}
-            className="flex items-center gap-tk-8 px-tk-8 font-sans text-3xl md:text-5xl tracking-[-0.03em] whitespace-nowrap text-[var(--bp-stone)]"
-          >
-            <span className={i % 2 ? 'font-medium italic' : 'font-semibold'}>{t}</span>
-            <img src="/brands/bonpoints/mark-bone.svg" alt="" className="h-6 md:h-8 w-auto opacity-40" />
-          </span>
-        ))}
-      </div>
-    </div>
   );
 }
 

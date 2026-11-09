@@ -4,7 +4,6 @@ import { getVideos } from '@/api/content';
 import { fetchPosts } from '@/components/home/postsQuery';
 import {
   BpHero,
-  BpTopics,
   BpDisclosures,
   BpVideos,
   BpPillars,
@@ -27,7 +26,6 @@ export default function Bonpoints() {
   return (
     <div className="bg-[var(--bp-ink)] text-[var(--bp-bone)] font-sans -mt-px">
       <BpHero />
-      <BpTopics />
       <BpDisclosures />
       <BpVideos videos={videos} />
       <BpPillars />
