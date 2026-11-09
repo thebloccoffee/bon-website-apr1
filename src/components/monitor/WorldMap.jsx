@@ -231,7 +231,7 @@ export default function WorldMap({
         })}
 
         {focusPlace && (
-          <span aria-hidden="true" className="absolute pointer-events-none" style={{ ...pct(focusPlace.xy), width: 44, height: 44, margin: '-22px 0 0 -22px', transform: `scale(${inv})` }}>
+          <span aria-hidden="true" className="m-focus absolute pointer-events-none" style={{ ...pct(focusPlace.xy), width: 44, height: 44, margin: '-22px 0 0 -22px', transform: `scale(${inv})` }}>
             <span className="m-br tl" /><span className="m-br tr" /><span className="m-br bl" /><span className="m-br brr" />
           </span>
         )}

@@ -30,9 +30,13 @@ export function useMapContent() {
       if (n) countryCounts[c.slug] = n;
     }
     const cityCounts = {};
+    const cityFirst = {};
     for (const p of PLACES) {
-      const n = itemsFor({ kind: 'city', ...p }, all).length;
-      if (n) cityCounts[p.slug] = n;
+      const items = itemsFor({ kind: 'city', ...p }, all);
+      if (items.length) {
+        cityCounts[p.slug] = items.length;
+        cityFirst[p.slug] = Math.min(...items.map(dateOf).filter((t) => t > 0));
+      }
     }
     const newest = [...all].sort((a, b) => dateOf(b) - dateOf(a));
     let latestCity = null;
@@ -40,7 +44,7 @@ export function useMapContent() {
       const hit = PLACES.find((p) => itemsFor({ kind: 'city', ...p }, [it]).length);
       if (hit) { latestCity = hit.slug; break; }
     }
-    return { videos, posts, all, countryCounts, cityCounts, latestCity, isLoading: vLoading || pLoading };
+    return { videos, posts, all, countryCounts, cityCounts, cityFirst, latestCity, isLoading: vLoading || pLoading };
   }, [videos, posts, vLoading, pLoading]);
 }
 

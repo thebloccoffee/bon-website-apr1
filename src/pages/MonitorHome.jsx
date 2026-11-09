@@ -2,16 +2,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import MonitorHeader from '@/components/monitor/MonitorHeader';
 import WorldMap, { WORLD, MAX_K, fitBox } from '@/components/monitor/WorldMap';
-import { useMapContent, thumbFor } from '@/components/monitor/useMapContent';
-import { useHasProducts } from '@/hooks/use-has-products';
+import { useMapContent } from '@/components/monitor/useMapContent';
+import FocusCard from '@/components/monitor/FocusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { COUNTRIES, TRIPS, MAP_W, MAP_H, findPlace, itemsFor, countryOf, citiesIn, project } from '@/lib/places';
+import { COUNTRIES, PLACES, COUNTRY_COLORS, MAP_W, MAP_H, findPlace, itemsFor, countryOf, citiesIn, project } from '@/lib/places';
 import '@/components/monitor/monitor.css';
-
-const LOOK_KEY = 'jb-look';
-const readLook = () => {
-  try { return localStorage.getItem(LOOK_KEY) === 'log'; } catch { return false; }
-};
 
 const MAP_ASPECT = MAP_W / MAP_H;
 const PHONE_ASPECT = 4 / 5; // tall frame on phones: the map fills it and you swipe sideways
@@ -32,23 +27,17 @@ function viewFor(place, b, current) {
 }
 
 // Home: the world map seen through Jon's camera monitor. Trips run along the
-// bottom like clips on an edit timeline; LOG / GRADED flattens or grades it.
+// bottom like clips on an edit timeline.
 export default function MonitorHome() {
-  const { all, countryCounts, cityCounts, latestCity } = useMapContent();
-  const hasShop = useHasProducts();
+  const { all, countryCounts, cityCounts, cityFirst, latestCity } = useMapContent();
   const phone = useIsMobile();
   const b = phone ? PHONE_B : 1;
 
-  const [log, setLog] = useState(readLook);
   const [hover, setHover] = useState(null);
   const [sel, setSel] = useState(null); // { slug } of a city or country, or { name } of a country with nothing yet
   const [view, setView] = useState(WORLD);
   const touched = useRef(false);
   const mapRef = useRef(null);
-
-  useEffect(() => {
-    try { localStorage.setItem(LOOK_KEY, log ? 'log' : 'graded'); } catch { /* private mode */ }
-  }, [log]);
 
   // On a phone, open on the latest place instead of the middle of the Atlantic.
   useEffect(() => {
@@ -101,9 +90,30 @@ export default function MonitorHome() {
   const statusLine = (p, pv) =>
     pv?.count ? `${pv.count} ${pv.count === 1 ? 'STORY' : 'STORIES'}` : p?.status === 'edit' ? 'IN THE EDIT' : 'COMING SOON';
 
+  const clips = useMemo(
+    () => [
+      ...PLACES.filter((p) => cityCounts[p.slug]).sort((a, b) => (cityFirst[a.slug] || 0) - (cityFirst[b.slug] || 0)),
+      ...PLACES.filter((p) => !cityCounts[p.slug] && p.status === 'edit'),
+    ],
+    [cityCounts, cityFirst]
+  );
+
+  const card = sel?.name
+    ? { key: `geo-${sel.name}`, label: '▸ IN FOCUS', name: sel.name, note: 'Not filmed yet. Maybe the next trip.', muted: true }
+    : place && preview
+      ? {
+          key: place.slug,
+          href: `/travel/${place.slug}`,
+          label: sel || hover ? '▸ IN FOCUS' : '▸ LATEST',
+          name: place.name,
+          meta: `${(preview.where || '').toUpperCase()} · ${statusLine(place, preview)}`,
+          latest: preview.latest,
+        }
+      : null;
+
   return (
     <div className="monitor md:min-h-screen flex flex-col gap-3 px-4 md:px-6 pt-4 pb-5">
-      <MonitorHeader profile={log ? 'S-LOG3 · S-GAMUT3.CINE' : 'GRADED · JOOONBON LOOK'} />
+      <MonitorHeader />
 
       <h1 className="sr-only">jooonbon: every place Jon Bon Tabas has filmed, on one map</h1>
 
@@ -118,7 +128,6 @@ export default function MonitorHome() {
           view={view}
           onViewChange={changeView}
           aspect={phone ? PHONE_ASPECT : MAP_ASPECT}
-          log={log}
           style={phone ? undefined : { width: 'min(100%, calc((100svh - 250px) * 1.92))' }}
         />
 
@@ -148,20 +157,7 @@ export default function MonitorHome() {
         )}
 
         {/* desktop: what's in focus */}
-        {place && preview && (
-          <Link to={`/travel/${place.slug}`} className="absolute hidden md:flex gap-3 p-2 border" style={{ right: 76, top: '12%', width: 240, borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 88%, transparent)' }}>
-            {preview.latest && (
-              <img src={thumbFor(preview.latest)} alt="" width="72" height="128" loading="lazy" className="block object-cover" style={{ width: preview.latest.format === 'short' ? 64 : 96, aspectRatio: preview.latest.format === 'short' ? '9 / 16' : '16 / 9' }} />
-            )}
-            <span className="flex flex-col gap-1 min-w-0">
-              <span className="m-mono" style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--m-rec)' }}>{sel || hover ? '▸ IN FOCUS' : '▸ LATEST'}</span>
-              <span className="font-semibold leading-tight" style={{ fontSize: 18 }}>{place.name}</span>
-              <span className="m-mono" style={{ fontSize: 10, letterSpacing: '0.06em', color: 'var(--m-dim)' }}>{(preview.where || '').toUpperCase()} · {statusLine(place, preview)}</span>
-              {preview.latest && <span className="text-xs leading-snug line-clamp-2 mt-auto" style={{ color: 'var(--m-dim)' }}>{preview.latest.title}</span>}
-              <span className="m-mono mt-1" style={{ fontSize: 10, letterSpacing: '0.1em' }}>OPEN →</span>
-            </span>
-          </Link>
-        )}
+        <FocusCard item={card} className="absolute hidden md:block" style={{ right: 76, bottom: '11%', width: 380 }} />
 
         <span className="m-mono absolute left-4 hidden md:flex items-center gap-4 pointer-events-none" style={{ bottom: zoomed ? 'calc(11% + 56px)' : '11%', fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-dim)' }}>
           <span className="flex items-center gap-1.5"><span className="inline-block w-2 h-2 rounded-full" style={{ background: 'var(--m-rec)' }} />FILMED</span>
@@ -171,69 +167,35 @@ export default function MonitorHome() {
       </section>
 
       {/* phone: card for the selected place */}
-      <div className="md:hidden border" style={{ borderColor: 'var(--m-line)', background: 'var(--m-panel)' }} aria-live="polite">
-        {sel?.name ? (
-          <div className="p-3">
-            <p className="m-mono" style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--m-faint)' }}>▸ IN FOCUS</p>
-            <p className="font-semibold text-lg mt-1">{sel.name}</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--m-dim)' }}>Not filmed yet. Maybe the next trip.</p>
-          </div>
-        ) : place && preview ? (
-          <Link to={`/travel/${place.slug}`} className="flex gap-3 p-3 items-stretch">
-            {preview.latest && (
-              <img src={thumbFor(preview.latest)} alt="" width="72" height="128" loading="lazy" className="block object-cover shrink-0" style={{ width: preview.latest.format === 'short' ? 58 : 112, aspectRatio: preview.latest.format === 'short' ? '9 / 16' : '16 / 9' }} />
-            )}
-            <span className="flex flex-col gap-1 min-w-0 flex-1">
-              <span className="m-mono" style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--m-rec)' }}>{sel ? '▸ IN FOCUS' : '▸ LATEST'}</span>
-              <span className="font-semibold text-lg leading-tight">{place.name}</span>
-              <span className="m-mono" style={{ fontSize: 10, letterSpacing: '0.06em', color: 'var(--m-dim)' }}>{(preview.where || '').toUpperCase()} · {statusLine(place, preview)}</span>
-              {preview.latest && <span className="text-xs leading-snug line-clamp-2" style={{ color: 'var(--m-dim)' }}>{preview.latest.title}</span>}
-            </span>
-            <span className="m-mono self-center shrink-0 px-3 py-2 border" style={{ fontSize: 11, letterSpacing: '0.1em', borderColor: 'var(--m-line-2)' }}>OPEN →</span>
-          </Link>
-        ) : (
-          <p className="p-3 text-sm" style={{ color: 'var(--m-dim)' }}>Tap a pin or a country.</p>
-        )}
-      </div>
+      <FocusCard item={card || { key: 'empty', label: '▸ TAP A PIN OR A COUNTRY', name: 'Explore the map', muted: true }} size="md" className="md:hidden" />
 
-      {/* look switch + trips timeline */}
-      <section aria-label="Look and trips" className="flex flex-wrap gap-3 md:gap-4 items-stretch">
-        <div className="flex md:flex-col items-center md:items-start gap-3 md:gap-2">
-          <div role="group" aria-label="Look" className="m-mono flex border" style={{ borderColor: 'var(--m-line-2)', fontSize: 12, letterSpacing: '0.1em' }}>
-            {[['LOG', true], ['GRADED', false]].map(([label, val]) => (
-              <button key={label} type="button" aria-pressed={log === val} onClick={() => setLog(val)} className="min-h-[44px] px-4"
-                style={log === val ? { background: 'var(--m-text)', color: 'var(--m-bg)' } : { color: 'var(--m-dim)' }}>
-                {label}
-              </button>
-            ))}
-          </div>
-          {hasShop && <Link to="/shop" className="m-mono" style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--m-dim)' }}>GET THIS GRADE →</Link>}
-        </div>
-
-        <div className="flex-1 min-w-0 border" style={{ minWidth: 'min(100%, 560px)', borderColor: 'var(--m-line)', background: 'var(--m-panel)' }}>
+      {/* places timeline: every city filmed, oldest to newest; in-the-edit last */}
+      <section aria-label="Places" className="flex">
+        <div className="flex-1 min-w-0 border" style={{ borderColor: 'var(--m-line)', background: 'var(--m-panel)' }}>
           <div className="m-mono flex justify-between px-3 py-1.5" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-faint)', borderBottom: '1px solid var(--m-line)' }}>
-            <span>V1 · TRIPS</span><span>{TRIPS[0]?.when?.toUpperCase()} → NOW</span>
+            <span>V1 · PLACES</span><span>FIRST → LATEST</span>
           </div>
-          <div className="flex overflow-x-auto p-2 snap-x">
-            {TRIPS.map((t) => {
-              const target = findPlace(t.to);
+          <div className="flex overflow-x-auto p-2 snap-x snap-mandatory md:snap-none">
+            {clips.map((p) => {
+              const [bg, ink] = COUNTRY_COLORS[p.country] || ['#B49A72', '#111'];
+              const edit = !cityCounts[p.slug];
               const tap = (e) => {
                 if (!phone) return;
                 e.preventDefault();
-                select(t.to, { scroll: true });
+                select(p.slug, { scroll: true });
               };
               return (
                 <Link
-                  key={t.label}
-                  to={`/travel/${t.to}`}
-                  className={`m-clip snap-start ${t.status === 'edit' ? 'is-edit' : ''}`}
-                  style={{ flex: `${Math.min(8, Math.max(2, cityCounts[t.to] || countryCounts[t.to] || 2))} 0 auto`, ...(t.status === 'edit' ? {} : { background: t.color, color: t.ink || '#111' }) }}
-                  onMouseEnter={() => target?.kind === 'city' && setHover(t.to)}
-                  onFocus={() => target?.kind === 'city' && setHover(t.to)}
+                  key={p.slug}
+                  to={`/travel/${p.slug}`}
+                  className={`m-clip snap-start ${edit ? 'is-edit' : ''}`}
+                  style={{ flex: `${Math.min(6, Math.max(2, cityCounts[p.slug] || 2))} ${phone ? 0 : 1} auto`, ...(edit ? {} : { background: bg, color: ink }) }}
+                  onMouseEnter={() => setHover(p.slug)}
+                  onFocus={() => setHover(p.slug)}
                   onClick={tap}
-                  title={`${t.label} · ${t.when}`}
+                  title={`${p.name}, ${countryOf(p.country)?.name}`}
                 >
-                  {t.label.toUpperCase()}{t.status === 'edit' ? ' · IN THE EDIT' : ''}
+                  {p.name.toUpperCase()}{edit ? ' · IN THE EDIT' : ''}
                 </Link>
               );
             })}
