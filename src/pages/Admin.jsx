@@ -3,11 +3,17 @@ import { useAuth } from '@/lib/AuthContext';
 import BlogPostEditor from '../components/admin/BlogPostEditor';
 import PortfolioEditor from '../components/admin/PortfolioEditor';
 import DestinationsEditor from '../components/admin/DestinationsEditor';
+import VideosEditor from '../components/admin/VideosEditor';
+import ProductsEditor from '../components/admin/ProductsEditor';
+import SignupsViewer from '../components/admin/SignupsViewer';
 
 const TABS = [
   { key: 'blog', label: 'Blog Posts' },
   { key: 'portfolio', label: 'Portfolio' },
   { key: 'destinations', label: 'Destinations' },
+  { key: 'videos', label: 'Videos' },
+  { key: 'products', label: 'Products' },
+  { key: 'signups', label: 'Signups' },
 ];
 
 export default function Admin() {
@@ -104,6 +110,9 @@ export default function Admin() {
         {activeTab === 'blog' && <BlogPostEditor />}
         {activeTab === 'portfolio' && <PortfolioEditor />}
         {activeTab === 'destinations' && <DestinationsEditor />}
+        {activeTab === 'videos' && <VideosEditor />}
+        {activeTab === 'products' && <ProductsEditor />}
+        {activeTab === 'signups' && <SignupsViewer />}
       </div>
     </div>
   );

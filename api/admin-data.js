@@ -4,18 +4,23 @@
  * admin session cookie and then uses the service_role key (bypasses RLS).
  *
  * POST /api/admin-data
- *   { table: 'blog_posts' | 'portfolio_projects' | 'destinations',
+ *   { table: 'blog_posts' | 'portfolio_projects' | 'destinations' | 'videos' | 'products' | 'email_signups' (list only),
  *     op: 'list' | 'create' | 'update' | 'delete',
  *     id?: string, payload?: object,
  *     order?: { column: string, ascending: boolean } }
  */
 import { requireAdmin, getServiceClient } from '../server-lib/adminAuth.js';
 
-const TABLES = new Set(['blog_posts', 'portfolio_projects', 'destinations']);
+const TABLES = new Set(['blog_posts', 'portfolio_projects', 'destinations', 'videos', 'products', 'email_signups']);
+// email_signups is read-only from the admin UI (list only).
+const READ_ONLY = new Set(['email_signups']);
 const DEFAULT_ORDER = {
   blog_posts: { column: 'created_at', ascending: false },
   portfolio_projects: { column: 'order', ascending: true },
   destinations: { column: 'order', ascending: true },
+  videos: { column: 'published_at', ascending: false },
+  products: { column: 'order', ascending: true },
+  email_signups: { column: 'created_at', ascending: false },
 };
 // Never allow the client to overwrite these columns.
 const PROTECTED_KEYS = new Set(['id', 'created_at']);
@@ -37,6 +42,9 @@ export default async function handler(req, res) {
   const { table, op, id, payload, order } = req.body || {};
   if (!TABLES.has(table)) {
     return res.status(400).json({ error: 'Unknown table' });
+  }
+  if (READ_ONLY.has(table) && op !== 'list') {
+    return res.status(400).json({ error: 'Read-only table' });
   }
 
   let client;
