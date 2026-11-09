@@ -1,53 +1,14 @@
-// Vercel serverless function — injects OG tags for /journal/:slug
-// Called by Vercel middleware for social share crawlers
-
-export default async function handler(req, res) {
-  const slug = req.query.slug;
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!slug || !supabaseUrl || !supabaseKey) {
-    return res.redirect('/');
-  }
-
-  try {
-    const response = await fetch(
-      `${supabaseUrl}/rest/v1/blog_posts?slug=eq.${slug}&status=eq.published&select=title,excerpt,cover_image`,
-      { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
-    );
-    const [post] = await response.json();
-
-    if (!post) return res.redirect('/journal');
-
-    const pageUrl = `https://${req.headers.host}/journal/${slug}`;
-    const title = post.title;
-    const description = post.excerpt || 'A travel dispatch by Jon Bon Tabas.';
-    const image = post.cover_image || '';
-
-    res.setHeader('Content-Type', 'text/html');
-    res.send(`<!doctype html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>${title} — Jon Bon Tabas</title>
-  <meta name="description" content="${description}" />
-  <meta property="og:title" content="${title}" />
-  <meta property="og:description" content="${description}" />
-  <meta property="og:image" content="${image}" />
-  <meta property="og:url" content="${pageUrl}" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Jon Bon Tabas" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${title}" />
-  <meta name="twitter:description" content="${description}" />
-  <meta name="twitter:image" content="${image}" />
-  <meta http-equiv="refresh" content="0;url=${pageUrl}" />
-</head>
-<body>
-  <p>Redirecting to <a href="${pageUrl}">${title}</a>...</p>
-</body>
-</html>`);
-  } catch {
-    res.redirect('/journal');
-  }
+// Compat shim. Head injection for every route now lives in api/page.js, and
+// vercel.json no longer sends anything here. Old /api/og?slug=... links get a
+// permanent redirect to the canonical journal URL. The slug is validated and
+// encoded, so nothing from the query reaches HTML or a database query.
+export default function handler(req, res) {
+  let slug = req.query?.slug;
+  if (Array.isArray(slug)) slug = slug[0];
+  const valid = typeof slug === 'string' && /^[A-Za-z0-9_-]{1,200}$/.test(slug);
+  const location = valid ? `/journal/${encodeURIComponent(slug)}` : '/journal';
+  res.statusCode = 308;
+  res.setHeader('Location', location);
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.end();
 }

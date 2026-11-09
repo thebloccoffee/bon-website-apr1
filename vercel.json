@@ -1,10 +1,17 @@
 {
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/blog", "destination": "/journal", "permanent": true },
+    { "source": "/blog/:slug", "destination": "/journal/:slug", "permanent": true },
+    { "source": "/works", "destination": "/portfolio", "permanent": true },
+    { "source": "/destinations", "destination": "/travel", "permanent": true },
+    { "source": "/store", "destination": "/shop", "permanent": true },
+    { "source": "/luts", "destination": "/shop", "permanent": true },
+    { "source": "/points", "destination": "/bonpoints", "permanent": true },
+    { "source": "/bon.points", "destination": "/bonpoints", "permanent": true }
+  ],
   "rewrites": [
-    {
-      "source": "/journal/:slug",
-      "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|twitterbot|linkedinbot|whatsapp|slackbot|pinterest|googlebot).*" }],
-      "destination": "/api/og?slug=:slug"
-    },
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/:path((?!api/|assets/|.*\\.[a-z0-9]+$).*)", "destination": "/api/page?path=:path" }
   ]
 }
