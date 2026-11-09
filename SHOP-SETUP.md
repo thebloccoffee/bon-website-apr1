@@ -1,6 +1,6 @@
 # Shop setup
 
-> **Current setup (2026-11-08): checkout on Stan Store.** The site is the shop window: product pages live on tabasjonbon.com and the Buy button opens the product's Stan link (paste it in /admin → Products → Buy link). Stan handles payment, delivery, email capture and upsells. Nothing below needs setting up unless a product uses a Stripe Payment Link instead; the Stripe flow is built and tested but dormant.
+> **Current setup (2026-11-08): checkout on Stan Store.** The site is the shop window: product pages live on jooonbon.com and the Buy button opens the product's Stan link (paste it in /admin → Products → Buy link). Stan handles payment, delivery, email capture and upsells. Nothing below needs setting up unless a product uses a Stripe Payment Link instead; the Stripe flow is built and tested but dormant.
 
 Products sell through Stripe Payment Links. Stripe takes the payment, then sends the buyer back to `/shop/thanks` on this site, where the files download from a private Supabase bucket.
 
@@ -46,7 +46,7 @@ Optional: `supabase/seed/products.sql` adds two draft products to try the admin 
 | `SUPABASE_SERVICE_ROLE_KEY` | yes | Never prefix it with `VITE_`. That would ship it in the browser bundle. |
 | `SUPABASE_URL` | yes | Or `VITE_SUPABASE_URL`, which is already set. |
 | `RESEND_API_KEY` | optional | Turns on the email copy of the download links. The thanks page works without it. |
-| `SHOP_FROM_EMAIL` | optional | e.g. `Jon Bon <shop@tabasjonbon.com>`. The domain must be verified in Resend. |
+| `SHOP_FROM_EMAIL` | optional | e.g. `Jon Bon <shop@jooonbon.com>`. The domain must be verified in Resend. |
 | `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` | yes | Already used by `/admin`. |
 
 ## 3. Stripe
@@ -54,11 +54,11 @@ Optional: `supabase/seed/products.sql` adds two draft products to try the admin 
 1. Product catalogue, Add product. Set the real price here. The site's `price_formatted` is display text only, so change both when the price changes.
 2. Copy the Price ID (`price_1...`). The webhook matches line items to products on this.
 3. Payment Links, New, pick the product. Under After payment, choose to redirect customers to your website, and set:
-   `https://www.tabasjonbon.com/shop/thanks?session_id={CHECKOUT_SESSION_ID}`
+   `https://jooonbon.com/shop/thanks?session_id={CHECKOUT_SESSION_ID}`
    The old branch used `/shop/success`. That path no longer exists.
 4. Skip Stripe's own file delivery. Files come from your bucket.
 5. Developers, Webhooks, Add endpoint:
-   - URL `https://www.tabasjonbon.com/api/stripe-webhook`
+   - URL `https://jooonbon.com/api/stripe-webhook`
    - Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `charge.refunded`
    - Copy the signing secret into `STRIPE_WEBHOOK_SECRET`
 6. For GCash: Settings, Payment methods, enable GCash. It may need PHP presentment, so either price in PHP or turn on Adaptive Pricing. Without the two `async_payment_*` events, GCash buyers would stay `pending` forever.

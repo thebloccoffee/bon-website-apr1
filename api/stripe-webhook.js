@@ -5,7 +5,7 @@
 // (await request.text()), which the signature is computed over.
 //
 // Configure in Stripe -> Developers -> Webhooks:
-//   URL:    https://www.tabasjonbon.com/api/stripe-webhook
+//   URL:    https://jooonbon.com/api/stripe-webhook
 //   Events: checkout.session.completed,
 //           checkout.session.async_payment_succeeded,
 //           checkout.session.async_payment_failed,
@@ -117,7 +117,7 @@ async function sendDownloadEmail({ to, name, productTitle, orderNumber, links })
             Save the files somewhere safe once you have them. If something goes wrong, reply to this email.
           </p>
           <hr style="border:none;border-top:1px solid #eee;margin:32px 0;" />
-          <p style="font-size:12px;color:#999;">tabasjonbon.com</p>
+          <p style="font-size:12px;color:#999;">jooonbon.com</p>
         </div>`,
       }),
     });

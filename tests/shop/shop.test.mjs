@@ -13,7 +13,7 @@ import order from '../../api/order.js';
 import download from '../../api/download.js';
 
 const SECRET = 'whsec_test_secret';
-const ORIGIN = 'https://www.tabasjonbon.com';
+const ORIGIN = 'https://jooonbon.com';
 const SESSION = 'cs_test_a1B2c3D4e5F6g7H8i9J0';
 
 let be;
