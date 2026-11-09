@@ -35,7 +35,7 @@ const db = {
       status: 'published',
     },
   ],
-  destinations: [{ slug: 'xiamen', name: 'Xiamen', tagline: '', description: '', cover_image: '', status: 'published', created_at: '2026-04-01T00:00:00Z' }],
+  destinations: [{ slug: 'lisbon', name: 'Lisbon', tagline: '', description: '', cover_image: '', status: 'published', created_at: '2026-04-01T00:00:00Z' }],
   shop_products: null, // null = table missing (PGRST205), like prod today
   videos: null,
 };
@@ -264,7 +264,7 @@ await test('Supabase timeout: 200 with section copy, never a false 404', async (
 await test('Supabase 500: 200 with section copy', async () => {
   supabaseMode = 'error';
   try {
-    const res = await get('/travel/xiamen');
+    const res = await get('/travel/lisbon');
     assert.equal(res.statusCode, 200);
     assert.match(res.body, /<title>Travel destinations \| Jon Bon Tabas<\/title>/);
   } finally {
@@ -273,9 +273,25 @@ await test('Supabase 500: 200 with section copy', async () => {
 });
 
 await test('destination: name in title, breadcrumbs', async () => {
-  const res = await get('/travel/xiamen');
-  assert.match(res.body, /<title>Xiamen \| Jon Bon Tabas<\/title>/);
+  const res = await get('/travel/lisbon');
+  assert.match(res.body, /<title>Lisbon \| Jon Bon Tabas<\/title>/);
   assert.ok(ldBlocks(res.body).some((x) => x['@type'] === 'BreadcrumbList'));
+});
+
+await test('map place: city and country pages have titles and country breadcrumb, even when Supabase is down', async () => {
+  supabaseMode = 'error';
+  try {
+    let res = await get('/travel/hanoi');
+    assert.equal(res.statusCode, 200);
+    assert.match(res.body, /<title>Hanoi: films and travel notes \| Jon Bon Tabas<\/title>/);
+    const crumbs = ldBlocks(res.body).find((x) => x['@type'] === 'BreadcrumbList');
+    assert.ok(crumbs && JSON.stringify(crumbs).includes('/travel/vietnam'));
+    res = await get('/travel/vietnam');
+    assert.equal(res.statusCode, 200);
+    assert.match(res.body, /<title>Vietnam: films and travel notes/);
+  } finally {
+    supabaseMode = 'ok';
+  }
 });
 
 await test('/videos: tolerates missing table, ItemList when rows exist', async () => {
@@ -318,7 +334,7 @@ await test('sitemap: well-formed XML, static + DB rows, noindex routes left out'
   assert.equal(res.statusCode, 200);
   assert.match(res.headers['content-type'], /application\/xml/);
   const xml = res.body;
-  for (const p of ['', '/journal', '/bonpoints', '/bonpoints/guides', '/travel', '/shop', '/about', '/journal/natural-bridge', '/journal/evil', '/travel/xiamen']) {
+  for (const p of ['', '/journal', '/bonpoints', '/bonpoints/guides', '/travel', '/shop', '/about', '/journal/natural-bridge', '/journal/evil', '/travel/lisbon', '/travel/hanoi']) {
     assert.ok(xml.includes(`<loc>https://www.tabasjonbon.com${p}</loc>`), `missing ${p}`);
   }
   for (const p of ['/admin', '/search', '/shop/thanks']) {
