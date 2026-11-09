@@ -8,6 +8,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LegalPage, { ToFill } from '@/components/legal/LegalPage';
+import { resetCookieConsent } from '@/components/CookieBanner';
 
 const sections = [
   {
@@ -116,7 +117,11 @@ const sections = [
           <li>An admin login cookie, which only exists for Jon when he signs in to manage the site.</li>
         </ul>
         <p>
-          Metricool loads only after you accept analytics. Vercel Web Analytics doesn't use cookies.
+          Metricool loads only after you accept analytics. Vercel Web Analytics doesn't use cookies.{' '}
+          <button type="button" onClick={resetCookieConsent} className="underline underline-offset-2 hover:text-foreground">
+            Change your analytics choice
+          </button>
+          . If you had accepted, reload the page after declining to stop Metricool.
         </p>
         <p>
           Some pages embed videos from YouTube or Vimeo. When you play one, that company may set its own cookies and
