@@ -85,7 +85,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <p className="mt-16 font-sans text-xs text-muted-foreground/60">
+        <p className="mt-16 font-sans text-xs text-muted-foreground">
           © {new Date().getFullYear()} Jon Bon Tabas. All rights reserved.
         </p>
       </div>

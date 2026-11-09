@@ -23,7 +23,8 @@ const DEFAULT_ORDER = {
   email_signups: { column: 'created_at', ascending: false },
 };
 // Never allow the client to overwrite these columns.
-const PROTECTED_KEYS = new Set(['id', 'created_at']);
+// `search` is a generated tsvector column; Postgres rejects writes to it.
+const PROTECTED_KEYS = new Set(['id', 'created_at', 'search']);
 
 function sanitize(payload) {
   const clean = {};
