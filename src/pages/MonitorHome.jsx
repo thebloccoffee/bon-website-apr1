@@ -119,11 +119,8 @@ export default function MonitorHome() {
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
         <div className="min-w-0">
           <h1 className="font-semibold tracking-tight leading-tight" style={{ fontSize: 'clamp(18px, 2.4vw, 26px)' }}>
-            Travel films by Jon Bon Tabas. Every place I've filmed, on one map.
+            Every place I've filmed, on one map.
           </h1>
-          <p className="m-mono mt-1" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--m-dim)' }}>
-            PICK A PIN OR A COUNTRY TO SEE ITS FILMS, STORIES AND GUIDES
-          </p>
         </div>
         <a
           href="https://youtube.com/jonbontabas"
