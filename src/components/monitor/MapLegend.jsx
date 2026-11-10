@@ -46,7 +46,7 @@ export function CoachMarks() {
     try { localStorage.setItem(KEY, '1'); } catch { /* ignore */ }
     setShow(false);
   };
-  const steps = ['Tap a pin or a country on the map', 'Open the place for films, stories and guides', 'Or scroll the timeline below'];
+  const steps = ['Tap a pin to explore a place'];
 
   return (
     <div
@@ -54,14 +54,7 @@ export function CoachMarks() {
       className="m-mono absolute z-10 left-3 bottom-[130px] md:left-12 md:bottom-[26%] max-w-[260px] p-3 border"
       style={{ fontSize: 11, letterSpacing: '0.06em', borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 92%, transparent)', backdropFilter: 'blur(6px)' }}
     >
-      <ol className="space-y-1.5" style={{ color: 'var(--m-text)' }}>
-        {steps.map((t, i) => (
-          <li key={t} className="flex gap-2">
-            <span style={{ color: 'var(--m-rec)' }}>{i + 1}</span>
-            <span>{t}</span>
-          </li>
-        ))}
-      </ol>
+      <p style={{ color: 'var(--m-text)' }}>{steps[0]}</p>
       <button type="button" onClick={done} className="mt-3 min-h-[36px] px-3 border" style={{ borderColor: 'var(--m-text)', letterSpacing: '0.12em' }}>
         GOT IT
       </button>

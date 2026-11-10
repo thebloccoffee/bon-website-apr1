@@ -6,7 +6,7 @@ import { useMapContent } from '@/components/monitor/useMapContent';
 import FocusCard from '@/components/monitor/FocusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { COUNTRIES, PLACES, COUNTRY_COLORS, MAP_W, MAP_H, findPlace, itemsFor, countryOf, citiesIn, project } from '@/lib/places';
-import MapLegend, { CoachMarks } from '@/components/monitor/MapLegend';
+import { CoachMarks } from '@/components/monitor/MapLegend';
 import '@/components/monitor/monitor.css';
 
 const MAP_ASPECT = MAP_W / MAP_H;
@@ -121,9 +121,6 @@ export default function MonitorHome() {
           <h1 className="font-semibold tracking-tight leading-tight" style={{ fontSize: 'clamp(18px, 2.4vw, 26px)' }}>
             Every place I've filmed, on one map.
           </h1>
-          <p className="m-mono mt-1" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--m-dim)' }}>
-            JON BON TABAS · FILIPINO TRAVEL FILMMAKER BASED IN VANCOUVER
-          </p>
         </div>
         <a
           href="https://youtube.com/jonbontabas"
@@ -133,7 +130,7 @@ export default function MonitorHome() {
           style={{ fontSize: 11, letterSpacing: '0.12em', borderColor: 'var(--m-rec)', color: 'var(--m-text)' }}
         >
           <span className="inline-block w-2 h-2 rounded-full" style={{ background: 'var(--m-rec)' }} />
-          SUBSCRIBE ON YOUTUBE ↗
+          YOUTUBE ↗
         </a>
       </div>
 
@@ -182,7 +179,6 @@ export default function MonitorHome() {
         <CoachMarks />
       </section>
 
-      <MapLegend countries={Object.keys(countryCounts).length} stories={all.length} />
 
       {/* phone: card for the selected place */}
       <FocusCard item={card || { key: 'empty', label: '▸ TAP A PIN OR A COUNTRY', name: 'Explore the map', muted: true }} size="md" className="md:hidden" />
@@ -191,7 +187,7 @@ export default function MonitorHome() {
       <section aria-label="Places" className="flex">
         <div className="flex-1 min-w-0 border" style={{ borderColor: 'var(--m-line)', background: 'var(--m-panel)' }}>
           <div className="m-mono flex justify-between px-3 py-1.5" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-faint)', borderBottom: '1px solid var(--m-line)' }}>
-            <span>V1 · PLACES · COLOUR = COUNTRY · STRIPED = IN THE EDIT</span><span>FIRST → LATEST</span>
+            <span>PLACES</span><span>FIRST → LATEST</span>
           </div>
           <div className="flex overflow-x-auto p-2 snap-x snap-mandatory md:snap-none">
             {clips.map((p) => {
