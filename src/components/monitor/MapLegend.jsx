@@ -51,7 +51,7 @@ export function CoachMarks() {
   return (
     <div
       role="note"
-      className="m-mono absolute z-10 left-3 bottom-14 md:left-12 md:bottom-[26%] max-w-[260px] p-3 border"
+      className="m-mono absolute z-10 left-3 bottom-[130px] md:left-12 md:bottom-[26%] max-w-[260px] p-3 border"
       style={{ fontSize: 11, letterSpacing: '0.06em', borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 92%, transparent)', backdropFilter: 'blur(6px)' }}
     >
       <ol className="space-y-1.5" style={{ color: 'var(--m-text)' }}>
