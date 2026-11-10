@@ -121,6 +121,9 @@ export default function MonitorHome() {
           <h1 className="font-semibold tracking-tight leading-tight" style={{ fontSize: 'clamp(18px, 2.4vw, 26px)' }}>
             Every place I've filmed, on one map.
           </h1>
+          <p className="m-mono mt-1" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--m-dim)' }}>
+            JON BON TABAS · FILIPINO TRAVEL FILMMAKER BASED IN VANCOUVER
+          </p>
         </div>
         <a
           href="https://youtube.com/jonbontabas"

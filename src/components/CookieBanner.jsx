@@ -101,7 +101,7 @@ export default function CookieBanner() {
           role="dialog"
           aria-live="polite"
           aria-label="Analytics consent"
-          className="fixed bottom-3 inset-x-3 md:inset-x-auto md:right-4 md:left-auto md:bottom-4 md:max-w-[300px] z-[60] bg-card text-card-foreground border border-border shadow-xl p-4"
+          className="fixed bottom-3 inset-x-3 md:inset-x-auto md:left-4 md:right-auto md:bottom-4 md:max-w-[300px] z-[60] bg-card text-card-foreground border border-border shadow-xl p-4"
         >
           <p className="font-serif text-sm leading-relaxed text-muted-foreground">
             Can I count your visit with Metricool analytics? It sees the page you're on, where you came from and your
