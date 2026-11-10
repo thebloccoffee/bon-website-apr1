@@ -13,7 +13,7 @@ const sections = [
     title: 'Using this site',
     body: (
       <p>
-        tabasjonbon.com is run by Jon Bon Tabas in Vancouver, British Columbia, Canada ("I", "me"). By using the site
+        jooonbon.com is run by Jon Bon Tabas in Vancouver, British Columbia, Canada ("I", "me"). By using the site
         or buying something from it, you agree to these terms. If you don't agree, please don't use the site.
       </p>
     ),
@@ -141,7 +141,7 @@ export default function Terms() {
   return (
     <LegalPage
       title="Terms of Use"
-      intro={<p>The rules for using tabasjonbon.com and buying from the shop.</p>}
+      intro={<p>The rules for using jooonbon.com and buying from the shop.</p>}
       sections={sections}
     />
   );

@@ -4,7 +4,7 @@
 // and relative imports with explicit .js extensions so Node can load it.
 import { BRANDS } from './brands.js';
 
-export const SITE_URL = 'https://www.tabasjonbon.com';
+export const SITE_URL = 'https://jooonbon.com';
 export const SITE_NAME = 'Jon Bon Tabas';
 export const DEFAULT_IMAGE = '/og-image.png';
 export const PERSON_NAME = 'Jon Bon Tabas';
@@ -92,23 +92,23 @@ export const STATIC_ROUTES = {
   },
   '/search': {
     title: 'Search',
-    description: 'Search stories, videos and products on tabasjonbon.com.',
+    description: 'Search stories, videos and products on jooonbon.com.',
     noindex: true,
     sitemap: false,
   },
   '/privacy': {
     title: 'Privacy policy',
-    description: 'How tabasjonbon.com collects and uses personal information.',
+    description: 'How jooonbon.com collects and uses personal information.',
     sitemap: { priority: '0.2', changefreq: 'yearly' },
   },
   '/terms': {
     title: 'Terms of use',
-    description: 'Terms of use for tabasjonbon.com and its shop.',
+    description: 'Terms of use for jooonbon.com and its shop.',
     sitemap: { priority: '0.2', changefreq: 'yearly' },
   },
   '/refunds': {
     title: 'Refund policy',
-    description: 'Refund policy for digital products bought on tabasjonbon.com.',
+    description: 'Refund policy for digital products bought on jooonbon.com.',
     sitemap: { priority: '0.2', changefreq: 'yearly' },
   },
   '/disclosures': {

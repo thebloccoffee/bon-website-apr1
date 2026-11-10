@@ -5,6 +5,9 @@ import { thumbFor } from './useMapContent';
 
 const EASE = [0.22, 1, 0.36, 1];
 
+// Captions arrive with hashtags and cut-off endings; show a clean one-line title.
+export const cleanTitle = (t = '') => t.replace(/#\S+/g, '').replace(/[.…]+\s*$/, '').replace(/\s+/g, ' ').trim();
+
 /**
  * The "in focus" card. Its frame never unmounts; only the content crossfades
  * when the place changes, so moving between pins feels continuous.
@@ -33,7 +36,7 @@ export default function FocusCard({ item, size = 'lg', className = '', style }) 
         <span className="font-semibold leading-[1.05] tracking-tight" style={{ fontSize: lg ? 28 : 24 }}>{item.name}</span>
         {item.meta && <span className="m-mono" style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--m-dim)' }}>{item.meta}</span>}
         {(item.latest?.title || item.note) && (
-          <span className="leading-snug line-clamp-2 mt-auto" style={{ fontSize: lg ? 14 : 13, color: 'var(--m-dim)' }}>{item.latest?.title || item.note}</span>
+          <span className="leading-snug line-clamp-2 mt-auto" style={{ fontSize: lg ? 14 : 13, color: 'var(--m-dim)' }}>{item.latest?.title ? cleanTitle(item.latest.title) : item.note}</span>
         )}
         {item.href && <span className="m-mono" style={{ fontSize: 11, letterSpacing: '0.12em' }}>OPEN →</span>}
       </span>

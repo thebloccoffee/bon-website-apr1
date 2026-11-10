@@ -101,7 +101,7 @@ export default function CookieBanner() {
           role="dialog"
           aria-live="polite"
           aria-label="Analytics consent"
-          className="fixed bottom-4 inset-x-4 md:inset-x-auto md:left-6 md:bottom-6 md:max-w-sm z-[60] bg-card text-card-foreground border border-border shadow-xl p-5"
+          className="fixed bottom-3 inset-x-3 md:inset-x-auto md:left-4 md:right-auto md:bottom-4 md:max-w-[300px] z-[60] bg-card text-card-foreground border border-border shadow-xl p-4"
         >
           <p className="font-serif text-sm leading-relaxed text-muted-foreground">
             Can I count your visit with Metricool analytics? It sees the page you're on, where you came from and your
@@ -111,14 +111,14 @@ export default function CookieBanner() {
             <button
               type="button"
               onClick={decline}
-              className="font-sans text-xs tracking-[0.25em] uppercase border border-border px-5 py-2.5 text-muted-foreground hover:text-foreground hover:border-foreground transition-all duration-300"
+              className="font-sans text-xs tracking-[0.25em] uppercase border border-border px-4 py-2 text-muted-foreground hover:text-foreground hover:border-foreground transition-all duration-300"
             >
               No thanks
             </button>
             <button
               type="button"
               onClick={accept}
-              className="font-sans text-xs tracking-[0.25em] uppercase border border-foreground px-5 py-2.5 hover:bg-foreground hover:text-background transition-all duration-300"
+              className="font-sans text-xs tracking-[0.25em] uppercase border border-foreground px-4 py-2 hover:bg-foreground hover:text-background transition-all duration-300"
             >
               Accept
             </button>

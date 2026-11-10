@@ -72,7 +72,7 @@ export default function Refunds() {
   return (
     <LegalPage
       title="Refund Policy"
-      intro={<p>How refunds work for digital products bought on tabasjonbon.com.</p>}
+      intro={<p>How refunds work for digital products bought on jooonbon.com.</p>}
       sections={sections}
     />
   );

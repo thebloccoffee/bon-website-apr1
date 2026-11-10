@@ -29,13 +29,6 @@ export default function SiteFooter() {
   const siteLinks = withoutShop(allSiteLinks, useHasProducts());
   return (
     <footer className="relative py-16 md:py-32 px-6 md:px-16 overflow-hidden">
-      {/* Large background text */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
-        <span className="font-sans text-[15vw] font-bold uppercase tracking-wider text-foreground/[0.04] leading-none whitespace-nowrap">
-          Jon Bon
-        </span>
-      </div>
-
       <div className="relative z-10 max-w-5xl mx-auto">
         <div className="w-full h-px bg-border mb-12" />
 
