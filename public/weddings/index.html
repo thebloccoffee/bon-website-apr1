@@ -717,6 +717,9 @@ footer a:hover { color: var(--ink); }
         </div>
         <form id="inquiry" novalidate>
           <div class="field"><label for="f-names">Your names</label><input id="f-names" name="names" autocomplete="name" placeholder="Alex &amp; Sam" required></div>
+          <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@email.com" required></div>
+          <div class="field"><label for="f-phone">Phone <span style="font-weight:400;color:var(--mute)">(optional)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="604 555 0123"></div>
+          <div style="position:absolute;left:-9999px" aria-hidden="true"><label for="f-website">Website</label><input id="f-website" name="website" tabindex="-1" autocomplete="off"></div>
           <div class="field"><label for="f-date">Date</label><input id="f-date" name="date" type="date" required></div>
           <div class="field"><label for="f-venue">Venue</label><input id="f-venue" name="venue" placeholder="Venue or city" required></div>
           <div class="field"><label for="f-coll">Interested in</label>
@@ -858,24 +861,42 @@ footer a:hover { color: var(--ink); }
 
   /* Inquiry: builds an email to Vivid Stories */
   var form = $("inquiry"), status = $("status"), draft = $("draft");
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var missing = ["f-names", "f-date", "f-venue"].filter(function (id) { return !$(id).value.trim(); });
-    if (missing.length) { status.textContent = "Add your names, date and venue so we can check the calendar."; $(missing[0]).focus(); return; }
-    var d = $("f-date").value;
-    var body = "Names: " + $("f-names").value.trim() + "\nDate: " + d + "\nVenue: " + $("f-venue").value.trim() +
-      "\nCollection: " + $("f-coll").value + ($("f-note").value.trim() ? "\n\n" + $("f-note").value.trim() : "");
-    var subject = ($("f-coll").value === "Pre-wedding shoot" ? "Pre-wedding" : "Wedding") + " inquiry · " + d + " · " + $("f-names").value.trim();
+  var startedAt = Date.now();
+  function mailFallback(subject, body) {
     draft.hidden = false;
     draft.textContent = "To: jooonbon@gmail.com\nSubject: " + subject + "\n\n" + body;
     status.innerHTML = "";
-    status.append("Your email app should open with this filled in. If it doesn't, ");
+    status.append("We couldn't send it from here. ");
     var b = document.createElement("button"); b.type = "button"; b.className = "mini"; b.textContent = "Copy message";
     b.addEventListener("click", function () { copy(draft.textContent, b, "Copied", draft); });
-    status.append(b, " and send it to jooonbon@gmail.com.");
-    var a = document.createElement("a");
+    status.append(b, " and email it to jooonbon@gmail.com, or ");
+    var a = document.createElement("a"); a.textContent = "open your email app";
     a.href = "mailto:jooonbon@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-    a.click();
+    status.append(a, ".");
+  }
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var missing = ["f-names", "f-email", "f-date", "f-venue"].filter(function (id) { return !$(id).value.trim(); });
+    if (missing.length) { status.textContent = "Add your names, email, date and venue so we can check the calendar."; $(missing[0]).focus(); return; }
+    if (!$("f-email").checkValidity()) { status.textContent = "That email doesn't look right."; $("f-email").focus(); return; }
+    var d = $("f-date").value, coll = $("f-coll").value, phone = $("f-phone").value.trim(), note = $("f-note").value.trim();
+    var kind = coll === "Pre-wedding shoot" ? "Pre-wedding" : "Wedding";
+    var subject = kind + " inquiry · " + d + " · " + $("f-names").value.trim();
+    var message = "Interested in: " + coll + (phone ? "\nPhone: " + phone : "") + (note ? "\n\n" + note : "");
+    var body = "Names: " + $("f-names").value.trim() + "\nEmail: " + $("f-email").value.trim() + "\nDate: " + d + "\nVenue: " + $("f-venue").value.trim() + "\n" + message;
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true; status.textContent = "Sending…"; draft.hidden = true;
+    fetch("/api/contact", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: $("f-names").value.trim(), email: $("f-email").value.trim(), project_type: "Vivid Stories · " + kind + " · " + coll,
+        location: $("f-venue").value.trim(), when: d, message: message, website: $("f-website").value, t: startedAt })
+    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.j.error || "failed");
+        form.reset(); btn.disabled = false;
+        status.textContent = "Sent. Thank you! We'll reply within 48 hours. Check your inbox for a confirmation.";
+      })
+      .catch(function () { btn.disabled = false; mailFallback(subject, body); });
   });
 })();
 </script>
