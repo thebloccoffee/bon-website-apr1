@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import StoriesTabs from '@/components/shared/StoriesTabs';
+import NotebookHero from '@/components/journal/NotebookHero';
 
 // Map location names → continent
 const CONTINENT_MAP = {
@@ -122,21 +123,7 @@ export default function Journal() {
     <div className="pt-28 pb-24">
       <StoriesTabs />
 
-      {/* PAGE HEADER */}
-      <div className="px-6 md:px-16 mb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <h1 className="font-sans text-4xl md:text-6xl font-light tracking-[-0.02em] leading-[1.1]">
-            The Journal
-          </h1>
-          <p className="font-serif text-lg text-muted-foreground mt-4 max-w-lg">
-            Dispatches from the edges of the map, slow travel, quiet observation, and the stories that unfold between destinations.
-          </p>
-        </motion.div>
-      </div>
+      <NotebookHero posts={posts} isLoading={isLoading} />
 
       {/* DESTINATIONS SECTION */}
       {!isLoading && destinations.length > 0 && (
