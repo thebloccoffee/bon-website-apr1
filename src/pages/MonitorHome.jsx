@@ -120,17 +120,8 @@ export default function MonitorHome() {
           compact={phone}
         />
 
-        {/* 2.39 letterbox and frame lines: decoration only */}
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[7%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderBottom: '1px solid var(--m-line-2)' }} />
-        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[7%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderTop: '1px solid var(--m-line-2)' }} />
-        <span aria-hidden="true" className="absolute pointer-events-none" style={{ inset: 12 }}>
-          <span className="m-br tl" style={{ width: 22, height: 22 }} /><span className="m-br tr" style={{ width: 22, height: 22 }} />
-          <span className="m-br bl" style={{ width: 22, height: 22 }} /><span className="m-br brr" style={{ width: 22, height: 22 }} />
-        </span>
-        <span aria-hidden="true" className="m-mono absolute hidden sm:block pointer-events-none" style={{ left: 48, top: 16, fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-dim)' }}>2.39:1</span>
-
         {/* bottom centre: hint or reset, plus zoom */}
-        <div className="absolute inset-x-0 bottom-3 md:bottom-[8.5%] flex items-center justify-center gap-2 pointer-events-none">
+        <div className="absolute inset-x-0 bottom-3 md:bottom-6 flex items-center justify-center gap-2 pointer-events-none">
           {zoomed ? (
             <button type="button" onClick={reset} className="m-mono pointer-events-auto min-h-[40px] px-3 border" style={{ fontSize: 11, letterSpacing: '0.1em', borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
               ⤢ WHOLE WORLD
