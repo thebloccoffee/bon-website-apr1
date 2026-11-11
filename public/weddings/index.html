@@ -243,6 +243,41 @@ tbody tr:hover td, tbody tr:hover th { background: #f6f6f6; }
 .plate.land { aspect-ratio: 16 / 6.8; }
 @media (max-width: 760px) { .pair { grid-template-columns: 1fr; gap: 12px; } .plate.land { aspect-ratio: 4 / 3; } }
 
+
+/* ---------- Pre-wedding: pick a type, see two packages ---------- */
+.pw-intro { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 6vw, 96px); align-items: end; padding-top: 28px; }
+.pw-intro > * { min-width: 0; }
+.pw-intro p { font-size: 0.9375rem; color: var(--ink-2); }
+.pw-ask { padding-top: clamp(44px, 6vw, 80px); }
+.pw-ask .q { font-size: var(--step-lead); font-weight: 300; padding-bottom: 14px; }
+.pw-pick { display: flex; flex-wrap: wrap; gap: 10px; }
+.pw-pick button {
+  appearance: none; cursor: pointer; font: inherit; font-size: var(--step-label); font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  min-height: 44px; padding: 0 20px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 999px;
+  transition: background .25s var(--ease), color .25s var(--ease), transform .25s var(--ease);
+}
+.pw-pick button:hover { transform: translateY(-2px); }
+.pw-pick button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.pw-cards { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 3vw, 40px); padding-top: 32px; }
+.pw-card { border-top: 4px solid var(--ink); padding-top: 18px; display: flex; flex-direction: column; gap: 18px; min-width: 0; transition: transform .4s var(--ease); }
+.pw-card[hidden] { display: none; }
+.pw-card:hover { transform: translateY(-4px); }
+.pw-card .top-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.pw-card h3 { font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.4rem); font-weight: 300; letter-spacing: -0.02em; }
+.pw-card h3 em { font-family: var(--serif); font-weight: 400; }
+.pw-card .tag { font-size: var(--step-label); font-weight: 600; letter-spacing: .18em; text-transform: uppercase; background: var(--ink); color: var(--paper); padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+.pw-card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0; }
+.pw-card li { font-size: 0.9375rem; padding-block: 11px; border-bottom: 1px solid var(--hair); }
+.pw-card .price-row { padding-top: 6px; margin-top: auto; }
+.pw-more { margin-top: clamp(40px, 5vw, 64px); border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+.pw-more summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 16px; padding-block: 20px; font-size: 1.0625rem; font-weight: 500; }
+.pw-more summary::-webkit-details-marker { display: none; }
+.pw-more summary::after { content: "+"; font-weight: 300; font-size: 1.4rem; line-height: 1; transition: transform .3s var(--ease); }
+.pw-more[open] summary::after { transform: rotate(45deg); }
+.pw-more table { min-width: 0; margin-bottom: 20px; }
+@media (max-width: 760px) { .pw-intro, .pw-cards { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .pw-card, .pw-pick button { transition: none; } .pw-card:hover, .pw-pick button:hover { transform: none; } }
+
 /* ---------- FAQ ---------- */
 .faq { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(32px, 8vw, 128px); }
 .faq details { border-bottom: 1px solid var(--hair); min-width: 0; }
@@ -351,7 +386,7 @@ footer a:hover { color: var(--ink); }
     <a href="#work"><small>01</small>Work</a>
     <a href="#about"><small>02</small>About</a>
     <a href="#collections"><small>03</small>Collections</a>
-    <a href="#kind-words"><small>04</small>Kind words</a>
+    <a href="#prewedding"><small>04</small>Pre-wedding</a>
     <a href="#faq"><small>05</small>Good to know</a>
     <a href="#contact"><small>06</small>Check availability</a>
   </nav>
@@ -503,7 +538,7 @@ footer a:hover { color: var(--ink); }
               <tr><th scope="row">Ceremony + speeches films</th><td>—</td><td>Yes</td><td>Yes</td></tr>
               <tr><th scope="row">Vertical reel (30 to 60 sec)</th><td>—</td><td>Yes</td><td>Yes</td></tr>
               <tr><th scope="row">Documentary film</th><td>—</td><td>—</td><td>20 to 30 min</td></tr>
-              <tr><th scope="row">Engagement session</th><td>$500 add-on</td><td>$500 add-on</td><td>Included</td></tr>
+              <tr><th scope="row">Pre-wedding shoot</th><td>15% off</td><td>15% off</td><td>Photo Mini included</td></tr>
               <tr><th scope="row">Online gallery + print release</th><td>Yes</td><td>Yes</td><td>Yes</td></tr>
             </tbody>
           </table>
@@ -515,7 +550,7 @@ footer a:hover { color: var(--ink); }
 
   <section id="addons">
     <div class="wrap">
-      <div class="eyebrow label"><span>Add-ons + à la carte</span><span class="count">10 options</span></div>
+      <div class="eyebrow label"><span>Add-ons + à la carte</span><span class="count">9 options</span></div>
       <table class="addons">
         <tbody>
           <tr><td>Video only (1 videographer, 8 hours)</td><td>$2,800</td></tr>
@@ -523,8 +558,7 @@ footer a:hover { color: var(--ink); }
           <tr><td>Video only (3 videographers, 11 hours)</td><td>$6,500</td></tr>
           <tr><td>Photo only (1 photographer, 8 hours)</td><td>$2,800</td></tr>
           <tr><td>Photo only (2 photographers, 10 hours)</td><td>$4,200</td></tr>
-          <tr><td>Photo only (2 photographers, 11 hours + engagement session)</td><td>$5,200</td></tr>
-          <tr><td>Engagement session</td><td>$500</td></tr>
+          <tr><td>Photo only (2 photographers, 11 hours + Photo Mini pre-wedding)</td><td>$5,200</td></tr>
           <tr><td>Extra hour of coverage (by crew size)</td><td>$300 to $800</td></tr>
           <tr><td>Vertical reel (30 to 60 seconds)</td><td>$350</td></tr>
           <tr><td>Express delivery (photos in 3 weeks, films in 6)</td><td>$500</td></tr>
@@ -541,14 +575,63 @@ footer a:hover { color: var(--ink); }
     </div>
   </div>
 
-  <section id="engagement">
+  <section id="prewedding">
     <div class="wrap">
-      <div class="eyebrow label"><span>Engagement session</span><span class="count">$500 or included in Platinum</span></div>
+      <div class="eyebrow label"><span>Pre-wedding</span><span class="count">From $500 CAD</span></div>
       <div class="plate-wrap"><img class="plate land" src="/weddings/photos/engagement.jpg" alt="Couple lying on the grass under autumn trees" loading="lazy"></div>
-      <div class="pair">
-        <p>Before the wedding, spend an hour with us somewhere that feels like you. Walk, talk, and let us catch the moments between the poses.</p>
-        <p>It gets you comfortable on camera and gives you portraits with no schedule. Included in Platinum and the 11-hour photo-only option, or $500 on its own.</p>
+      <div class="pw-intro">
+        <h2>Before the <b>big day.</b></h2>
+        <p>Spend a few hours with us somewhere that feels like you. You get used to the camera, and you walk away with portraits, a short film, or both for your save-the-dates.</p>
       </div>
+      <div class="pw-ask">
+        <p class="q" id="pw-q">What would you like?</p>
+        <div class="pw-pick" role="group" aria-labelledby="pw-q">
+          <button type="button" data-type="photo" aria-pressed="false">Photos</button>
+          <button type="button" data-type="film" aria-pressed="false">Film</button>
+          <button type="button" data-type="both" aria-pressed="true">Photo + Film</button>
+        </div>
+      </div>
+      <div class="pw-cards" id="pw-cards" aria-live="polite">
+        <article class="pw-card" data-types="photo">
+          <div class="top-row"><h3>Photo <em>Mini</em></h3></div>
+          <ul><li>1 hour, 1 location</li><li>1 photographer</li><li>About 60 edited photos</li></ul>
+          <div class="price-row"><div class="price">$500 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Photo Mini ($500)">Ask about this</a></div>
+        </article>
+        <article class="pw-card" data-types="photo">
+          <div class="top-row"><h3>Photo <em>Full</em></h3></div>
+          <ul><li>2 hours, 2 locations, 1 outfit change</li><li>1 photographer</li><li>About 120 edited photos</li></ul>
+          <div class="price-row"><div class="price">$850 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Photo Full ($850)">Ask about this</a></div>
+        </article>
+        <article class="pw-card" data-types="film">
+          <div class="top-row"><h3>Film <em>Only</em></h3></div>
+          <ul><li>2 hours</li><li>1 videographer</li><li>60 to 90 second film + vertical reel</li></ul>
+          <div class="price-row"><div class="price">$1,200 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Film Only ($1,200)">Ask about this</a></div>
+        </article>
+        <article class="pw-card" data-types="film both">
+          <div class="top-row"><h3>Photo <em>+</em> Film</h3><span class="tag">Our pick</span></div>
+          <ul><li>2 hours, 2 locations</li><li>1 photographer + 1 videographer</li><li>About 120 photos, 1 to 2 minute film, vertical reel</li></ul>
+          <div class="price-row"><div class="price">$1,800 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Photo + Film ($1,800)">Ask about this</a></div>
+        </article>
+        <article class="pw-card" data-types="both">
+          <div class="top-row"><h3>Love <em>Story</em></h3></div>
+          <ul><li>4 hours, 3 locations, drone</li><li>1 photographer + 1 videographer</li><li>About 200 photos, 2 to 3 minute film with a short interview, 2 vertical reels</li></ul>
+          <div class="price-row"><div class="price">$2,800 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Love Story ($2,800)">Ask about this</a></div>
+        </article>
+      </div>
+      <details class="pw-more">
+        <summary>Add-ons</summary>
+        <table class="addons">
+          <tbody>
+            <tr><td>Extra hour (photo only / photo + film)</td><td>$300 / $450</td></tr>
+            <tr><td>Extra location</td><td>$150</td></tr>
+            <tr><td>Drone</td><td>$300</td></tr>
+            <tr><td>Save-the-date cut (60 seconds)</td><td>$300</td></tr>
+            <tr><td>Rush delivery (1 week)</td><td>$200</td></tr>
+            <tr><td>Park or venue permits</td><td>At cost</td></tr>
+          </tbody>
+        </table>
+      </details>
+      <p class="fine">// 30% retainer holds the date. Delivery in 2 to 3 weeks. Book a wedding collection and get 15% off, or the Photo Mini free with Platinum.</p>
     </div>
   </section>
 
@@ -563,7 +646,7 @@ footer a:hover { color: var(--ink); }
     </div>
   </section>
 
-  <section id="kind-words">
+  <section id="kind-words" hidden>
     <div class="wrap">
       <div class="eyebrow label"><span>Kind words</span><span class="count">From our couples</span></div>
       <span class="label sample-tag">Mockup · sample quotes, replace with real reviews</span>
@@ -634,11 +717,11 @@ footer a:hover { color: var(--ink); }
         </div>
         <form id="inquiry" novalidate>
           <div class="field"><label for="f-names">Your names</label><input id="f-names" name="names" autocomplete="name" placeholder="Alex &amp; Sam" required></div>
-          <div class="field"><label for="f-date">Wedding date</label><input id="f-date" name="date" type="date" required></div>
+          <div class="field"><label for="f-date">Date</label><input id="f-date" name="date" type="date" required></div>
           <div class="field"><label for="f-venue">Venue</label><input id="f-venue" name="venue" placeholder="Venue or city" required></div>
-          <div class="field"><label for="f-coll">Collection</label>
+          <div class="field"><label for="f-coll">Interested in</label>
             <select id="f-coll" name="collection">
-              <option>Not sure yet</option><option>Silver</option><option>Gold</option><option>Platinum</option><option>Custom package</option>
+              <option>Not sure yet</option><option>Silver</option><option>Gold</option><option>Platinum</option><option>Pre-wedding shoot</option><option>Custom package</option>
             </select>
           </div>
           <div class="field full"><label for="f-note">A bit about you</label><textarea id="f-note" name="note" placeholder="Guest count, the moments you care about, anything we should know"></textarea></div>
@@ -697,8 +780,8 @@ footer a:hover { color: var(--ink); }
       get: ["About 400 edited photos", "3 to 4 minute highlight film", "Online gallery with downloads and print release"], price: "$5,000" },
     gold: { pitch: "Two of each, so the ceremony and the room both get covered.", coverage: "10 hours, getting ready through dancing", crew: "2 photographers + 2 videographers",
       get: ["About 650 edited photos", "Sneak peek of 10 photos within 1 week", "4 to 6 minute highlight film", "Ceremony and speeches films", "30 to 60 second vertical reel", "Online gallery with downloads and print release"], price: "$7,500" },
-    platinum: { pitch: "Everything in Gold, plus a documentary of the whole day and an engagement session.", coverage: "11 hours, getting ready through the send-off", crew: "2 photographers + 2 videographers",
-      get: ["About 800 edited photos", "Sneak peek of 15 photos within 48 hours", "Engagement session", "4 to 6 minute highlight film", "Ceremony and speeches films", "20 to 30 minute documentary film", "30 to 60 second vertical reel", "Online gallery with downloads and print release"], price: "$10,500" }
+    platinum: { pitch: "Everything in Gold, plus a documentary of the whole day and a pre-wedding shoot.", coverage: "11 hours, getting ready through the send-off", crew: "2 photographers + 2 videographers",
+      get: ["About 800 edited photos", "Sneak peek of 15 photos within 48 hours", "Pre-wedding Photo Mini shoot", "4 to 6 minute highlight film", "Ceremony and speeches films", "20 to 30 minute documentary film", "30 to 60 second vertical reel", "Online gallery with downloads and print release"], price: "$10,500" }
   };
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
   var current = "gold";
@@ -727,6 +810,27 @@ footer a:hover { color: var(--ink); }
     });
   });
   $("coll-cta").addEventListener("click", function () { $("f-coll").value = cap(current); });
+
+
+  /* Pre-wedding picker: two packages per choice */
+  var pwBtns = Array.prototype.slice.call(document.querySelectorAll(".pw-pick button"));
+  var pwCards = Array.prototype.slice.call(document.querySelectorAll(".pw-card"));
+  function pwShow(type) {
+    pwBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.type === type)); });
+    pwCards.forEach(function (c) {
+      var on = c.dataset.types.split(" ").indexOf(type) > -1;
+      c.hidden = !on;
+      if (on) { c.classList.remove("fade"); void c.offsetWidth; c.classList.add("fade"); }
+    });
+  }
+  pwBtns.forEach(function (b) { b.addEventListener("click", function () { pwShow(b.dataset.type); }); });
+  pwShow("both");
+  Array.prototype.forEach.call(document.querySelectorAll(".pw-cta"), function (a) {
+    a.addEventListener("click", function () {
+      $("f-coll").value = "Pre-wedding shoot";
+      var n = $("f-note"); if (!n.value.trim()) n.value = "Pre-wedding: " + a.dataset.pkg + "\n";
+    });
+  });
 
   /* Copy helper */
   function copy(text, btn, done, selectEl) {
@@ -759,9 +863,9 @@ footer a:hover { color: var(--ink); }
     var missing = ["f-names", "f-date", "f-venue"].filter(function (id) { return !$(id).value.trim(); });
     if (missing.length) { status.textContent = "Add your names, date and venue so we can check the calendar."; $(missing[0]).focus(); return; }
     var d = $("f-date").value;
-    var body = "Names: " + $("f-names").value.trim() + "\nWedding date: " + d + "\nVenue: " + $("f-venue").value.trim() +
+    var body = "Names: " + $("f-names").value.trim() + "\nDate: " + d + "\nVenue: " + $("f-venue").value.trim() +
       "\nCollection: " + $("f-coll").value + ($("f-note").value.trim() ? "\n\n" + $("f-note").value.trim() : "");
-    var subject = "Wedding inquiry · " + d + " · " + $("f-names").value.trim();
+    var subject = ($("f-coll").value === "Pre-wedding shoot" ? "Pre-wedding" : "Wedding") + " inquiry · " + d + " · " + $("f-names").value.trim();
     draft.hidden = false;
     draft.textContent = "To: jooonbon@gmail.com\nSubject: " + subject + "\n\n" + body;
     status.innerHTML = "";
