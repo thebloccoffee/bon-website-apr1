@@ -163,7 +163,7 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
 }
 .sn-btn.is-solid { background: var(--m-text); color: var(--m-bg); }
 .sn-btn.is-solid:hover { opacity: 0.85; }
-.sn-btn.is-ghost { border: 1px solid var(--m-line-2); }
+.sn-btn.is-ghost { border: 1px solid var(--m-line-2, var(--color-border-default)); }
 .sn-btn.is-ghost:hover { background: color-mix(in srgb, var(--m-text) 6%, transparent); }
 @media (max-width: 767px) { .sn-btn { height: 40px; padding: 0 14px; font-size: 14px; } }
 

@@ -20,6 +20,14 @@ export const MAX_ZOOM = 6;
 const isTouchUi = () => typeof window !== 'undefined' && window.matchMedia?.('(hover: none)').matches;
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+// Kodak Portra 400-ish: soft cyan sea, muted sage land, warm skin-tone peach,
+// creamy highlights. Same in light and dark mode.
+const PORTRA = {
+  seaLight: '#9fc2bd', sea: '#5f9294', seaDeep: '#2c5660',
+  land: '#a9ae86', sand: '#d6c3a0', peach: '#e6a688', peachHot: '#f2bf9c',
+  border: 'rgba(74, 58, 44, 0.35)', cream: '#f4e6cf',
+};
+
 const shortName = (n) => n.replace(/, BC$/, '').replace(' National Park', '');
 
 /**
@@ -96,13 +104,26 @@ export default function GlobeMap({
     let raf = 0;
     let alive = true;
     const front = geoOrthographic().clipAngle(90).precision(0.6);
-    const back = geoOrthographic().clipAngle(90).precision(0.6).reflectX(true);
     const pf = geoPath(front, ctx);
-    const pb = geoPath(back, ctx);
     const grid = geoGraticule10();
     const routes = ROUTES.map((r) => ({ type: 'LineString', coordinates: r.map(placeOf).filter(Boolean).map((p) => [p.lng, p.lat]) }));
 
     loadWorld().then((f) => { s.features = f; });
+
+    // Film grain: one noise tile, nudged a few times a second, clipped to the globe.
+    const noise = document.createElement('canvas');
+    noise.width = noise.height = 192;
+    const nctx = noise.getContext('2d');
+    const img = nctx.createImageData(192, 192);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const g = 128 + (Math.random() - 0.5) * 255;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = g;
+      img.data[i + 3] = 255;
+    }
+    nctx.putImageData(img, 0, 0);
+    const grain = ctx.createPattern(noise, 'repeat');
+    let grainAt = 0;
+    let grainOff = [0, 0];
 
     const readColors = () => {
       const cs = getComputedStyle(wrap.current);
@@ -160,48 +181,80 @@ export default function GlobeMap({
       const R = Math.min(h * P.radius, w * (P.compact ? 0.27 : 0.22)) * s.k;
       const cx = w / 2;
       const cy = h / 2;
-      for (const pr of [front, back]) pr.scale(R).translate([cx, cy]);
-      front.rotate([s.rot[0], s.rot[1], 0]);
-      back.rotate([s.rot[0] + 180, -s.rot[1], 0]);
+      front.scale(R).translate([cx, cy]).rotate([s.rot[0], s.rot[1], 0]);
       const center = [-s.rot[0], -s.rot[1]];
 
       ctx.setTransform(s.dpr, 0, 0, s.dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
-      // far side, seen through the glass: coastlines only
-      ctx.lineWidth = 0.6;
-      ctx.strokeStyle = C.text;
-      ctx.globalAlpha = 0.12;
-      ctx.beginPath(); for (const f of s.features) pb(f); ctx.stroke();
+      // ── Portra 400 globe: teal-cyan sea, sage land, peach for Jon's countries,
+      //    warm cream highlight, soft falloff, grain. ──
+      const sphere = () => { ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); };
 
-      // sphere rim + soft fill so the front reads as solid glass
-      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.fillStyle = C.bg; ctx.globalAlpha = 0.6; ctx.fill();
-      ctx.globalAlpha = 0.5; ctx.lineWidth = 0.8; ctx.stroke();
+      // atmosphere: a warm glow just outside the rim
+      ctx.save();
+      sphere();
+      ctx.shadowColor = 'rgba(240, 190, 150, 0.35)';
+      ctx.shadowBlur = R * 0.18;
+      ctx.fillStyle = PORTRA.seaDeep;
+      ctx.fill();
+      ctx.restore();
 
-      // near side: dotted lat/long grid
-      ctx.globalAlpha = 0.35; ctx.lineWidth = 0.8; ctx.setLineDash([1, 4]);
-      ctx.beginPath(); pf(grid); ctx.stroke();
-      ctx.setLineDash([]);
+      // sea
+      const sea = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.05, cx, cy, R);
+      sea.addColorStop(0, PORTRA.seaLight);
+      sea.addColorStop(0.55, PORTRA.sea);
+      sea.addColorStop(1, PORTRA.seaDeep);
+      sphere(); ctx.fillStyle = sea; ctx.globalAlpha = 1; ctx.fill();
 
-      // countries: every outline faint; ours strong; hovered/focused filled
-      ctx.lineWidth = 0.7;
-      ctx.globalAlpha = 0.45;
+      ctx.save();
+      sphere(); ctx.clip();
+
+      // land
       ctx.beginPath();
       for (const f of s.features) if (!litRef.current[f.properties.name]) pf(f);
-      ctx.stroke();
+      ctx.fillStyle = PORTRA.land; ctx.fill();
       for (const f of s.features) {
         const lit = litRef.current[f.properties.name];
         const name = f.properties.name;
         const hot = name === s.hoverGeo || name === s.focusGeo;
         if (!lit && !hot) continue;
         ctx.beginPath(); pf(f);
-        if (hot) { ctx.globalAlpha = 0.16; ctx.fillStyle = C.text; ctx.fill(); }
-        ctx.globalAlpha = lit && !lit.soon ? 0.95 : 0.6;
-        ctx.lineWidth = hot ? 1.3 : 1;
-        ctx.strokeStyle = C.text;
-        ctx.stroke();
+        ctx.fillStyle = hot ? PORTRA.peachHot : lit?.soon ? PORTRA.sand : PORTRA.peach;
+        ctx.fill();
       }
+      // borders: thin warm-brown lines
+      ctx.beginPath(); for (const f of s.features) pf(f);
+      ctx.strokeStyle = PORTRA.border; ctx.lineWidth = 0.6; ctx.stroke();
+
+      // dotted lat/long, cream
+      ctx.globalAlpha = 0.35; ctx.strokeStyle = PORTRA.cream; ctx.lineWidth = 0.8; ctx.setLineDash([1, 4]);
+      ctx.beginPath(); pf(grid); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+
+      // light: warm highlight top-left, soft teal falloff to the edge
+      const hi = ctx.createRadialGradient(cx - R * 0.4, cy - R * 0.45, 0, cx - R * 0.4, cy - R * 0.45, R * 0.95);
+      hi.addColorStop(0, 'rgba(255, 238, 210, 0.42)');
+      hi.addColorStop(1, 'rgba(255, 238, 210, 0)');
+      ctx.fillStyle = hi; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+      const edge = ctx.createRadialGradient(cx, cy, R * 0.55, cx, cy, R);
+      edge.addColorStop(0, 'rgba(18, 38, 44, 0)');
+      edge.addColorStop(1, 'rgba(18, 38, 44, 0.55)');
+      ctx.fillStyle = edge; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+
+      // grain
+      if (!reduce && now - grainAt > 70) { grainAt = now; grainOff = [Math.random() * 192, Math.random() * 192]; }
+      ctx.translate(grainOff[0], grainOff[1]);
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.globalAlpha = 0.22;
+      ctx.fillStyle = grain;
+      ctx.fillRect(cx - R - grainOff[0], cy - R - grainOff[1], R * 2, R * 2);
+      ctx.restore();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+
+      // rim
+      sphere(); ctx.strokeStyle = 'rgba(245, 225, 195, 0.45)'; ctx.lineWidth = 1; ctx.stroke();
 
       // trip routes
       ctx.globalAlpha = 0.9; ctx.strokeStyle = C.rec; ctx.lineWidth = 1.2; ctx.setLineDash([3, 3]);
@@ -213,7 +266,7 @@ export default function GlobeMap({
       const sides = { left: [], right: [] };
       for (const p of places) {
         const near = geoDistance([p.lng, p.lat], center) < Math.PI / 2 - 0.08;
-        const xy = (near ? front : back)([p.lng, p.lat]);
+        const xy = near ? front([p.lng, p.lat]) : null;
         const isFocus = P.focus === p.slug;
         if (xy) {
           ctx.globalAlpha = near ? 1 : 0.2;
@@ -221,8 +274,9 @@ export default function GlobeMap({
           // halation: red light bleeding round the pin, like highlights on film
           ctx.shadowColor = near && p.status !== 'soon' ? C.rec : 'transparent';
           ctx.shadowBlur = isFocus ? 14 : 8;
-          ctx.beginPath(); ctx.arc(xy[0], xy[1], isFocus ? 3.6 : 2.4, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(xy[0], xy[1], isFocus ? 3.6 : 2.6, 0, Math.PI * 2); ctx.fill();
           ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+          ctx.strokeStyle = PORTRA.cream; ctx.lineWidth = 1; ctx.stroke();
           if (isFocus && near) {
             ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.arc(xy[0], xy[1], 7 + Math.sin(t * 4) * 1.5, 0, Math.PI * 2); ctx.fill();
           }

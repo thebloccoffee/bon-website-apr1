@@ -108,9 +108,6 @@ export default function MonitorHeader() {
               {l.label}
             </Link>
           ))}
-          <Link to="/bonpoints" className="sn-link">
-            bon.points <span className="sn-badge">Finance</span>
-          </Link>
         </nav>
 
         <SearchBox className="hidden md:flex flex-1 mx-4 xl:mx-6" />
@@ -139,7 +136,6 @@ export default function MonitorHeader() {
             <nav aria-label="Main" className="flex flex-col">
               <Link to="/" className="sn-sheet-link">Map</Link>
               {links.map((l) => <Link key={l.to} to={l.to} className="sn-sheet-link">{l.label}</Link>)}
-              <Link to="/bonpoints" className="sn-sheet-link">bon.points <span className="sn-badge">Finance</span></Link>
             </nav>
             <p className="mt-8 mb-3 text-sm" style={{ color: 'var(--m-faint)' }}>Places</p>
             <PlacesMenu onDone={() => setSheet(false)} />
