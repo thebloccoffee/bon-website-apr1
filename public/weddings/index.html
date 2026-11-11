@@ -141,7 +141,7 @@ p { margin: 0; max-width: 62ch; }
 .fine { font-size: var(--step-label); letter-spacing: 0.1em; color: var(--mute); padding-top: 28px; }
 
 /* ---------- About ---------- */
-.about-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: clamp(32px, 7vw, 120px); align-items: end; }
+.about-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: clamp(32px, 7vw, 120px); align-items: start; }
 .about-grid > * { min-width: 0; }
 .about-grid .lead { font-size: clamp(1.4rem, 1rem + 1.5vw, 2.125rem); line-height: 1.3; font-weight: 300; letter-spacing: -0.01em; }
 .about-grid .lead b { font-weight: 600; }
@@ -201,14 +201,14 @@ p { margin: 0; max-width: 62ch; }
 /* ---------- Collections ---------- */
 .coll-head { display: inline-block; max-width: 100%; }
 .coll-name { font-size: var(--step-giant); line-height: .9; font-weight: 200; letter-spacing: -0.035em; }
-.tabs { display: flex; gap: clamp(20px, 4vw, 64px); padding-top: 12px; border-bottom: 4px solid var(--ink); padding-bottom: 10px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 18px; }
 .tabs button {
-  appearance: none; background: none; border: 0; padding: 0; cursor: pointer;
-  font: inherit; font-size: var(--step-label); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ghost); transition: color .2s;
+  appearance: none; cursor: pointer; font: inherit; font-size: var(--step-label); font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+  min-height: 44px; padding: 0 20px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 999px;
+  transition: background .25s var(--ease), color .25s var(--ease), transform .25s var(--ease);
 }
-.tabs button[aria-selected="true"] { color: var(--ink); }
-.tabs button:hover { color: var(--ink-2); }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.tabs button:hover { transform: translateY(-2px); }
 .coll-body { display: grid; grid-template-columns: 1fr 1.25fr; gap: clamp(32px, 6vw, 96px); padding-top: 32px; }
 .coll-body > * { min-width: 0; }
 .pitch { font-size: var(--step-lead); line-height: 1.35; max-width: 24ch; font-weight: 300; }
@@ -277,6 +277,19 @@ tbody tr:hover td, tbody tr:hover th { background: #f6f6f6; }
 .pw-more table { min-width: 0; margin-bottom: 20px; }
 @media (max-width: 760px) { .pw-intro, .pw-cards { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .pw-card, .pw-pick button { transition: none; } .pw-card:hover, .pw-pick button:hover { transform: none; } }
+
+/* ---------- Pricing hub ---------- */
+#pricing h2 { padding-bottom: 22px; }
+.pane-pick { padding-bottom: clamp(36px, 5vw, 64px); border-bottom: 1px solid var(--hair); margin-bottom: clamp(32px, 4vw, 56px); }
+.pane-pick button { min-height: 52px; padding: 0 26px; }
+.pane-lead { font-size: var(--step-lead); font-weight: 300; line-height: 1.35; max-width: 34ch; }
+#pane-prewedding .pw-ask { padding-top: 32px; }
+.pw-card table { min-width: 0; }
+.pw-more + .pw-more { margin-top: 0; border-top: 0; }
+.addons tbody tr:first-child td { font-weight: 400; }
+.pw-card .addons td { padding-block: 13px; }
+.swipe { display: none; color: var(--mute); padding-bottom: 10px; }
+@media (max-width: 760px) { .swipe { display: block; } }
 
 /* ---------- FAQ ---------- */
 .faq { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(32px, 8vw, 128px); }
@@ -383,12 +396,11 @@ footer a:hover { color: var(--ink); }
   </div>
   <div class="wrap"><div class="rule"></div></div>
   <nav class="wrap" aria-label="Menu">
-    <a href="#work"><small>01</small>Work</a>
-    <a href="#about"><small>02</small>About</a>
-    <a href="#collections"><small>03</small>Collections</a>
-    <a href="#prewedding"><small>04</small>Pre-wedding</a>
-    <a href="#faq"><small>05</small>Good to know</a>
-    <a href="#contact"><small>06</small>Check availability</a>
+    <a href="#about"><small>01</small>About</a>
+    <a href="#work"><small>02</small>Work</a>
+    <a href="#pricing"><small>03</small>Pricing</a>
+    <a href="#faq"><small>04</small>Good to know</a>
+    <a href="#contact"><small>05</small>Check availability</a>
   </nav>
   <div class="wrap foot label"><span>Metro Vancouver, BC</span><span>jooonbon@gmail.com</span></div>
 </div>
@@ -482,15 +494,24 @@ footer a:hover { color: var(--ink); }
         <div>
           <span class="n">03</span>
           <h3>The wedding</h3>
-          <p>2 to 4 of us show up, keep out of the way and catch what happens. Photos arrive in 6 weeks, films in 10 to 12.</p>
+          <p>2 to 4 of us show up, keep out of the way and catch what happens.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="collections">
+  <section id="pricing">
+    <span id="collections"></span>
     <div class="wrap">
-      <div class="eyebrow label"><span>Collections</span><span class="count">From $5,000 CAD</span></div>
+      <div class="eyebrow label"><span>Pricing</span><span class="count">CAD, before GST</span></div>
+      <h2>What are you <b>planning?</b></h2>
+      <div class="pw-pick pane-pick" role="group" aria-label="Pricing">
+        <button type="button" data-pane="weddings" aria-pressed="true">Wedding</button>
+        <button type="button" data-pane="prewedding" aria-pressed="false">Pre-wedding</button>
+        <button type="button" data-pane="alacarte" aria-pressed="false">Photo or film only</button>
+      </div>
+
+      <div class="pane" id="pane-weddings">
       <div class="coll-head">
         <div class="coll-name" id="coll-name">GOLD</div>
         <div class="tabs" role="tablist" aria-label="Collections">
@@ -520,10 +541,10 @@ footer a:hover { color: var(--ink); }
           </div>
         </div>
       </div>
-
-      <div style="padding-top: clamp(72px, 9vw, 130px)">
-        <div class="eyebrow label"><span>Compare collections</span><span class="count">Side by side</span></div>
-        <div class="scroll">
+        <details class="pw-more">
+          <summary>Compare all three</summary>
+          <p class="swipe label">Swipe sideways to see all three →</p>
+          <div class="scroll">
           <table>
             <thead>
               <tr><th scope="col"><span class="sr">Feature</span></th><th scope="col">Silver</th><th scope="col">Gold</th><th scope="col">Platinum</th></tr>
@@ -543,47 +564,21 @@ footer a:hover { color: var(--ink); }
             </tbody>
           </table>
         </div>
-        <p class="fine">// All prices in CAD, before GST. Travel outside Metro Vancouver quoted separately.</p>
+        </details>
+        <details class="pw-more">
+          <summary>Add-ons</summary>
+          <table class="addons"><tbody>
+            <tr><td>Extra hour of coverage (by crew size)</td><td>$300 to $800</td></tr>
+            <tr><td>Vertical reel (30 to 60 seconds)</td><td>$350</td></tr>
+            <tr><td>Express delivery (photos in 3 weeks, films in 6)</td><td>$500</td></tr>
+          </tbody></table>
+        </details>
+        <p class="fine">// 40% retainer holds your date. Travel outside Metro Vancouver quoted separately.</p>
       </div>
-    </div>
-  </section>
 
-  <section id="addons">
-    <div class="wrap">
-      <div class="eyebrow label"><span>Add-ons + à la carte</span><span class="count">9 options</span></div>
-      <table class="addons">
-        <tbody>
-          <tr><td>Video only (1 videographer, 8 hours)</td><td>$2,800</td></tr>
-          <tr><td>Video only (2 videographers, 10 hours)</td><td>$4,500</td></tr>
-          <tr><td>Video only (3 videographers, 11 hours)</td><td>$6,500</td></tr>
-          <tr><td>Photo only (1 photographer, 8 hours)</td><td>$2,800</td></tr>
-          <tr><td>Photo only (2 photographers, 10 hours)</td><td>$4,200</td></tr>
-          <tr><td>Photo only (2 photographers, 11 hours + Photo Mini pre-wedding)</td><td>$5,200</td></tr>
-          <tr><td>Extra hour of coverage (by crew size)</td><td>$300 to $800</td></tr>
-          <tr><td>Vertical reel (30 to 60 seconds)</td><td>$350</td></tr>
-          <tr><td>Express delivery (photos in 3 weeks, films in 6)</td><td>$500</td></tr>
-        </tbody>
-      </table>
-      <p class="fine">// All prices in CAD, before GST.</p>
-    </div>
-  </section>
-
-  <div class="band">
-    <div class="wrap">
-      <h2>Your date is still open? Let's keep it that way.</h2>
-      <a class="btn-line" href="#contact">Check availability</a>
-    </div>
-  </div>
-
-  <section id="prewedding">
-    <div class="wrap">
-      <div class="eyebrow label"><span>Pre-wedding</span><span class="count">From $500 CAD</span></div>
-      <div class="plate-wrap"><img class="plate land" src="/weddings/photos/engagement.jpg" alt="Couple lying on the grass under autumn trees" loading="lazy"></div>
-      <div class="pw-intro">
-        <h2>Before the <b>big day.</b></h2>
-        <p>Spend a few hours with us somewhere that feels like you. You get used to the camera, and you walk away with portraits, a short film, or both for your save-the-dates.</p>
-      </div>
-      <div class="pw-ask">
+      <div class="pane" id="pane-prewedding" hidden>
+        <p class="pane-lead">A few hours with us somewhere that feels like you. You get used to the camera and walk away with portraits, a short film, or both for your save-the-dates.</p>
+        <div class="pw-ask">
         <p class="q" id="pw-q">What would you like?</p>
         <div class="pw-pick" role="group" aria-labelledby="pw-q">
           <button type="button" data-type="photo" aria-pressed="false">Photos</button>
@@ -632,19 +627,43 @@ footer a:hover { color: var(--ink); }
         </table>
       </details>
       <p class="fine">// 30% retainer holds the date. Delivery in 2 to 3 weeks. Book a wedding collection and get 15% off, or the Photo Mini free with Platinum.</p>
-    </div>
-  </section>
+      </div>
 
-  <section id="after">
-    <div class="wrap">
-      <div class="eyebrow label"><span>After the wedding</span><span class="count">6 / 10–12 / 14–16 weeks</span></div>
-      <div class="plate-wrap"><img class="plate land" src="/weddings/photos/ceremony.jpg" alt="Garden ceremony with white flowers and groomsmen standing to the side" loading="lazy"></div>
-      <div class="pair">
-        <p>Everything lands in a private online gallery you can share with family and download in full resolution, with a print release and a year of hosting.</p>
-        <p>Photos arrive 6 weeks after the wedding, films in 10 to 12 weeks, and the documentary in 14 to 16.</p>
+      <div class="pane" id="pane-alacarte" hidden>
+        <p class="pane-lead">Just need one of us? Pick the crew size and hours.</p>
+        <div class="pw-cards">
+          <article class="pw-card">
+            <div class="top-row"><h3>Film <em>only</em></h3></div>
+            <table class="addons"><tbody>
+              <tr><td>1 videographer, 8 hours</td><td>$2,800</td></tr>
+              <tr><td>2 videographers, 10 hours</td><td>$4,500</td></tr>
+              <tr><td>3 videographers, 11 hours</td><td>$6,500</td></tr>
+            </tbody></table>
+            <div class="price-row"><a class="btn-line ala-cta" href="#contact" data-pkg="Film only">Ask about film only</a></div>
+          </article>
+          <article class="pw-card">
+            <div class="top-row"><h3>Photo <em>only</em></h3></div>
+            <table class="addons"><tbody>
+              <tr><td>1 photographer, 8 hours</td><td>$2,800</td></tr>
+              <tr><td>2 photographers, 10 hours</td><td>$4,200</td></tr>
+              <tr><td>2 photographers, 11 hours + Photo Mini pre-wedding</td><td>$5,200</td></tr>
+            </tbody></table>
+            <div class="price-row"><a class="btn-line ala-cta" href="#contact" data-pkg="Photo only">Ask about photo only</a></div>
+          </article>
+        </div>
       </div>
     </div>
   </section>
+
+
+  <div class="band">
+    <div class="wrap">
+      <h2>Your date is still open? Let's keep it that way.</h2>
+      <a class="btn-line" href="#contact">Check availability</a>
+    </div>
+  </div>
+
+
 
   <section id="kind-words" hidden>
     <div class="wrap">
@@ -693,7 +712,7 @@ footer a:hover { color: var(--ink); }
         </div>
         <div>
           <details open><summary>Do you travel?</summary><p>Yes. Metro Vancouver has no travel fee. Anywhere else is quoted separately.</p></details>
-          <details><summary>When do we get everything?</summary><p>Photos in 6 weeks, films in 10 to 12, and the documentary in 14 to 16. Express delivery ($500) gets you photos in 3 weeks and films in 6.</p></details>
+          <details><summary>When do we get everything?</summary><p>Photos in 6 weeks, films in 10 to 12, and the documentary in 14 to 16. Pre-wedding shoots arrive in 2 to 3 weeks. Express delivery ($500) gets you photos in 3 weeks and films in 6.</p></details>
           <details><summary>What's in the gallery?</summary><p>A private online gallery with full-resolution downloads, a print release and a year of hosting.</p></details>
         </div>
       </div>
@@ -816,8 +835,8 @@ footer a:hover { color: var(--ink); }
 
 
   /* Pre-wedding picker: two packages per choice */
-  var pwBtns = Array.prototype.slice.call(document.querySelectorAll(".pw-pick button"));
-  var pwCards = Array.prototype.slice.call(document.querySelectorAll(".pw-card"));
+  var pwBtns = Array.prototype.slice.call(document.querySelectorAll(".pw-ask .pw-pick button"));
+  var pwCards = Array.prototype.slice.call(document.querySelectorAll("#pane-prewedding .pw-card"));
   function pwShow(type) {
     pwBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.type === type)); });
     pwCards.forEach(function (c) {
@@ -832,6 +851,30 @@ footer a:hover { color: var(--ink); }
     a.addEventListener("click", function () {
       $("f-coll").value = "Pre-wedding shoot";
       var n = $("f-note"); if (!n.value.trim()) n.value = "Pre-wedding: " + a.dataset.pkg + "\n";
+    });
+  });
+
+  /* Pricing panes: Wedding / Pre-wedding / Photo or film only */
+  var paneBtns = Array.prototype.slice.call(document.querySelectorAll(".pane-pick button"));
+  function paneShow(name) {
+    paneBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.pane === name)); });
+    ["weddings", "prewedding", "alacarte"].forEach(function (n) {
+      var el = $("pane-" + n), on = n === name; el.hidden = !on;
+      if (on) { el.classList.remove("fade"); void el.offsetWidth; el.classList.add("fade"); }
+    });
+  }
+  paneBtns.forEach(function (b) { b.addEventListener("click", function () { paneShow(b.dataset.pane); }); });
+  /* Shareable links: /weddings#prewedding opens that tab */
+  function fromHash() {
+    var h = location.hash.replace("#", "");
+    var map = { prewedding: "prewedding", "pre-wedding": "prewedding", alacarte: "alacarte", collections: "weddings", pricing: null };
+    if (h in map) { if (map[h]) paneShow(map[h]); $("pricing").scrollIntoView(); }
+  }
+  window.addEventListener("hashchange", fromHash); fromHash();
+  Array.prototype.forEach.call(document.querySelectorAll(".ala-cta"), function (a) {
+    a.addEventListener("click", function () {
+      $("f-coll").value = "Custom package";
+      var n = $("f-note"); if (!n.value.trim()) n.value = a.dataset.pkg + ": \n";
     });
   });
 
