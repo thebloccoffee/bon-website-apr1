@@ -65,6 +65,9 @@ export default async function handler(req, res) {
   const messageHtml = h.message.replace(/\n/g, '<br>');
   const mailtoHref = `mailto:${encodeURIComponent(emailHeader)}`;
 
+  // Inquiries from jooonbon.com/weddings get the Vivid Stories confirmation.
+  const isVivid = fields.project_type.startsWith('Vivid Stories');
+
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: 'jooonbon@gmail.com', pass: gmailPass },
@@ -76,7 +79,7 @@ export default async function handler(req, res) {
       from: '"Jon Bon Website" <jooonbon@gmail.com>',
       to: 'jooonbon@gmail.com',
       replyTo: { name: nameHeader, address: emailHeader },
-      subject: `New inquiry from ${nameHeader}`,
+      subject: isVivid ? `${oneLine(fields.project_type).replace(/^Vivid Stories · /, '')} inquiry from ${nameHeader}` : `New inquiry from ${nameHeader}`,
       html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; color: #111;">
         <h2 style="font-weight: 300; font-size: 28px; margin-bottom: 24px;">New Inquiry</h2>
@@ -94,24 +97,55 @@ export default async function handler(req, res) {
     });
 
     // Confirmation email to the person who submitted
-    await transporter.sendMail({
-      from: '"Jon Bon" <jooonbon@gmail.com>',
-      to: emailHeader,
-      subject: `Got your inquiry, ${nameHeader}!`,
-      html: `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; color: #111;">
-        <h2 style="font-weight: 300; font-size: 28px; margin-bottom: 16px;">Thank you, ${h.name}.</h2>
-        <p style="font-size: 16px; line-height: 1.7; color: #444;">
-          Your inquiry has been received. I'll be in touch within 48 hours to discuss your vision.
+    if (isVivid) {
+      const iso = /^\d{4}-\d{2}-\d{2}$/.test(fields.when);
+      const niceWhen = iso
+        ? new Date(fields.when + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+        : h.when;
+      const whenLine = h.when && h.location
+        ? `We got your note about ${niceWhen} at ${h.location}.`
+        : 'We got your note.';
+      await transporter.sendMail({
+        from: '"Vivid Stories" <jooonbon@gmail.com>',
+        to: emailHeader,
+        replyTo: 'jooonbon@gmail.com',
+        subject: `We got your inquiry, ${nameHeader}`,
+        html: `
+      <div style="font-family: Helvetica, Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 28px; color: #0d0d0d;">
+        <p style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; margin: 0 0 28px;"><b>Vivid</b> Stories</p>
+        <h2 style="font-weight: 300; font-size: 30px; line-height: 1.15; margin: 0 0 24px;">Thank you, ${h.name}.</h2>
+        <p style="font-size: 16px; line-height: 1.7; color: #3a3a3a; margin: 0 0 16px;">
+          ${whenLine} We'll check the calendar and email you within 48 hours with a few times for a quick call.
         </p>
-        <p style="font-size: 16px; line-height: 1.7; color: #444; margin-top: 16px;">
-          — Jon Bon
+        <p style="font-size: 16px; line-height: 1.7; color: #3a3a3a; margin: 0 0 16px;">
+          If there's anything you want to add before then, just reply to this email.
         </p>
-        <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;" />
-        <p style="font-size: 12px; color: #999;">jonbontabas.com</p>
+        <p style="font-size: 16px; line-height: 1.7; color: #3a3a3a; margin: 28px 0 0;">Jon Bon<br>Vivid Stories</p>
+        <hr style="border: none; border-top: 1px solid #dcdcdc; margin: 36px 0 16px;" />
+        <p style="font-size: 12px; letter-spacing: 0.1em; color: #8a8a8a; margin: 0;">PHOTO + FILM · METRO VANCOUVER, BC · <a href="https://jooonbon.com/weddings" style="color: #8a8a8a;">jooonbon.com/weddings</a></p>
       </div>
     `,
-    });
+      });
+    } else {
+      await transporter.sendMail({
+        from: '"Jon Bon" <jooonbon@gmail.com>',
+        to: emailHeader,
+        subject: `Got your inquiry, ${nameHeader}!`,
+        html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; color: #111;">
+          <h2 style="font-weight: 300; font-size: 28px; margin-bottom: 16px;">Thank you, ${h.name}.</h2>
+          <p style="font-size: 16px; line-height: 1.7; color: #444;">
+            Your inquiry has been received. I'll be in touch within 48 hours to discuss your vision.
+          </p>
+          <p style="font-size: 16px; line-height: 1.7; color: #444; margin-top: 16px;">
+            — Jon Bon
+          </p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;" />
+          <p style="font-size: 12px; color: #999;">jonbontabas.com</p>
+        </div>
+      `,
+      });
+    }
   } catch (e) {
     console.error('contact: sendMail failed', e.message);
     return res.status(502).json({ error: 'Could not send your message right now. Please try again later.' });
