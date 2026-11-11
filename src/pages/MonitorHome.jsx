@@ -1,240 +1,159 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import MonitorHeader from '@/components/monitor/MonitorHeader';
-import WorldMap, { WORLD, MAX_K, fitBox } from '@/components/monitor/WorldMap';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import GlobeMap from '@/components/monitor/GlobeMap';
 import { useMapContent } from '@/components/monitor/useMapContent';
-import FocusCard from '@/components/monitor/FocusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { COUNTRIES, PLACES, COUNTRY_COLORS, MAP_W, MAP_H, findPlace, itemsFor, countryOf, citiesIn, project } from '@/lib/places';
-import { CoachMarks } from '@/components/monitor/MapLegend';
+import { COUNTRIES, findPlace, itemsFor, countryOf, citiesIn } from '@/lib/places';
 import '@/components/monitor/monitor.css';
 
-const MAP_ASPECT = MAP_W / MAP_H;
-const PHONE_ASPECT = 4 / 5; // tall frame on phones: the map fills it and you swipe sideways
-const PHONE_B = MAP_ASPECT / PHONE_ASPECT;
+const storyCount = (n) => `${n} ${n === 1 ? 'story' : 'stories'}`;
 
-/** A view that frames a city or a whole country. */
-function viewFor(place, b, current) {
-  if (!place) return WORLD;
-  if (place.kind === 'city') {
-    const [x, y] = project(place.lat, place.lng);
-    return { k: Math.max(current?.k || 1, 4 / b, 1.6), cx: x, cy: y };
-  }
-  const pts = citiesIn(place.slug).map((c) => project(c.lat, c.lng));
-  if (!pts.length) return WORLD;
-  const xs = pts.map((p) => p[0]); const ys = pts.map((p) => p[1]);
-  const x = Math.min(...xs); const y = Math.min(...ys);
-  return fitBox({ x: x - 12, y: y - 12, width: Math.max(...xs) - x + 24, height: Math.max(...ys) - y + 24 }, b, 0.5);
-}
-
-// Home: the world map seen through Jon's camera monitor. Trips run along the
-// bottom like clips on an edit timeline.
+// Home: the globe is the hero. The site header sits over it, the title and
+// counts sit bottom-left, the hint bottom-right. Every place is listed below.
 export default function MonitorHome() {
-  const { all, countryCounts, cityCounts, cityFirst, latestCity } = useMapContent();
+  const { all, countryCounts, cityCounts, latestCity } = useMapContent();
   const phone = useIsMobile();
-  const b = phone ? PHONE_B : 1;
 
   const [hover, setHover] = useState(null);
   const [sel, setSel] = useState(null); // { slug } of a city or country, or { name } of a country with nothing yet
-  const [view, setView] = useState(WORLD);
-  const touched = useRef(false);
-  const mapRef = useRef(null);
+  const [zoom, setZoom] = useState(1);
+  const [flyTo, setFlyTo] = useState(null);
+  const flyN = useRef(0);
 
-  // On a phone, open on the latest place instead of the middle of the Atlantic.
+  const fly = useCallback((target) => { flyN.current += 1; setFlyTo({ ...target, n: flyN.current }); }, []);
+
+  // Phones open spun to the latest place.
   useEffect(() => {
-    if (touched.current) return;
-    const p = latestCity ? findPlace(latestCity) : null;
-    if (phone && p) setView({ k: 1, cx: project(p.lat, p.lng)[0], cy: MAP_H / 2 });
-    else setView(WORLD);
-  }, [phone, latestCity]);
+    if (phone && latestCity) fly({ slug: latestCity });
+  }, [phone, latestCity, fly]);
 
-  const changeView = useCallback((next) => {
-    touched.current = true;
-    setView((cur) => (typeof next === 'function' ? next(cur) : next));
-  }, []);
-
-  const select = useCallback((slug, { zoom = true, scroll = false } = {}) => {
+  const select = useCallback((slug) => {
     const place = findPlace(slug);
     if (!place) return;
     setSel({ slug });
-    if (zoom) {
-      // A country frames its whole outline, like tapping it on the map.
-      const shape = place.kind === 'country' ? mapRef.current?.querySelector(`path[data-geo="${CSS.escape(place.geo)}"]`) : null;
-      changeView((cur) => (shape ? fitBox(shape.getBBox(), b) : viewFor(place, b, cur)));
-    }
-    if (scroll) mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [b, changeView]);
+    fly({ slug });
+    setZoom((cur) => Math.max(cur, place.kind === 'country' ? 1.6 : 2.2));
+  }, [fly]);
 
-  const onCountry = useCallback((slug, bbox, name) => {
-    if (slug) { setSel({ slug }); changeView(fitBox(bbox, b)); }
-    else { setSel({ name }); changeView(fitBox(bbox, b)); }
-  }, [b, changeView]);
+  const onCountry = useCallback((slug, name) => setSel(slug ? { slug } : { name }), []);
+  const reset = () => { setSel(null); setZoom(1); fly({ world: true }); };
 
-  const activeSlug = sel?.slug || hover || latestCity;
+  const activeSlug = sel?.slug || hover;
   const place = activeSlug ? findPlace(activeSlug) : null;
-  const preview = useMemo(() => {
-    if (!place) return null;
-    const items = itemsFor(place, all);
-    const vids = items.filter((i) => i._type === 'video');
-    return {
-      count: items.length,
-      latest: vids[0] || null,
-      where: place.kind === 'city' ? countryOf(place.country)?.name : `${citiesIn(place.slug).length} places`,
-    };
-  }, [place, all]);
+  const count = useMemo(() => (place ? itemsFor(place, all).length : 0), [place, all]);
   const focusCity = place?.kind === 'city' ? place.slug : null;
-  const zoomed = view.k > 1.01 || (phone && touched.current);
+  const reduce = useReducedMotion();
 
-  const zoomBy = (f) => changeView((cur) => ({ ...cur, k: Math.min(MAX_K, Math.max(1, cur.k * f)) }));
-  const reset = () => { setSel(null); changeView(phone && latestCity ? { k: 1, cx: view.cx, cy: MAP_H / 2 } : WORLD); };
+  // The place's latest film, shown full-bleed behind the globe as you point at it.
+  const still = useMemo(() => {
+    if (!place) return null;
+    const vids = itemsFor(place, all).filter((i) => i._type === 'video' && i.youtube_id);
+    const v = vids.find((x) => x.format !== 'short') || vids[0];
+    return v ? { id: v.youtube_id, short: v.format === 'short' } : null;
+  }, [place, all]);
+  const zoomed = zoom > 1.01 || Boolean(sel);
 
-  const statusLine = (p, pv) =>
-    pv?.count ? `${pv.count} ${pv.count === 1 ? 'STORY' : 'STORIES'}` : p?.status === 'edit' ? 'IN THE EDIT' : 'COMING SOON';
+  // The one line under the globe: a hint, or what you're pointing at.
+  let line;
+  if (sel?.name) {
+    line = <span>{sel.name} · not filmed yet</span>;
+  } else if (place) {
+    const where = place.kind === 'city' ? countryOf(place.country)?.name : `${citiesIn(place.slug).length} places`;
+    const status = count ? storyCount(count) : place.status === 'edit' ? 'in the edit' : 'coming soon';
+    line = (
+      <Link to={`/travel/${place.slug}`} className="pointer-events-auto hover:opacity-70">
+        <span style={{ color: 'var(--m-text)', fontWeight: 600 }}>{place.name}</span> · {where} · {status} <span aria-hidden="true">→</span>
+      </Link>
+    );
+  } else {
+    line = <span>Drag to spin · tap a city</span>;
+  }
 
-  const clips = useMemo(
-    () => [
-      ...PLACES.filter((p) => cityCounts[p.slug]).sort((a, b) => (cityFirst[a.slug] || 0) - (cityFirst[b.slug] || 0)),
-      ...PLACES.filter((p) => !cityCounts[p.slug] && p.status === 'edit'),
-    ],
-    [cityCounts, cityFirst]
-  );
-
-  const card = sel?.name
-    ? { key: `geo-${sel.name}`, label: '▸ IN FOCUS', name: sel.name, note: 'Not filmed yet. Maybe the next trip.', muted: true }
-    : place && preview
-      ? {
-          key: place.slug,
-          href: `/travel/${place.slug}`,
-          label: sel || hover ? '▸ IN FOCUS' : '▸ LATEST',
-          name: place.name,
-          meta: `${(preview.where || '').toUpperCase()} · ${statusLine(place, preview)}`,
-          latest: preview.latest,
-        }
-      : null;
+  const listed = COUNTRIES.filter((c) => countryCounts[c.slug] || citiesIn(c.slug).some((p) => p.status === 'edit'));
 
   return (
-    <div className="monitor md:min-h-screen flex flex-col gap-3 px-4 md:px-6 pt-4 pb-5">
-      <MonitorHeader />
-
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-        <div className="min-w-0">
-          <h1 className="font-semibold tracking-tight leading-tight" style={{ fontSize: 'clamp(18px, 2.4vw, 26px)' }}>
-            Every place I've filmed, on one map.
-          </h1>
+    <div className="monitor">
+      <section aria-label="Globe" className="relative overflow-hidden" style={{ height: '100svh', minHeight: phone ? 600 : 640 }}>
+        {/* footage behind the globe, in Jon's grade (stills from the film for now) */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <AnimatePresence>
+            {still && (
+              <motion.img
+                key={still.id}
+                src={`https://i.ytimg.com/vi/${still.id}/${still.short ? 'hqdefault' : 'maxresdefault'}.jpg`}
+                onError={(e) => { if (!e.currentTarget.src.includes('hqdefault')) e.currentTarget.src = `https://i.ytimg.com/vi/${still.id}/hqdefault.jpg`; }}
+                alt=""
+                className="absolute inset-0 w-full h-full"
+                style={{ objectFit: 'cover' }}
+                initial={{ opacity: 0, scale: reduce ? 1 : 1.06 }}
+                animate={{ opacity: 0.5, scale: 1, transition: { opacity: { duration: 0.7 }, scale: { duration: 6, ease: 'easeOut' } } }}
+                exit={{ opacity: 0, transition: { duration: 0.5 } }}
+              />
+            )}
+          </AnimatePresence>
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 0%, color-mix(in srgb, var(--m-bg) 55%, transparent) 60%, var(--m-bg) 100%)' }} />
         </div>
-        <a
-          href="https://youtube.com/jonbontabas"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="m-mono shrink-0 inline-flex items-center gap-2 min-h-[44px] px-4 border"
-          style={{ fontSize: 11, letterSpacing: '0.12em', borderColor: 'var(--m-rec)', color: 'var(--m-text)' }}
-        >
-          <span className="inline-block w-2 h-2 rounded-full" style={{ background: 'var(--m-rec)' }} />
-          YOUTUBE ↗
-        </a>
-      </div>
-
-      {/* the frame */}
-      <section ref={mapRef} aria-label="World map" className="relative md:flex-1 flex items-center justify-center overflow-hidden border md:min-h-[300px]" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)' }}>
-        <WorldMap
+        <GlobeMap
           focus={focusCity}
           onFocus={phone ? undefined : setHover}
-          onPin={(slug) => select(slug)}
+          onPin={select}
           onCountry={onCountry}
           counts={countryCounts}
-          view={view}
-          onViewChange={changeView}
-          aspect={phone ? PHONE_ASPECT : MAP_ASPECT}
-          style={phone ? undefined : { width: 'min(100%, calc((100svh - 250px) * 1.92))' }}
+          cityCounts={cityCounts}
+          flyTo={flyTo}
+          zoom={zoom}
+          onZoom={setZoom}
+          spin={!sel && !hover}
+          compact={phone}
+          radius={phone ? 0.24 : 0.27}
         />
 
-        {/* 2.39 letterbox and frame lines: decoration only */}
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[9%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderBottom: '1px solid var(--m-line-2)' }} />
-        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[9%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderTop: '1px solid var(--m-line-2)' }} />
-        <span aria-hidden="true" className="absolute pointer-events-none" style={{ inset: 12 }}>
-          <span className="m-br tl" style={{ width: 22, height: 22 }} /><span className="m-br tr" style={{ width: 22, height: 22 }} />
-          <span className="m-br bl" style={{ width: 22, height: 22 }} /><span className="m-br brr" style={{ width: 22, height: 22 }} />
-        </span>
-        <span aria-hidden="true" className="m-mono absolute hidden sm:block pointer-events-none" style={{ left: 48, top: 16, fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-dim)' }}>2.39:1</span>
+        <div aria-hidden="true" className="m-grain" />
 
-        {/* zoom controls: bottom-right on phones, middle-right on desktop */}
-        <div className="absolute right-3 bottom-3 md:bottom-auto md:right-4 md:top-1/2 md:-translate-y-1/2 flex flex-col border" style={{ borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
-          <button type="button" aria-label="Zoom in" disabled={view.k >= MAX_K} onClick={() => zoomBy(2)} className="m-mono w-11 h-11 disabled:opacity-30 text-lg" style={{ borderBottom: '1px solid var(--m-line-2)' }}>+</button>
-          <button type="button" aria-label="Zoom out" disabled={view.k <= 1} onClick={() => zoomBy(0.5)} className="m-mono w-11 h-11 disabled:opacity-30 text-lg">−</button>
+        {/* bottom-left: title and counts */}
+        <div className="absolute left-6 md:left-16 bottom-6 md:bottom-10 max-w-[60%] pointer-events-none">
+          <h1 className="font-semibold tracking-tight leading-none" style={{ fontSize: 'clamp(24px, 3.4vw, 44px)' }}>Every place I've filmed.</h1>
+          <p className="mt-3 text-sm" style={{ color: 'var(--m-dim)' }}>
+            {Object.keys(countryCounts).length} countries · {Object.keys(cityCounts).length} places · {all.length} stories
+          </p>
         </div>
-        {zoomed && (
-          <button type="button" onClick={reset} className="m-mono absolute left-3 bottom-3 md:left-4 md:bottom-[11%] min-h-[44px] px-3 border" style={{ fontSize: 11, letterSpacing: '0.1em', borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
-            ⤢ WORLD
-          </button>
-        )}
-        {!zoomed && (
-          <span className="m-mono absolute left-3 bottom-3 md:hidden pointer-events-none px-2 py-1" style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--m-dim)', background: 'color-mix(in srgb, var(--m-bg) 70%, transparent)' }}>
-            SWIPE · PINCH · TAP A COUNTRY
-          </span>
-        )}
 
-        {/* desktop: what's in focus */}
-        <FocusCard item={card} className="absolute hidden md:block" style={{ right: 76, bottom: '11%', width: 380 }} />
-
-        <CoachMarks />
-      </section>
-
-
-      {/* phone: card for the selected place */}
-      <FocusCard item={card || { key: 'empty', label: '▸ TAP A PIN OR A COUNTRY', name: 'Explore the map', muted: true }} size="md" className="md:hidden" />
-
-      {/* places timeline: every city filmed, oldest to newest; in-the-edit last */}
-      <section aria-label="Places" className="flex">
-        <div className="flex-1 min-w-0 border" style={{ borderColor: 'var(--m-line)', background: 'var(--m-panel)' }}>
-          <div className="m-mono flex justify-between px-3 py-1.5" style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-faint)', borderBottom: '1px solid var(--m-line)' }}>
-            <span>PLACES</span><span>FIRST → LATEST</span>
-          </div>
-          <div className="flex overflow-x-auto p-2 snap-x snap-mandatory md:snap-none">
-            {clips.map((p) => {
-              const [bg, ink] = COUNTRY_COLORS[p.country] || ['#B49A72', '#111'];
-              const edit = !cityCounts[p.slug];
-              const tap = (e) => {
-                if (!phone) return;
-                e.preventDefault();
-                select(p.slug, { scroll: true });
-              };
-              return (
-                <Link
-                  key={p.slug}
-                  to={`/travel/${p.slug}`}
-                  className={`m-clip snap-start ${edit ? 'is-edit' : ''}`}
-                  style={{ flex: `${Math.min(6, Math.max(2, cityCounts[p.slug] || 2))} ${phone ? 0 : 1} auto`, ...(edit ? {} : { background: bg, color: ink }) }}
-                  onMouseEnter={() => setHover(p.slug)}
-                  onFocus={() => setHover(p.slug)}
-                  onClick={tap}
-                  title={`${p.name}, ${countryOf(p.country)?.name}${edit ? ' (in the edit)' : ''}`}
-                >
-                  <span className="m-clip-label">{p.name.toUpperCase()}</span>
-                </Link>
-              );
-            })}
-          </div>
+        {/* bottom-right: hint, or what you're pointing at */}
+        <div className="absolute right-6 md:right-16 bottom-6 md:bottom-10 flex flex-col items-end gap-2 pointer-events-none text-right max-w-[45%] md:max-w-[40%]">
+          <p className="text-sm" style={{ color: 'var(--m-dim)' }} aria-live="polite">{line}</p>
+          {zoomed && (
+            <button type="button" onClick={reset} className="pointer-events-auto text-sm underline underline-offset-4 min-h-[36px] hover:opacity-70" style={{ color: 'var(--m-faint)' }}>
+              ← Whole world
+            </button>
+          )}
         </div>
       </section>
 
-      {/* countries: tap to fly the map there */}
-      <nav aria-label="Countries" className="m-mono flex gap-2 overflow-x-auto md:flex-wrap pb-1 -mx-4 px-4 md:mx-0 md:px-0" style={{ fontSize: 11, letterSpacing: '0.08em' }}>
-        {COUNTRIES.filter((c) => c.status !== 'soon').map((c) => (
-          <button
-            key={c.slug}
-            type="button"
-            onClick={() => select(c.slug, { scroll: phone })}
-            aria-pressed={sel?.slug === c.slug}
-            className="shrink-0 min-h-[40px] px-3 border whitespace-nowrap"
-            style={{
-              borderColor: sel?.slug === c.slug ? 'var(--m-text)' : 'var(--m-line)',
-              color: countryCounts[c.slug] ? 'var(--m-text)' : 'var(--m-faint)',
-            }}
-          >
-            {c.name.toUpperCase()} {countryCounts[c.slug] || (c.status === 'soon' ? '· SOON' : '')}
-          </button>
-        ))}
-      </nav>
+      {/* every place, in plain text */}
+      <section aria-labelledby="places" className="px-6 md:px-16 py-20">
+        <h2 id="places" className="text-2xl mb-8">Places</h2>
+        <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {listed.map((c) => (
+            <div key={c.slug}>
+              <Link to={`/travel/${c.slug}`} className="flex justify-between items-baseline pb-2 hover:opacity-70" style={{ borderBottom: '1px solid var(--m-line)' }}>
+                <span className="font-medium">{c.name}</span>
+                <span className="m-mono" style={{ fontSize: 11, color: 'var(--m-faint)' }}>{countryCounts[c.slug] || ''}</span>
+              </Link>
+              <ul className="mt-2">
+                {citiesIn(c.slug).filter((p) => cityCounts[p.slug] || p.status === 'edit').map((p) => (
+                  <li key={p.slug}>
+                    <Link to={`/travel/${p.slug}`} className="flex justify-between py-1.5 text-sm hover:opacity-70" style={{ color: 'var(--m-dim)' }}>
+                      <span>{p.name}</span>
+                      <span className="m-mono" style={{ fontSize: 11, color: 'var(--m-faint)' }}>{cityCounts[p.slug] || 'in the edit'}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

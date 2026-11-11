@@ -24,11 +24,7 @@ export default function StoriesTabs({ className = '' }) {
               key={t.to}
               to={t.to}
               aria-current={active ? 'page' : undefined}
-              className={`shrink-0 font-sans text-tk-sm uppercase tracking-[0.15em] px-tk-4 py-tk-3 border transition-colors duration-fast ${
-                active
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
-              }`}
+              className={`ui-chip ${active ? 'is-active' : ''}`}
             >
               {t.label}
             </Link>

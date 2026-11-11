@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Sun, Moon, Search, ChevronDown, X } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import { useHasProducts, withoutShop } from '@/hooks/use-has-products';
+import { COUNTRIES, citiesIn } from '@/lib/places';
 
 const LINKS = [
-  { label: 'Map', to: '/' },
   { label: 'Films', to: '/videos' },
   { label: 'Journal', to: '/journal' },
   { label: 'Work', to: '/portfolio' },
@@ -13,90 +13,139 @@ const LINKS = [
   { label: 'About', to: '/about' },
 ];
 
-// Running timecode since the page opened, 24 fps. Writes straight to the DOM
-// so it never re-renders React.
-function Timecode() {
-  const ref = useRef(null);
-  useEffect(() => {
-    const start = performance.now();
-    const pad = (n) => String(n).padStart(2, '0');
-    const tick = () => {
-      const ms = performance.now() - start;
-      const s = Math.floor(ms / 1000);
-      if (ref.current) {
-        ref.current.textContent = `TC ${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}:${pad(Math.floor((ms % 1000) / (1000 / 24)))}`;
-      }
-    };
-    tick();
-    const id = setInterval(tick, 84);
-    return () => clearInterval(id);
-  }, []);
-  return <span ref={ref} aria-hidden="true">TC 00:00:00:00</span>;
+const FILMED = COUNTRIES;
+
+function SearchBox({ className = '', autoFocus = false, onDone }) {
+  const navigate = useNavigate();
+  const [q, setQ] = useState('');
+  const submit = (e) => {
+    e.preventDefault();
+    const v = q.trim();
+    navigate(v ? `/search?q=${encodeURIComponent(v)}` : '/search');
+    setQ('');
+    onDone?.();
+  };
+  return (
+    <form role="search" onSubmit={submit} className={`sn-search ${className}`}>
+      <Search className="w-4 h-4 shrink-0" aria-hidden="true" />
+      <input
+        type="search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search places, films, stories"
+        aria-label="Search the site"
+        autoFocus={autoFocus}
+      />
+    </form>
+  );
 }
 
-function VancouverClock() {
-  const fmt = () =>
-    new Intl.DateTimeFormat('en-CA', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Vancouver' }).format(new Date());
-  const [t, setT] = useState(fmt);
-  useEffect(() => {
-    const id = setInterval(() => setT(fmt()), 30000);
-    return () => clearInterval(id);
-  }, []);
-  return <span>VANCOUVER {t}</span>;
+/** "Places" menu: every country filmed, with its cities. */
+function PlacesMenu({ onDone }) {
+  return (
+    <div className="sn-places">
+      {FILMED.map((c) => (
+        <div key={c.slug}>
+          <Link to={`/travel/${c.slug}`} onClick={onDone} className="sn-places-country">{c.name}</Link>
+          <ul>
+            {citiesIn(c.slug).map((p) => (
+              <li key={p.slug}><Link to={`/travel/${p.slug}`} onClick={onDone}>{p.name}</Link></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <Link to="/" onClick={onDone} className="sn-places-all">See them all on the globe →</Link>
+    </div>
+  );
 }
 
-/** Camera-monitor header used by the map homepage and place pages. */
-export default function MonitorHeader({ profile }) {
+/** Site header for every jooonbon page. */
+export default function MonitorHeader() {
   const { isDark, toggle } = useTheme();
   const { pathname } = useLocation();
   const links = withoutShop(LINKS, useHasProducts());
-  const [open, setOpen] = useState(false);
-  useEffect(() => setOpen(false), [pathname]);
+  const [sheet, setSheet] = useState(false);
+  const [places, setPlaces] = useState(false);
+  const placesRef = useRef(null);
+
+  useEffect(() => { setSheet(false); setPlaces(false); }, [pathname]);
+  useEffect(() => {
+    if (!places) return undefined;
+    const close = (e) => { if (!placesRef.current?.contains(e.target)) setPlaces(false); };
+    const esc = (e) => { if (e.key === 'Escape') setPlaces(false); };
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', esc); };
+  }, [places]);
+  useEffect(() => {
+    document.body.style.overflow = sheet ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [sheet]);
+
+  const isActive = (to) => pathname.startsWith(to);
+  const onPlaces = pathname === '/' || pathname.startsWith('/travel/');
 
   return (
-    <header className="m-mono" style={{ fontSize: 12, letterSpacing: '0.08em' }}>
-      <div className="grid items-center gap-4" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-2 font-medium" style={{ color: 'var(--m-rec)' }}>
-            <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: 'var(--m-rec)' }} />REC
-          </span>
-          <span className="hidden sm:inline"><Timecode /></span>
-        </div>
-        <Link to="/" aria-label="jooonbon home">
-          <img src="/logo.png" alt="jooonbon" width="1037" height="474" className="m-logo block h-9 md:h-11 w-auto" />
+    <header className="sn">
+      <div className="sn-bar">
+        <Link to="/" aria-label="jooonbon home" className="shrink-0">
+          <img src="/logo.png" alt="jooonbon" width="1037" height="474" className="m-logo block h-8 md:h-9 w-auto" />
         </Link>
-        <div className="flex items-center justify-end gap-5">
-          <nav aria-label="Main" className="hidden lg:flex items-center gap-5">
-            {links.map((l) => {
-              const active = l.to === '/' ? pathname === '/' || pathname.startsWith('/travel/') : pathname.startsWith(l.to);
-              return (
-                <Link key={l.to} to={l.to} aria-current={active ? 'page' : undefined} style={active ? { color: 'var(--m-rec)' } : undefined} className="uppercase hover:opacity-70">
-                  {l.label}
-                </Link>
-              );
-            })}
-            <Link to="/bonpoints" className="uppercase hover:opacity-70" style={{ color: 'var(--m-dim)' }}>bon.points ↗</Link>
-          </nav>
-          <button type="button" onClick={toggle} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} className="w-11 h-11 flex items-center justify-center border" style={{ borderColor: 'var(--m-line-2)' }}>
+
+        <nav aria-label="Main" className="hidden xl:flex items-center gap-1 ml-6">
+          <div ref={placesRef} className="relative">
+            <button type="button" className={`sn-link ${onPlaces ? 'is-active' : ''}`} aria-expanded={places} aria-haspopup="true" onClick={() => setPlaces((o) => !o)}>
+              Places <ChevronDown className={`w-3.5 h-3.5 transition-transform ${places ? 'rotate-180' : ''}`} aria-hidden="true" />
+            </button>
+            {places && (
+              <div className="sn-pop">
+                <PlacesMenu onDone={() => setPlaces(false)} />
+              </div>
+            )}
+          </div>
+          {links.map((l) => (
+            <Link key={l.to} to={l.to} aria-current={isActive(l.to) ? 'page' : undefined} className={`sn-link ${isActive(l.to) ? 'is-active' : ''}`}>
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
+        <SearchBox className="hidden md:flex flex-1 mx-4 xl:mx-6" />
+
+        <div className="flex items-center gap-2 ml-auto md:ml-0">
+          <Link to="/search" aria-label="Search" className="sn-icon md:hidden"><Search className="w-4 h-4" /></Link>
+          <button type="button" onClick={toggle} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} className="sn-icon">
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="Menu" className="lg:hidden w-11 h-11 flex items-center justify-center border" style={{ borderColor: 'var(--m-line-2)' }}>
+          <a href="https://youtube.com/jonbontabas" target="_blank" rel="noopener noreferrer" className="sn-btn is-ghost hidden lg:inline-flex">YouTube ↗</a>
+          <Link to="/contact" className="sn-btn is-solid hidden sm:inline-flex">Work with me</Link>
+          <button type="button" onClick={() => setSheet(true)} aria-expanded={sheet} aria-label="Menu" className="sn-icon xl:hidden">
             <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 1H17M1 6H17M1 11H17" stroke="currentColor" strokeWidth="1.5" /></svg>
           </button>
         </div>
       </div>
-      {open && (
-        <nav aria-label="Main" className="lg:hidden flex flex-col border-t border-b mt-3" style={{ borderColor: 'var(--m-line)' }}>
-          {[...links, { label: 'bon.points ↗', to: '/bonpoints' }].map((l) => (
-            <Link key={l.to} to={l.to} className="uppercase py-3" style={{ borderBottom: '1px solid var(--m-line)' }}>{l.label}</Link>
-          ))}
-        </nav>
+
+      {sheet && (
+        <div className="sn-sheet xl:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+          <div className="sn-bar">
+            <Link to="/" aria-label="jooonbon home"><img src="/logo.png" alt="jooonbon" width="1037" height="474" className="m-logo block h-8 w-auto" /></Link>
+            <button type="button" onClick={() => setSheet(false)} aria-label="Close menu" className="sn-icon ml-auto"><X className="w-5 h-5" /></button>
+          </div>
+          <div className="px-4 pb-10 overflow-y-auto">
+            <SearchBox className="flex md:hidden mb-6" onDone={() => setSheet(false)} />
+            <nav aria-label="Main" className="flex flex-col">
+              <Link to="/" className="sn-sheet-link">Map</Link>
+              {links.map((l) => <Link key={l.to} to={l.to} className="sn-sheet-link">{l.label}</Link>)}
+            </nav>
+            <p className="mt-8 mb-3 text-sm" style={{ color: 'var(--m-faint)' }}>Places</p>
+            <PlacesMenu onDone={() => setSheet(false)} />
+            <div className="flex gap-2 mt-8">
+              <Link to="/contact" className="sn-btn is-solid flex-1 justify-center">Work with me</Link>
+              <a href="https://youtube.com/jonbontabas" target="_blank" rel="noopener noreferrer" className="sn-btn is-ghost flex-1 justify-center">YouTube ↗</a>
+            </div>
+          </div>
+        </div>
       )}
-      <div className="flex flex-wrap justify-between gap-3 mt-2" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--m-dim)' }}>
-        <span className="hidden sm:inline">4K · 23.98P · 180°</span>
-        <VancouverClock />
-        {profile && <span style={{ color: 'var(--m-text)' }}>{profile}</span>}
-      </div>
     </header>
   );
 }

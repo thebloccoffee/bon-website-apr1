@@ -183,11 +183,29 @@
     --input: 44 9% 79%;
     --ring: 150 4% 11%;
   }
-  /* Small caps labels read like monitor overlays: monospace. */
-  .jb .uppercase { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
-  /* Headlines: tight and solid like the place pages. */
-  .jb main h1 { font-weight: 700; letter-spacing: -0.035em; }
+  /* One type system on every jooonbon page, matching the site header:
+     Inter, sentence case, no monospace caps. (Strings already typed in
+     capitals stay as written.) */
+  .jb main .uppercase,
+  .jb main .m-mono {
+    font-family: 'Inter', system-ui, sans-serif;
+    text-transform: none;
+    letter-spacing: -0.005em;
+    font-weight: 500;
+  }
+  .jb main .font-light { font-weight: 400; }
+  /* Headlines: tight and solid. */
+  .jb main h1, .jb main h1.font-light, .jb main h1.font-bold { font-weight: 650; letter-spacing: -0.035em; }
   .jb main h2 { font-weight: 600; letter-spacing: -0.02em; }
+  .jb main h3 { letter-spacing: -0.015em; }
+
+  /* One shape for controls and media: soft 10px corners like the header. */
+  .jb main :is(a, button).border:not(.rounded-full),
+  .jb main :is(input, textarea, select):not([type='checkbox']):not([type='radio']) { border-radius: 10px; }
+  .jb main img.object-cover:not(.rounded-full),
+  .jb main iframe,
+  .jb main video,
+  .jb main [class*='aspect-'].overflow-hidden { border-radius: 12px; }
 
   * {
     @apply border-border outline-ring/50;

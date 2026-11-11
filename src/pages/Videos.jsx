@@ -12,12 +12,7 @@ const FORMATS = [
   { key: 'short', label: 'Shorts' },
 ];
 
-const chipClass = (active) =>
-  `font-sans text-tk-sm uppercase tracking-[0.15em] px-tk-4 py-tk-3 border transition-colors duration-fast ${
-    active
-      ? 'border-foreground bg-foreground text-background'
-      : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
-  }`;
+const chipClass = (active) => `ui-chip ${active ? 'is-active' : ''}`;
 
 const prettyTag = (t) => t.replace(/[-_]/g, ' ');
 
@@ -115,16 +110,14 @@ export default function Videos({ lockedBrand = 'jooonbon' }) {
           <span className="mx-tk-3 h-6 w-px bg-border hidden sm:block" aria-hidden="true" />
           </>)}
 
-          <div className="inline-flex border border-border" role="group" aria-label="Video length">
+          <div className="inline-flex gap-2" role="group" aria-label="Video length">
             {FORMATS.map((f) => (
               <button
                 key={f.key}
                 type="button"
                 aria-pressed={format === f.key}
                 onClick={() => update('format', f.key === 'long' ? null : f.key)}
-                className={`font-sans text-tk-sm uppercase tracking-[0.15em] px-tk-4 py-tk-3 transition-colors duration-fast ${
-                  format === f.key ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'
-                }`}
+                className={`ui-chip ${format === f.key ? 'is-active' : ''}`}
               >
                 {f.label}
                 {!isLoading && <span className="ml-tk-2 opacity-60">{formatCounts[f.key]}</span>}
@@ -142,11 +135,7 @@ export default function Videos({ lockedBrand = 'jooonbon' }) {
                 type="button"
                 aria-pressed={tag === t}
                 onClick={() => update('tag', tag === t ? null : t)}
-                className={`font-sans text-tk-sm px-tk-3 py-tk-1 rounded-tk-pill border transition-colors duration-fast ${
-                  tag === t
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:text-foreground hover:border-foreground'
-                }`}
+                className={`ui-chip is-sm ${tag === t ? 'is-active' : ''}`}
               >
                 {prettyTag(t)}
               </button>

@@ -116,12 +116,7 @@ export default function Journal() {
     setActiveContinent('All');
   };
 
-  const pillCls = (active) =>
-    `font-sans text-xs tracking-[0.1em] md:tracking-[0.15em] px-3 md:px-4 py-2.5 md:py-2 border transition-all duration-300 ${
-      active
-        ? 'border-foreground bg-foreground text-background'
-        : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
-    }`;
+  const pillCls = (active) => `ui-chip ${active ? 'is-active' : ''}`;
 
   return (
     <div className="pt-28 pb-24">
