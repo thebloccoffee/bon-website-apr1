@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import WorldMap from '@/components/monitor/WorldMap';
+import GlobeMap from '@/components/monitor/GlobeMap';
 import { useMapContent, thumbFor, watchUrl, postUrl } from '@/components/monitor/useMapContent';
 import Seo from '@/components/shared/Seo';
-import { countryOf, citiesIn, itemsFor, project, MAP_W, MAP_H } from '@/lib/places';
+import { countryOf, citiesIn, itemsFor } from '@/lib/places';
 import '@/components/monitor/monitor.css';
 
 const fmtCoord = (lat, lng) =>
@@ -38,17 +38,7 @@ export default function PlacePage({ place }) {
     return items.filter((i) => i._type === 'video' && (tab === 'short' ? i.format === 'short' : i.format !== 'short'));
   }, [items, tab]);
 
-  // Zoom the small map onto this country's cities.
-  const { zoom, center } = useMemo(() => {
-    if (!cities.length) return { zoom: 1, center: undefined };
-    const pts = cities.map((c) => project(c.lat, c.lng));
-    const xs = pts.map((p) => p[0]); const ys = pts.map((p) => p[1]);
-    const span = Math.max(Math.max(...xs) - Math.min(...xs), (Math.max(...ys) - Math.min(...ys)) * (MAP_W / MAP_H), 20);
-    return {
-      zoom: Math.max(1.5, Math.min(6, Math.round((MAP_W / (span * 2.4)) * 2) / 2)),
-      center: [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2],
-    };
-  }, [cities]);
+  const globeView = useMemo(() => ({ slug: place.slug, n: 1, snap: true }), [place.slug]);
 
   const status = place.status || (isCountry && !countryCounts[place.slug] ? 'soon' : 'filmed');
   const title = isCountry ? place.name : place.name;
@@ -85,8 +75,8 @@ export default function PlacePage({ place }) {
               ))}
             </dl>
           </div>
-          <figure className="relative flex-[1_1_300px] max-w-[440px] m-0 border overflow-hidden rounded-xl" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)' }}>
-            <WorldMap focus={focusCity} counts={countryCounts} view={center ? { k: zoom, cx: center[0], cy: center[1] } : undefined} showLabels={false} />
+          <figure className="relative flex-[1_1_300px] max-w-[440px] aspect-square m-0" aria-label={`${title} on the globe`}>
+            <GlobeMap focus={focusCity} counts={countryCounts} flyTo={globeView} zoom={isCountry ? 1.7 : 2.6} spin={false} labels={false} compact radius={0.42} />
           </figure>
         </section>
 

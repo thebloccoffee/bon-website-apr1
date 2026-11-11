@@ -39,8 +39,8 @@ const shortName = (n) => n.replace(/, BC$/, '').replace(' National Park', '');
  * `zoom` is controlled; `onZoom(k)` reports pinch and wheel zooms.
  */
 export default function GlobeMap({
-  focus, onFocus, onPin, onCountry, counts = {}, cityCounts = {}, flyTo, zoom = 1, onZoom,
-  spin = true, compact = false, radius = 0.31, className = '', style,
+  focus, onFocus, onLeave, onPin, onCountry, counts = {}, cityCounts = {}, flyTo, zoom = 1, onZoom,
+  spin = true, compact = false, labels = true, radius = 0.31, className = '', style,
 }) {
   const wrap = useRef(null);
   const canvas = useRef(null);
@@ -80,16 +80,23 @@ export default function GlobeMap({
       s.idleUntil = 0;
       return;
     }
+    let live = true;
+    const go = (center) => {
+      if (!live || !center) return;
+      // `snap` jumps straight there (a page opening on a place); otherwise glide.
+      const t0 = flyTo.snap ? performance.now() - 5000 : performance.now();
+      s.fly = { from: [...s.rot], to: [-center[0], -center[1]], t0 };
+      s.idleUntil = Infinity;
+    };
     const p = placeOf(flyTo.slug);
-    let center = p ? [p.lng, p.lat] : null;
-    if (!center) {
-      const c = COUNTRIES.find((x) => x.slug === flyTo.slug || x.name === flyTo.name);
-      const f = s.features.find((x) => x.properties.name === (c?.geo || flyTo.name));
-      if (f) center = geoCentroid(f);
-    }
-    if (!center) return;
-    s.fly = { from: [...s.rot], to: [-center[0], -center[1]], t0: performance.now() };
-    s.idleUntil = Infinity;
+    if (p) { go([p.lng, p.lat]); return () => { live = false; }; }
+    // A country needs its shape, which may still be loading.
+    const c = COUNTRIES.find((x) => x.slug === flyTo.slug || x.name === flyTo.name);
+    loadWorld().then((features) => {
+      const f = features.find((x) => x.properties.name === (c?.geo || flyTo.name));
+      go(f ? geoCentroid(f) : null);
+    });
+    return () => { live = false; };
   }, [flyTo]);
 
   useEffect(() => {
@@ -301,8 +308,15 @@ export default function GlobeMap({
         const list = sides[side].sort((a, b) => a.elbow[1] - b.elbow[1]);
         let y = -Infinity;
         for (const it of list) { it.y = Math.max(it.elbow[1], y + gapY); y = it.y; }
-        const over = y - (h - 8);
+        // keep labels clear of the header (top) and the title/hint (bottom)
+        const minY = P.compact ? 70 : 92;
+        const maxY = h - (P.compact ? 60 : 130);
+        const over = y - maxY;
         if (over > 0) for (const it of list) it.y -= over;
+        if (list.length && list[0].y < minY) {
+          let yy = minY;
+          for (const it of list) { it.y = Math.max(it.y, yy); yy = it.y + gapY; }
+        }
         for (const it of list) {
           const { p, el, ln, xy, elbow, isFocus } = it;
           p._y = p._y == null ? it.y : p._y + (it.y - p._y) * Math.min(1, dt / 90);
@@ -409,7 +423,7 @@ export default function GlobeMap({
     onCountry?.(ours?.slug || null, name);
   };
 
-  const onPointerLeave = () => { st.current.hoverGeo = null; };
+  const onPointerLeave = () => { st.current.hoverGeo = null; onLeave?.(); };
 
   // ctrl/⌘ + wheel or trackpad pinch zooms
   useEffect(() => {
@@ -441,11 +455,11 @@ export default function GlobeMap({
       <div className="m-dust" aria-hidden="true" />
       <canvas ref={canvas} className="absolute inset-0" aria-hidden="true" />
       <svg ref={svg} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-        {places.map((p) => (
+        {labels && places.map((p) => (
           <polyline key={p.slug} ref={(el) => { lineEls.current[p.slug] = el; }} className="g-line" style={{ opacity: 0 }} />
         ))}
       </svg>
-      {places.map((p) => {
+      {labels && places.map((p) => {
         const status = p.status || 'filmed';
         return (
           <Link

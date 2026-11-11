@@ -215,3 +215,10 @@ html.light .m-grain { opacity: 0.12; mix-blend-mode: multiply; }
 }
 .film-frame > button, .film-frame > span:not(:first-child), .film-frame [class*='play'] { z-index: 2; }
 @media (prefers-reduced-motion: reduce) { .film-frame::after { animation: none; } }
+
+/* the same grain on every photo frame on jooonbon pages (video frames have their own) */
+.jb main [class*='aspect-'].overflow-hidden:not(.film-frame):has(img) { position: relative; isolation: isolate; }
+.jb main [class*='aspect-'].overflow-hidden:not(.film-frame):has(img)::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.26; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}

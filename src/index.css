@@ -202,10 +202,11 @@
   /* One shape for controls and media: soft 10px corners like the header. */
   .jb main :is(a, button).border:not(.rounded-full),
   .jb main :is(input, textarea, select):not([type='checkbox']):not([type='radio']) { border-radius: 10px; }
+  /* Photos and video frames: square corners, like a film still. */
   .jb main img.object-cover:not(.rounded-full),
   .jb main iframe,
   .jb main video,
-  .jb main [class*='aspect-'].overflow-hidden { border-radius: 12px; }
+  .jb main [class*='aspect-'].overflow-hidden { border-radius: 0; }
 
   * {
     @apply border-border outline-ring/50;
