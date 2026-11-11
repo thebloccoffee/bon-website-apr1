@@ -13,7 +13,7 @@ const LINKS = [
   { label: 'About', to: '/about' },
 ];
 
-const FILMED = COUNTRIES.filter((c) => c.status !== 'soon');
+const FILMED = COUNTRIES;
 
 function SearchBox({ className = '', autoFocus = false, onDone }) {
   const navigate = useNavigate();

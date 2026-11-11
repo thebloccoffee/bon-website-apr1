@@ -110,7 +110,7 @@ export default function GlobeMap({
 
     loadWorld().then((f) => { s.features = f; });
 
-    // Film grain: one noise tile, nudged a few times a second, clipped to the globe.
+    // Film grain: one still noise tile, clipped to the globe.
     const noise = document.createElement('canvas');
     noise.width = noise.height = 192;
     const nctx = noise.getContext('2d');
@@ -122,8 +122,6 @@ export default function GlobeMap({
     }
     nctx.putImageData(img, 0, 0);
     const grain = ctx.createPattern(noise, 'repeat');
-    let grainAt = 0;
-    let grainOff = [0, 0];
 
     const readColors = () => {
       const cs = getComputedStyle(wrap.current);
@@ -243,12 +241,11 @@ export default function GlobeMap({
       ctx.fillStyle = edge; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
 
       // grain
-      if (!reduce && now - grainAt > 70) { grainAt = now; grainOff = [Math.random() * 192, Math.random() * 192]; }
-      ctx.translate(grainOff[0], grainOff[1]);
+      // grain stays still on screen, like grain baked into a print
       ctx.globalCompositeOperation = 'overlay';
       ctx.globalAlpha = 0.22;
       ctx.fillStyle = grain;
-      ctx.fillRect(cx - R - grainOff[0], cy - R - grainOff[1], R * 2, R * 2);
+      ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
       ctx.restore();
       ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;

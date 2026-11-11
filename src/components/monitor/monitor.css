@@ -196,7 +196,6 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
 .m-grain {
   position: absolute; inset: -50%; pointer-events: none; z-index: 1; opacity: 0.09; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: m-grain 0.9s steps(6) infinite;
 }
 html.light .m-grain { opacity: 0.12; mix-blend-mode: multiply; }
 @keyframes m-grain {
@@ -204,3 +203,15 @@ html.light .m-grain { opacity: 0.12; mix-blend-mode: multiply; }
   60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); }
 }
 @media (prefers-reduced-motion: reduce) { .m-grain { animation: none; } }
+
+/* video frames on every page: square corners and film grain over the picture */
+.film-frame { position: relative; isolation: isolate; }
+.jb main .film-frame, .jb main .film-frame :is(img, iframe, video) { border-radius: 0 !important; }
+.film-frame::after {
+  content: ''; position: absolute; inset: -50%; z-index: 1; pointer-events: none;
+  opacity: 0.28; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.6 -0.3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: m-grain 0.9s steps(6) infinite;
+}
+.film-frame > button, .film-frame > span:not(:first-child), .film-frame [class*='play'] { z-index: 2; }
+@media (prefers-reduced-motion: reduce) { .film-frame::after { animation: none; } }

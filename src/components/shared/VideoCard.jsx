@@ -43,7 +43,7 @@ export default function VideoCard({ video, size = 'md', priority = false, playab
           sizes={s.sizes}
         />
       ) : (
-        <a href={watchUrl(video)} target="_blank" rel="noopener noreferrer" aria-label={`Watch on YouTube: ${video.title}`}>
+        <a href={watchUrl(video)} target="_blank" rel="noopener noreferrer" aria-label={`Watch on YouTube: ${video.title}`} className="film-frame block">
           <img
             src={`https://i.ytimg.com/vi/${video.youtube_id}/hqdefault.jpg`}
             alt=""

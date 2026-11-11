@@ -128,7 +128,7 @@ export default function PlacePage({ place }) {
               {shown.map((it, i) =>
                 it._type === 'video' ? (
                   <a key={`v${it.youtube_id}`} href={watchUrl(it)} target="_blank" rel="noopener noreferrer" className="block group" aria-label={`Watch on YouTube: ${it.title}`}>
-                    <span className="relative block overflow-hidden rounded-xl" style={{ background: 'var(--m-panel)' }}>
+                    <span className="film-frame relative block overflow-hidden" style={{ background: 'var(--m-panel)' }}>
                       <img src={thumbFor(it)} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" width="480" height={it.format === 'short' ? 853 : 270} className="block w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" style={{ aspectRatio: it.format === 'short' ? '9 / 16' : '16 / 9' }} />
                       <span className="absolute left-2.5 top-2.5 px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
                         {it.format === 'short' ? 'Short' : 'Film'}

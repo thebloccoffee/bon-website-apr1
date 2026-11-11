@@ -5,8 +5,8 @@ import { COUNTRIES } from '@/lib/places';
 
 // Personal bio. Facts only from Jon: Filipino, based in Vancouver, travel
 // films, recreates movie scenes where they were shot. Countries come from
-// the map so the list stays true as trips are added.
-const filmed = COUNTRIES.filter((c) => c.status !== 'soon' && c.slug !== 'canada').map((c) => (c.slug === 'usa' ? 'New York' : c.slug === 'philippines' ? 'the Philippines' : c.name));
+// the map (every country visited) so the list stays true as trips are added.
+const filmed = COUNTRIES.filter((c) => c.slug !== 'canada').map((c) => (c.slug === 'usa' ? 'New York' : c.slug === 'philippines' ? 'the Philippines' : c.name));
 const list = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}` : xs[0] || '');
 
 export default function About() {

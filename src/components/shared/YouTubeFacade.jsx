@@ -56,7 +56,7 @@ export default function YouTubeFacade({
   if (playing) {
     const params = new URLSearchParams({ autoplay: '1', rel: '0', playsinline: '1' });
     return (
-      <div className={`relative w-full overflow-hidden bg-tk-surface-muted ${aspect} ${className}`}>
+      <div className={`film-frame relative w-full overflow-hidden bg-tk-surface-muted ${aspect} ${className}`}>
         <iframe
           src={`${EMBED_ORIGIN}/embed/${youtubeId}?${params}`}
           title={title}
@@ -76,7 +76,7 @@ export default function YouTubeFacade({
       onPointerEnter={warmConnections}
       onFocus={warmConnections}
       aria-label={`Play video: ${title}`}
-      className={`group relative block w-full overflow-hidden bg-tk-surface-raised ${aspect} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground ${className}`}
+      className={`film-frame group relative block w-full overflow-hidden bg-tk-surface-raised ${aspect} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground ${className}`}
     >
       <img
         src={hq}
