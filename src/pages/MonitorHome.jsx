@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import GlobeMap from '@/components/monitor/GlobeMap';
 import { useMapContent } from '@/components/monitor/useMapContent';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -43,15 +42,6 @@ export default function MonitorHome() {
   const place = activeSlug ? findPlace(activeSlug) : null;
   const count = useMemo(() => (place ? itemsFor(place, all).length : 0), [place, all]);
   const focusCity = place?.kind === 'city' ? place.slug : null;
-  const reduce = useReducedMotion();
-
-  // The place's latest film, shown full-bleed behind the globe as you point at it.
-  const still = useMemo(() => {
-    if (!place) return null;
-    const vids = itemsFor(place, all).filter((i) => i._type === 'video' && i.youtube_id);
-    const v = vids.find((x) => x.format !== 'short') || vids[0];
-    return v ? { id: v.youtube_id, short: v.format === 'short' } : null;
-  }, [place, all]);
   const zoomed = zoom > 1.01 || Boolean(sel);
 
   // The one line under the globe: a hint, or what you're pointing at.
@@ -75,25 +65,6 @@ export default function MonitorHome() {
   return (
     <div className="monitor">
       <section aria-label="Globe" className="relative overflow-hidden" style={{ height: '100svh', minHeight: phone ? 600 : 640 }}>
-        {/* footage behind the globe, in Jon's grade (stills from the film for now) */}
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
-          <AnimatePresence>
-            {still && (
-              <motion.img
-                key={still.id}
-                src={`https://i.ytimg.com/vi/${still.id}/${still.short ? 'hqdefault' : 'maxresdefault'}.jpg`}
-                onError={(e) => { if (!e.currentTarget.src.includes('hqdefault')) e.currentTarget.src = `https://i.ytimg.com/vi/${still.id}/hqdefault.jpg`; }}
-                alt=""
-                className="absolute inset-0 w-full h-full"
-                style={{ objectFit: 'cover' }}
-                initial={{ opacity: 0, scale: reduce ? 1 : 1.06 }}
-                animate={{ opacity: 0.5, scale: 1, transition: { opacity: { duration: 0.7 }, scale: { duration: 6, ease: 'easeOut' } } }}
-                exit={{ opacity: 0, transition: { duration: 0.5 } }}
-              />
-            )}
-          </AnimatePresence>
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 0%, color-mix(in srgb, var(--m-bg) 55%, transparent) 60%, var(--m-bg) 100%)' }} />
-        </div>
         <GlobeMap
           focus={focusCity}
           onFocus={phone ? undefined : setHover}
