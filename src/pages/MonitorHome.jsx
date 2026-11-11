@@ -1,32 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Sun, Moon } from 'lucide-react';
 import GlobeMap from '@/components/monitor/GlobeMap';
 import { useMapContent } from '@/components/monitor/useMapContent';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useTheme } from '@/hooks/use-theme';
-import { useHasProducts, withoutShop } from '@/hooks/use-has-products';
 import { COUNTRIES, findPlace, itemsFor, countryOf, citiesIn } from '@/lib/places';
 import '@/components/monitor/monitor.css';
 
-const NAV = [
-  { label: 'Map', to: '/' },
-  { label: 'Films', to: '/videos' },
-  { label: 'Journal', to: '/journal' },
-  { label: 'Work', to: '/portfolio' },
-  { label: 'Shop', to: '/shop' },
-  { label: 'About', to: '/about' },
-];
-
 const storyCount = (n) => `${n} ${n === 1 ? 'story' : 'stories'}`;
 
-// Home: one quiet screen. Logo on top, the globe in the middle, a line of
-// text under it and the menu at the bottom. Every place is listed below.
+// Home: the globe is the hero. The site header sits over it, the title and
+// counts sit bottom-left, the hint bottom-right. Every place is listed below.
 export default function MonitorHome() {
   const { all, countryCounts, cityCounts, latestCity } = useMapContent();
   const phone = useIsMobile();
-  const { isDark, toggle } = useTheme();
-  const nav = withoutShop(NAV, useHasProducts());
 
   const [hover, setHover] = useState(null);
   const [sel, setSel] = useState(null); // { slug } of a city or country, or { name } of a country with nothing yet
@@ -67,11 +53,11 @@ export default function MonitorHome() {
     const status = count ? storyCount(count) : place.status === 'edit' ? 'in the edit' : 'coming soon';
     line = (
       <Link to={`/travel/${place.slug}`} className="pointer-events-auto hover:opacity-70">
-        <span style={{ color: 'var(--m-text)' }}>{place.name}</span> · {where} · {status} <span aria-hidden="true">→</span>
+        <span style={{ color: 'var(--m-text)', fontWeight: 600 }}>{place.name}</span> · {where} · {status} <span aria-hidden="true">→</span>
       </Link>
     );
   } else {
-    line = <span>Pick a city to start</span>;
+    line = <span>Drag to spin · tap a city</span>;
   }
 
   const listed = COUNTRIES.filter((c) => countryCounts[c.slug] || citiesIn(c.slug).some((p) => p.status === 'edit'));
@@ -85,58 +71,37 @@ export default function MonitorHome() {
           onPin={select}
           onCountry={onCountry}
           counts={countryCounts}
+          cityCounts={cityCounts}
           flyTo={flyTo}
           zoom={zoom}
           onZoom={setZoom}
           spin={!sel && !hover}
           compact={phone}
-          radius={phone ? 0.2 : 0.23}
-          band={phone ? [0.2, 0.52] : [0.18, 0.56]}
+          radius={phone ? 0.24 : 0.27}
         />
 
-        {/* top: logo | one line */}
-        <header className="absolute inset-x-0 top-0 flex items-center justify-center gap-4 pt-7 md:pt-10 pointer-events-none">
-          <Link to="/" aria-label="jooonbon home" className="pointer-events-auto">
-            <img src="/logo.png" alt="jooonbon" width="1037" height="474" className="m-logo block h-9 md:h-12 w-auto" />
-          </Link>
-          <span aria-hidden="true" className="h-7 w-px" style={{ background: 'var(--m-line-2)' }} />
-          <h1 className="text-sm md:text-base font-normal tracking-wide" style={{ color: 'var(--m-dim)' }}>Every place I've filmed</h1>
-        </header>
-
-        {/* under the globe */}
-        <div className="absolute inset-x-0 flex flex-col items-center gap-3 px-4 pointer-events-none" style={{ top: phone ? '74%' : '77%' }}>
-          <p className="m-mono uppercase text-center" style={{ fontSize: phone ? 11 : 12, letterSpacing: '0.2em', color: 'var(--m-dim)' }} aria-live="polite">
-            {line}
+        {/* bottom-left: title and counts */}
+        <div className="absolute left-4 md:left-8 bottom-6 md:bottom-8 max-w-[60%] pointer-events-none">
+          <h1 className="font-semibold tracking-tight leading-none" style={{ fontSize: 'clamp(24px, 3.4vw, 44px)' }}>Every place I've filmed.</h1>
+          <p className="mt-3 text-sm" style={{ color: 'var(--m-dim)' }}>
+            {Object.keys(countryCounts).length} countries · {Object.keys(cityCounts).length} places · {all.length} stories
           </p>
+        </div>
+
+        {/* bottom-right: hint, or what you're pointing at */}
+        <div className="absolute right-4 md:right-8 bottom-6 md:bottom-8 flex flex-col items-end gap-2 pointer-events-none text-right max-w-[45%] md:max-w-[40%]">
+          <p className="text-sm" style={{ color: 'var(--m-dim)' }} aria-live="polite">{line}</p>
           {zoomed && (
-            <button type="button" onClick={reset} className="m-mono pointer-events-auto uppercase min-h-[40px] px-3 hover:opacity-70" style={{ fontSize: 10, letterSpacing: '0.2em', color: 'var(--m-faint)' }}>
+            <button type="button" onClick={reset} className="pointer-events-auto text-sm underline underline-offset-4 min-h-[36px] hover:opacity-70" style={{ color: 'var(--m-faint)' }}>
               ← Whole world
             </button>
           )}
         </div>
-
-        {/* bottom: menu, then small icons */}
-        <footer className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 pb-5 md:pb-7">
-          <nav aria-label="Main" className="m-mono flex items-center gap-5 md:gap-9 uppercase overflow-x-auto max-w-full px-4" style={{ fontSize: phone ? 10 : 11, letterSpacing: '0.2em' }}>
-            {nav.map((l) => (
-              <Link key={l.to} to={l.to} aria-current={l.to === '/' ? 'page' : undefined} className="shrink-0 py-2 hover:opacity-70" style={{ color: l.to === '/' ? 'var(--m-text)' : 'var(--m-faint)' }}>
-                {l.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex items-center gap-6 m-mono uppercase" style={{ fontSize: 10, letterSpacing: '0.16em', color: 'var(--m-faint)' }}>
-            <button type="button" onClick={toggle} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} className="w-9 h-9 flex items-center justify-center hover:opacity-70">
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            <a href="https://youtube.com/jonbontabas" target="_blank" rel="noopener noreferrer" className="py-2 hover:opacity-70">YouTube ↗</a>
-            <Link to="/bonpoints" className="py-2 hover:opacity-70">bon.points ↗</Link>
-          </div>
-        </footer>
       </section>
 
       {/* every place, in plain text */}
       <section aria-labelledby="places" className="max-w-3xl mx-auto px-4 md:px-6 py-16">
-        <h2 id="places" className="m-mono uppercase text-center mb-8" style={{ fontSize: 11, letterSpacing: '0.2em', color: 'var(--m-faint)' }}>Places</h2>
+        <h2 id="places" className="text-2xl mb-8">Places</h2>
         <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
           {listed.map((c) => (
             <div key={c.slug}>

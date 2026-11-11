@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import MonitorHeader from '@/components/monitor/MonitorHeader';
 import WorldMap from '@/components/monitor/WorldMap';
 import { useMapContent, thumbFor, watchUrl, postUrl } from '@/components/monitor/useMapContent';
 import Seo from '@/components/shared/Seo';
@@ -61,8 +60,7 @@ export default function PlacePage({ place }) {
         title={`${title}: films and travel notes`}
         description={`Travel films, shorts and notes from ${title}${!isCountry && country ? `, ${country.name}` : ''} by Jon Bon Tabas.`}
       />
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8 pt-4 pb-24">
-        <MonitorHeader />
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 pt-24 pb-24">
 
         <nav aria-label="Breadcrumb" className="m-mono mt-6" style={{ fontSize: 12, letterSpacing: '0.1em', color: 'var(--m-faint)' }}>
           <Link to="/">WORLD</Link>

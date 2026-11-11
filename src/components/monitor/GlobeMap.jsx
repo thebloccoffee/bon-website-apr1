@@ -20,34 +20,19 @@ export const MAX_ZOOM = 6;
 const isTouchUi = () => typeof window !== 'undefined' && window.matchMedia?.('(hover: none)').matches;
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-// Which edge each country's tags sit on. The globe spins under fixed tags,
-// so their leader lines sweep across the screen as it turns.
-const LEFT = new Set(['canada', 'usa', 'china', 'south-korea', 'taiwan', 'japan']);
 const shortName = (n) => n.replace(/, BC$/, '').replace(' National Park', '');
 
-/** The triangle wireframe: a 15° grid plus one diagonal per cell. */
-function wireframe() {
-  const lines = [];
-  for (let lng = -180; lng < 180; lng += 15) {
-    for (let lat = -75; lat < 90; lat += 15) {
-      if (lat + 15 > 90) continue;
-      lines.push([[lng, lat], [lng + 15, lat + 15]]);
-    }
-  }
-  return { type: 'MultiLineString', coordinates: lines };
-}
-
 /**
- * A see-through spinning globe. City tags stay at the frame's edges and
- * point at their pins with thin leader lines. Drag to spin, pinch or
+ * A see-through spinning globe. Cities on the near side get callout labels
+ * beside the globe, joined to their pins by bent leader lines. Drag to spin, pinch or
  * ctrl+wheel to zoom, tap a country to fly there.
  *
  * `flyTo` = { slug } | { world: true }, with an `n` that changes per request.
  * `zoom` is controlled; `onZoom(k)` reports pinch and wheel zooms.
  */
 export default function GlobeMap({
-  focus, onFocus, onPin, onCountry, counts = {}, flyTo, zoom = 1, onZoom,
-  spin = true, compact = false, radius = 0.31, band = [0.13, 0.68], className = '', style,
+  focus, onFocus, onPin, onCountry, counts = {}, cityCounts = {}, flyTo, zoom = 1, onZoom,
+  spin = true, compact = false, radius = 0.31, className = '', style,
 }) {
   const wrap = useRef(null);
   const canvas = useRef(null);
@@ -62,12 +47,7 @@ export default function GlobeMap({
     spin: true, idleUntil: 0, size: { w: 0, h: 0 }, dpr: 1, visible: true,
   });
 
-  const places = useMemo(() => {
-    const left = PLACES.filter((p) => LEFT.has(p.country));
-    const right = PLACES.filter((p) => !LEFT.has(p.country));
-    const slots = (list, side) => list.map((p, i) => ({ ...p, side, slot: (i + 0.5) / list.length, phase: (p.lat * 7 + p.lng) % 6.28 }));
-    return [...slots(left, 'left'), ...slots(right, 'right')];
-  }, []);
+  const places = useMemo(() => PLACES.map((p, i) => ({ ...p, n: String(i + 1).padStart(2, '0') })), []);
 
   const litGeo = useMemo(() => {
     const out = {};
@@ -79,7 +59,7 @@ export default function GlobeMap({
 
   // Keep props readable from the animation loop without restarting it.
   const props = useRef({});
-  props.current = { focus, onFocus, onPin, onCountry, onZoom, spin, compact, radius, band };
+  props.current = { focus, onFocus, onPin, onCountry, onZoom, spin, compact, radius };
 
   // ── controlled zoom and fly-to ────────────────────────────────────────────
   useEffect(() => { st.current.kTarget = Math.min(MAX_ZOOM, Math.max(1, zoom)); }, [zoom]);
@@ -120,7 +100,6 @@ export default function GlobeMap({
     const pf = geoPath(front, ctx);
     const pb = geoPath(back, ctx);
     const grid = geoGraticule10();
-    const mesh = wireframe();
     const routes = ROUTES.map((r) => ({ type: 'LineString', coordinates: r.map(placeOf).filter(Boolean).map((p) => [p.lng, p.lat]) }));
 
     loadWorld().then((f) => { s.features = f; });
@@ -189,23 +168,21 @@ export default function GlobeMap({
       ctx.setTransform(s.dpr, 0, 0, s.dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
-      // far side, seen through the glass
+      // far side, seen through the glass: coastlines only
       ctx.lineWidth = 0.6;
-      ctx.globalAlpha = 0.07;
       ctx.strokeStyle = C.text;
-      ctx.beginPath(); pb(grid); pb(mesh); ctx.stroke();
-      ctx.globalAlpha = 0.16;
+      ctx.globalAlpha = 0.12;
       ctx.beginPath(); for (const f of s.features) pb(f); ctx.stroke();
 
       // sphere rim + soft fill so the front reads as solid glass
-      ctx.globalAlpha = 1;
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
-      ctx.fillStyle = C.bg; ctx.globalAlpha = 0.55; ctx.fill();
-      ctx.globalAlpha = 0.35; ctx.strokeStyle = C.text; ctx.lineWidth = 0.8; ctx.stroke();
+      ctx.fillStyle = C.bg; ctx.globalAlpha = 0.6; ctx.fill();
+      ctx.globalAlpha = 0.5; ctx.lineWidth = 0.8; ctx.stroke();
 
-      // near side wireframe
-      ctx.globalAlpha = 0.13; ctx.lineWidth = 0.6;
-      ctx.beginPath(); pf(grid); pf(mesh); ctx.stroke();
+      // near side: dotted lat/long grid
+      ctx.globalAlpha = 0.35; ctx.lineWidth = 0.8; ctx.setLineDash([1, 4]);
+      ctx.beginPath(); pf(grid); ctx.stroke();
+      ctx.setLineDash([]);
 
       // countries: every outline faint; ours strong; hovered/focused filled
       ctx.lineWidth = 0.7;
@@ -231,44 +208,63 @@ export default function GlobeMap({
       ctx.beginPath(); for (const r of routes) pf(r); ctx.stroke();
       ctx.setLineDash([]);
 
-      // pins, tags and leader lines
+      // pins
       const t = now / 1000;
-      const tagH = P.compact ? 22 : 26;
-      const top = h * P.band[0];
-      const span = h * P.band[1];
+      const sides = { left: [], right: [] };
       for (const p of places) {
-        const near = geoDistance([p.lng, p.lat], center) < Math.PI / 2 - 0.05;
+        const near = geoDistance([p.lng, p.lat], center) < Math.PI / 2 - 0.08;
         const xy = (near ? front : back)([p.lng, p.lat]);
         const isFocus = P.focus === p.slug;
         if (xy) {
-          ctx.globalAlpha = near ? 1 : 0.25;
+          ctx.globalAlpha = near ? 1 : 0.2;
           ctx.fillStyle = p.status === 'soon' ? C.faint : C.rec;
           ctx.beginPath(); ctx.arc(xy[0], xy[1], isFocus ? 3.6 : 2.4, 0, Math.PI * 2); ctx.fill();
           if (isFocus && near) {
             ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.arc(xy[0], xy[1], 7 + Math.sin(t * 4) * 1.5, 0, Math.PI * 2); ctx.fill();
           }
         }
-
         const el = tagEls.current[p.slug];
         const ln = lineEls.current[p.slug];
         if (!el || !ln) continue;
-        const fx = Math.sin(t * 0.7 + p.phase) * 5;
-        const fy = Math.cos(t * 0.55 + p.phase * 1.3) * 5;
-        const ty = top + p.slot * span + fy;
-        const gap = P.compact ? 10 : Math.max(24, w * 0.06);
-        const tw = el.offsetWidth;
-        const tx = p.side === 'left' ? gap + fx : w - gap - tw + fx;
-        el.style.transform = `translate(${tx}px, ${ty - tagH / 2}px)`;
-        el.style.opacity = near ? (isFocus ? '1' : '0.9') : (P.compact ? '0.18' : '0.3');
-        el.classList.toggle('is-back', !near);
-        el.classList.toggle('is-focus', isFocus);
-        if (near && xy) {
-          const ax = p.side === 'left' ? tx + tw : tx;
-          ln.setAttribute('x1', ax); ln.setAttribute('y1', ty);
-          ln.setAttribute('x2', xy[0]); ln.setAttribute('y2', xy[1]);
-          ln.style.opacity = isFocus ? '0.9' : '0.35';
-        } else {
+        if (!near || !xy) {
+          el.style.opacity = '0'; el.style.pointerEvents = 'none'; el.tabIndex = -1;
           ln.style.opacity = '0';
+          p._y = null;
+          continue;
+        }
+        // elbow: a point just outside the rim, straight out from the centre
+        const dx = xy[0] - cx; const dy = xy[1] - cy;
+        const d = Math.hypot(dx, dy) || 1;
+        const elbow = [cx + (dx / d) * (R + 14), cy + (dy / d) * (R + 14)];
+        sides[dx < 0 ? 'left' : 'right'].push({ p, xy, elbow, el, ln, isFocus });
+      }
+
+      // callouts: one column each side, hugging the globe, nudged apart
+      const gapY = P.compact ? 22 : 24;
+      const colOff = P.compact ? 26 : 46;
+      for (const side of ['left', 'right']) {
+        const list = sides[side].sort((a, b) => a.elbow[1] - b.elbow[1]);
+        let y = -Infinity;
+        for (const it of list) { it.y = Math.max(it.elbow[1], y + gapY); y = it.y; }
+        const over = y - (h - 8);
+        if (over > 0) for (const it of list) it.y -= over;
+        for (const it of list) {
+          const { p, el, ln, xy, elbow, isFocus } = it;
+          p._y = p._y == null ? it.y : p._y + (it.y - p._y) * Math.min(1, dt / 90);
+          const ty = p._y;
+          const tw = el.offsetWidth;
+          let tx = side === 'left' ? cx - R - colOff - tw : cx + R + colOff;
+          tx = Math.max(6, Math.min(w - tw - 6, tx));
+          el.style.transform = `translate(${tx}px, ${ty - el.offsetHeight / 2}px)`;
+          el.style.opacity = isFocus ? '1' : '0.92';
+          el.style.pointerEvents = 'auto'; el.tabIndex = 0;
+          el.classList.toggle('is-focus', isFocus);
+          el.classList.toggle('is-left', side === 'left');
+          el.classList.toggle('is-right', side === 'right');
+          const end = side === 'left' ? tx + tw + 6 : tx - 6;
+          const bend = side === 'left' ? Math.min(elbow[0], end + 1) : Math.max(elbow[0], end - 1);
+          ln.setAttribute('points', `${xy[0].toFixed(1)},${xy[1].toFixed(1)} ${bend.toFixed(1)},${ty.toFixed(1)} ${end.toFixed(1)},${ty.toFixed(1)}`);
+          ln.style.opacity = isFocus ? '0.95' : '0.4';
         }
       }
       ctx.globalAlpha = 1;
@@ -391,7 +387,7 @@ export default function GlobeMap({
       <canvas ref={canvas} className="absolute inset-0" aria-hidden="true" />
       <svg ref={svg} className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
         {places.map((p) => (
-          <line key={p.slug} ref={(el) => { lineEls.current[p.slug] = el; }} className="g-line" style={{ opacity: 0 }} />
+          <polyline key={p.slug} ref={(el) => { lineEls.current[p.slug] = el; }} className="g-line" style={{ opacity: 0 }} />
         ))}
       </svg>
       {places.map((p) => {
@@ -401,7 +397,8 @@ export default function GlobeMap({
             key={p.slug}
             ref={(el) => { tagEls.current[p.slug] = el; }}
             to={`/travel/${p.slug}`}
-            className={`g-tag is-${p.side} is-${status} ${compact ? 'is-compact' : ''}`}
+            className={`g-tag is-${status}`}
+            style={{ opacity: 0 }}
             aria-label={`${p.name}${status === 'edit' ? ', in the edit' : status === 'soon' ? ', coming soon' : ''}`}
             onMouseEnter={() => { st.current.hoverGeo = COUNTRIES.find((c) => c.slug === p.country)?.geo || null; onFocus?.(p.slug); }}
             onMouseLeave={() => { st.current.hoverGeo = null; }}
@@ -411,7 +408,9 @@ export default function GlobeMap({
               if (isTouchUi() && focus !== p.slug) { e.preventDefault(); onPin?.(p.slug); }
             }}
           >
-            {(compact ? shortName(p.name) : p.name).toUpperCase()}
+            <span className="g-n">{p.n}</span>
+            <span className="g-name">{compact ? shortName(p.name) : p.name}</span>
+            {cityCounts[p.slug] ? <sup className="g-c">{cityCounts[p.slug]}</sup> : status === 'edit' ? <sup className="g-c">edit</sup> : null}
           </Link>
         );
       })}
