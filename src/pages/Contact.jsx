@@ -83,7 +83,7 @@ export default function Contact() {
 
   return (
     <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl">
         {/* Inline sentence form; inputs wrap on narrow screens. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

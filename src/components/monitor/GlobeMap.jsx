@@ -218,7 +218,11 @@ export default function GlobeMap({
         if (xy) {
           ctx.globalAlpha = near ? 1 : 0.2;
           ctx.fillStyle = p.status === 'soon' ? C.faint : C.rec;
+          // halation: red light bleeding round the pin, like highlights on film
+          ctx.shadowColor = near && p.status !== 'soon' ? C.rec : 'transparent';
+          ctx.shadowBlur = isFocus ? 14 : 8;
           ctx.beginPath(); ctx.arc(xy[0], xy[1], isFocus ? 3.6 : 2.4, 0, Math.PI * 2); ctx.fill();
+          ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
           if (isFocus && near) {
             ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.arc(xy[0], xy[1], 7 + Math.sin(t * 4) * 1.5, 0, Math.PI * 2); ctx.fill();
           }

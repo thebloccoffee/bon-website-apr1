@@ -9,7 +9,7 @@ import { BonpointsWordmark } from '@/components/shared/BrandDoor';
 export default function About() {
   return (
     <div className="pt-28 pb-24 px-tk-6 md:px-16 min-h-screen">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

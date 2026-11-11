@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import GlobeMap from '@/components/monitor/GlobeMap';
 import { useMapContent } from '@/components/monitor/useMapContent';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -42,6 +43,15 @@ export default function MonitorHome() {
   const place = activeSlug ? findPlace(activeSlug) : null;
   const count = useMemo(() => (place ? itemsFor(place, all).length : 0), [place, all]);
   const focusCity = place?.kind === 'city' ? place.slug : null;
+  const reduce = useReducedMotion();
+
+  // The place's latest film, shown full-bleed behind the globe as you point at it.
+  const still = useMemo(() => {
+    if (!place) return null;
+    const vids = itemsFor(place, all).filter((i) => i._type === 'video' && i.youtube_id);
+    const v = vids.find((x) => x.format !== 'short') || vids[0];
+    return v ? { id: v.youtube_id, short: v.format === 'short' } : null;
+  }, [place, all]);
   const zoomed = zoom > 1.01 || Boolean(sel);
 
   // The one line under the globe: a hint, or what you're pointing at.
@@ -65,6 +75,25 @@ export default function MonitorHome() {
   return (
     <div className="monitor">
       <section aria-label="Globe" className="relative overflow-hidden" style={{ height: '100svh', minHeight: phone ? 600 : 640 }}>
+        {/* footage behind the globe, in Jon's grade (stills from the film for now) */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          <AnimatePresence>
+            {still && (
+              <motion.img
+                key={still.id}
+                src={`https://i.ytimg.com/vi/${still.id}/${still.short ? 'hqdefault' : 'maxresdefault'}.jpg`}
+                onError={(e) => { if (!e.currentTarget.src.includes('hqdefault')) e.currentTarget.src = `https://i.ytimg.com/vi/${still.id}/hqdefault.jpg`; }}
+                alt=""
+                className="absolute inset-0 w-full h-full"
+                style={{ objectFit: 'cover' }}
+                initial={{ opacity: 0, scale: reduce ? 1 : 1.06 }}
+                animate={{ opacity: 0.5, scale: 1, transition: { opacity: { duration: 0.7 }, scale: { duration: 6, ease: 'easeOut' } } }}
+                exit={{ opacity: 0, transition: { duration: 0.5 } }}
+              />
+            )}
+          </AnimatePresence>
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 0%, color-mix(in srgb, var(--m-bg) 55%, transparent) 60%, var(--m-bg) 100%)' }} />
+        </div>
         <GlobeMap
           focus={focusCity}
           onFocus={phone ? undefined : setHover}
@@ -80,8 +109,10 @@ export default function MonitorHome() {
           radius={phone ? 0.24 : 0.27}
         />
 
+        <div aria-hidden="true" className="m-grain" />
+
         {/* bottom-left: title and counts */}
-        <div className="absolute left-4 md:left-8 bottom-6 md:bottom-8 max-w-[60%] pointer-events-none">
+        <div className="absolute left-6 md:left-16 bottom-6 md:bottom-10 max-w-[60%] pointer-events-none">
           <h1 className="font-semibold tracking-tight leading-none" style={{ fontSize: 'clamp(24px, 3.4vw, 44px)' }}>Every place I've filmed.</h1>
           <p className="mt-3 text-sm" style={{ color: 'var(--m-dim)' }}>
             {Object.keys(countryCounts).length} countries · {Object.keys(cityCounts).length} places · {all.length} stories
@@ -89,7 +120,7 @@ export default function MonitorHome() {
         </div>
 
         {/* bottom-right: hint, or what you're pointing at */}
-        <div className="absolute right-4 md:right-8 bottom-6 md:bottom-8 flex flex-col items-end gap-2 pointer-events-none text-right max-w-[45%] md:max-w-[40%]">
+        <div className="absolute right-6 md:right-16 bottom-6 md:bottom-10 flex flex-col items-end gap-2 pointer-events-none text-right max-w-[45%] md:max-w-[40%]">
           <p className="text-sm" style={{ color: 'var(--m-dim)' }} aria-live="polite">{line}</p>
           {zoomed && (
             <button type="button" onClick={reset} className="pointer-events-auto text-sm underline underline-offset-4 min-h-[36px] hover:opacity-70" style={{ color: 'var(--m-faint)' }}>
@@ -100,9 +131,9 @@ export default function MonitorHome() {
       </section>
 
       {/* every place, in plain text */}
-      <section aria-labelledby="places" className="max-w-3xl mx-auto px-4 md:px-6 py-16">
+      <section aria-labelledby="places" className="px-6 md:px-16 py-20">
         <h2 id="places" className="text-2xl mb-8">Places</h2>
-        <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+        <div className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {listed.map((c) => (
             <div key={c.slug}>
               <Link to={`/travel/${c.slug}`} className="flex justify-between items-baseline pb-2 hover:opacity-70" style={{ borderBottom: '1px solid var(--m-line)' }}>

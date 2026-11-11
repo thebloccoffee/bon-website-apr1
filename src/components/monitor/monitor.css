@@ -133,8 +133,9 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
 
 /* site header (MonitorHeader.jsx): logo, links, wide search, two buttons */
 .sn { font-family: 'Inter', system-ui, sans-serif; font-size: 15px; letter-spacing: -0.01em; color: var(--m-text); }
-.sn-bar { display: flex; align-items: center; height: 72px; padding: 0 16px; }
-@media (min-width: 768px) { .sn-bar { padding: 0 28px; } }
+.sn-bar { display: flex; align-items: center; height: 72px; padding: 0 24px; }
+@media (min-width: 768px) { .sn-bar { padding: 0 64px; } }
+@media (min-width: 1280px) and (max-width: 1439px) { .sn-bar { padding: 0 40px; } }
 .sn-link {
   display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px; border-radius: 8px;
   color: var(--m-text); white-space: nowrap; transition: background 0.15s ease;
@@ -179,3 +180,27 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
 
 .sn-sheet { position: fixed; inset: 0; z-index: 70; background: var(--m-bg); display: flex; flex-direction: column; }
 .sn-sheet-link { padding: 14px 0; font-size: 22px; font-weight: 500; letter-spacing: -0.02em; border-bottom: 1px solid var(--m-line); display: flex; align-items: center; }
+
+/* chips: filters and tabs on every page, same family as the header links */
+.ui-chip {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border-radius: 10px;
+  font-size: 15px; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap;
+  background: color-mix(in srgb, var(--m-text, var(--color-text-primary)) 7%, transparent); color: var(--m-text, var(--color-text-primary)); transition: background 0.15s ease, color 0.15s ease;
+}
+.ui-chip:hover { background: color-mix(in srgb, var(--m-text, var(--color-text-primary)) 12%, transparent); }
+.ui-chip.is-active { background: var(--m-text, var(--color-text-primary)); color: var(--m-bg, var(--color-surface-muted)); }
+.ui-chip.is-sm { height: 32px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+.ui-chip .opacity-60 { opacity: 0.55; }
+
+/* film grain over the hero: a fixed noise tile that jitters a few times a second */
+.m-grain {
+  position: absolute; inset: -50%; pointer-events: none; z-index: 1; opacity: 0.09; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: m-grain 0.9s steps(6) infinite;
+}
+html.light .m-grain { opacity: 0.12; mix-blend-mode: multiply; }
+@keyframes m-grain {
+  0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); }
+  60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .m-grain { animation: none; } }

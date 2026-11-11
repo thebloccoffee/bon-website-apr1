@@ -118,9 +118,7 @@ function Chip({ active, onClick, children, ...rest }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`font-sans text-xs tracking-[0.15em] uppercase px-3 md:px-4 py-2.5 md:py-2 border transition-colors duration-200 ${
-        active ? 'border-foreground bg-foreground text-background' : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
-      }`}
+      className={`ui-chip ${active ? 'is-active' : ''}`}
       {...rest}
     >
       {children}
@@ -205,7 +203,7 @@ export default function Search() {
   else status = `${rows.length} ${rows.length === 1 ? 'result' : 'results'} for "${urlQ}".`;
 
   return (
-    <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen max-w-4xl mx-auto">
+    <div className="pt-28 pb-24 px-6 md:px-16 min-h-screen">
       <h1 className="font-sans text-4xl md:text-6xl font-light tracking-[-0.02em] leading-[1.1] mb-8">
         Search
       </h1>

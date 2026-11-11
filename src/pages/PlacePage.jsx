@@ -60,48 +60,45 @@ export default function PlacePage({ place }) {
         title={`${title}: films and travel notes`}
         description={`Travel films, shorts and notes from ${title}${!isCountry && country ? `, ${country.name}` : ''} by Jon Bon Tabas.`}
       />
-      <div className="max-w-[1280px] mx-auto px-4 md:px-8 pt-24 pb-24">
+      <div className="px-6 md:px-16 pt-28 pb-24">
 
-        <nav aria-label="Breadcrumb" className="m-mono mt-6" style={{ fontSize: 12, letterSpacing: '0.1em', color: 'var(--m-faint)' }}>
-          <Link to="/">WORLD</Link>
-          {!isCountry && country && <> / <Link to={`/travel/${country.slug}`}>{country.name.toUpperCase()}</Link></>}
-          {' / '}<span style={{ color: 'var(--m-text)' }}>{title.toUpperCase()}</span>
+        <nav aria-label="Breadcrumb" className="mt-6 text-sm" style={{ color: 'var(--m-faint)' }}>
+          <Link to="/" className="hover:underline underline-offset-4">World</Link>
+          {!isCountry && country && <> / <Link to={`/travel/${country.slug}`} className="hover:underline underline-offset-4">{country.name}</Link></>}
+          {' / '}<span style={{ color: 'var(--m-text)' }}>{title}</span>
         </nav>
 
         <section className="flex flex-wrap gap-10 pt-6 pb-12 items-stretch">
           <div className="flex-[999_1_480px] min-w-0 flex flex-col">
-            <p className="m-mono" style={{ fontSize: 12, letterSpacing: '0.12em', color: 'var(--m-dim)' }}>
-              {!isCountry && `${fmtCoord(place.lat, place.lng)} · `}{(where || '').toUpperCase()}
-              {status === 'edit' && <span style={{ color: 'var(--m-rec)' }}> · ● IN THE EDIT</span>}
-              {status === 'soon' && <span> · COMING SOON</span>}
+            <p className="text-sm" style={{ color: 'var(--m-dim)' }}>
+              {!isCountry && `${fmtCoord(place.lat, place.lng)} · `}{where === 'country' ? 'Country' : where}
+              {status === 'edit' && <span style={{ color: 'var(--m-rec)' }}> · ● In the edit</span>}
+              {status === 'soon' && <span> · Coming soon</span>}
             </p>
             <h1 className="font-bold mt-3 break-words" style={{ fontSize: 'clamp(64px, 11vw, 150px)', lineHeight: 0.9, letterSpacing: '-0.04em' }}>{title}</h1>
-            <dl className="m-mono flex flex-wrap gap-9 mt-auto pt-8" style={{ fontSize: 11, letterSpacing: '0.12em' }}>
+            <dl className="flex flex-wrap gap-9 mt-auto pt-8 text-sm">
               {[['Films', counts.long], ['Shorts', counts.short], ['Journal', counts.post]].map(([k, n]) => (
                 <div key={k}>
-                  <dt style={{ color: 'var(--m-faint)' }}>{k.toUpperCase()}</dt>
+                  <dt style={{ color: 'var(--m-faint)' }}>{k}</dt>
                   <dd className="font-semibold mt-1" style={{ fontFamily: 'Inter, sans-serif', fontSize: 38, letterSpacing: '-0.02em', color: n ? 'var(--m-text)' : 'var(--m-faint)' }}>{isLoading ? '–' : n}</dd>
                 </div>
               ))}
             </dl>
           </div>
-          <figure className="relative flex-[1_1_300px] max-w-[440px] m-0 border overflow-hidden" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)' }}>
+          <figure className="relative flex-[1_1_300px] max-w-[440px] m-0 border overflow-hidden rounded-xl" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)' }}>
             <WorldMap focus={focusCity} counts={countryCounts} view={center ? { k: zoom, cx: center[0], cy: center[1] } : undefined} showLabels={false} />
-            <span aria-hidden="true" className="absolute pointer-events-none" style={{ inset: 8 }}>
-              <span className="m-br tl" /><span className="m-br tr" /><span className="m-br bl" /><span className="m-br brr" />
-            </span>
           </figure>
         </section>
 
         {isCountry && cities.length > 0 && (
           <section aria-labelledby="cities" className="pb-10">
-            <h2 id="cities" className="m-mono mb-3" style={{ fontSize: 12, letterSpacing: '0.12em', color: 'var(--m-faint)' }}>PLACES IN {title.toUpperCase()}</h2>
-            <ul className="m-mono" style={{ fontSize: 13, letterSpacing: '0.06em' }}>
+            <h2 id="cities" className="text-xl mb-3">Places in {title}</h2>
+            <ul>
               {cities.map((c) => (
                 <li key={c.slug} className="flex justify-between py-3.5" style={{ borderBottom: '1px solid var(--m-line)' }}>
-                  <Link to={`/travel/${c.slug}`} className="hover:opacity-70">{c.name.toUpperCase()}</Link>
-                  <span style={{ color: c.status === 'edit' ? 'var(--m-rec)' : 'var(--m-faint)' }}>
-                    {cityCounts[c.slug] ? `${cityCounts[c.slug]} ${cityCounts[c.slug] === 1 ? 'STORY' : 'STORIES'}` : c.status === 'edit' ? '● IN THE EDIT' : 'SOON'}
+                  <Link to={`/travel/${c.slug}`} className="hover:opacity-70">{c.name}</Link>
+                  <span className="text-sm" style={{ color: c.status === 'edit' ? 'var(--m-rec)' : 'var(--m-faint)' }}>
+                    {cityCounts[c.slug] ? `${cityCounts[c.slug]} ${cityCounts[c.slug] === 1 ? 'story' : 'stories'}` : c.status === 'edit' ? '● In the edit' : 'Soon'}
                   </span>
                 </li>
               ))}
@@ -109,13 +106,13 @@ export default function PlacePage({ place }) {
           </section>
         )}
 
-        <nav aria-label="Filter" className="m-mono flex flex-wrap border" style={{ borderColor: 'var(--m-line)', fontSize: 12, letterSpacing: '0.1em' }}>
+        <nav aria-label="Filter" className="flex flex-wrap gap-2">
           {TABS.map((t) => {
             const n = t.key === 'all' ? items.length : counts[t.key];
             return (
-              <button key={t.key} type="button" aria-pressed={tab === t.key} onClick={() => setTab(t.key)} className="px-5 min-h-[46px]"
-                style={tab === t.key ? { background: 'var(--m-text)', color: 'var(--m-bg)' } : { color: n ? 'var(--m-text)' : 'var(--m-faint)', borderLeft: '1px solid var(--m-line)' }}>
-                {t.label.toUpperCase()} {n}
+              <button key={t.key} type="button" aria-pressed={tab === t.key} onClick={() => setTab(t.key)} className={`ui-chip ${tab === t.key ? 'is-active' : ''}`}
+                style={tab !== t.key && !n ? { color: 'var(--m-faint)' } : undefined}>
+                {t.label} <span className="opacity-60">{n}</span>
               </button>
             );
           })}
@@ -131,10 +128,10 @@ export default function PlacePage({ place }) {
               {shown.map((it, i) =>
                 it._type === 'video' ? (
                   <a key={`v${it.youtube_id}`} href={watchUrl(it)} target="_blank" rel="noopener noreferrer" className="block group" aria-label={`Watch on YouTube: ${it.title}`}>
-                    <span className="relative block overflow-hidden" style={{ background: 'var(--m-panel)' }}>
+                    <span className="relative block overflow-hidden rounded-xl" style={{ background: 'var(--m-panel)' }}>
                       <img src={thumbFor(it)} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" width="480" height={it.format === 'short' ? 853 : 270} className="block w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" style={{ aspectRatio: it.format === 'short' ? '9 / 16' : '16 / 9' }} />
-                      <span className="m-mono absolute left-2 top-2 px-1.5 py-0.5" style={{ fontSize: 10, letterSpacing: '0.1em', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
-                        A{String(i + 1).padStart(3, '0')} · {it.format === 'short' ? 'SHORT' : 'FILM'}
+                      <span className="absolute left-2.5 top-2.5 px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
+                        {it.format === 'short' ? 'Short' : 'Film'}
                       </span>
                     </span>
                     <span className="block mt-2.5 text-[15px] leading-snug">{it.title}</span>
@@ -156,12 +153,12 @@ export default function PlacePage({ place }) {
         {!isCountry && cities.length > 1 && (
           <section aria-labelledby="more" className="mt-16 pt-7" style={{ borderTop: '1px solid var(--m-line)' }}>
             <h2 id="more" className="font-semibold text-3xl tracking-tight">More in {country.name}</h2>
-            <ul className="m-mono mt-4" style={{ fontSize: 13, letterSpacing: '0.06em' }}>
+            <ul className="mt-4">
               {cities.filter((c) => c.slug !== place.slug).map((c) => (
                 <li key={c.slug} className="flex justify-between py-3.5" style={{ borderBottom: '1px solid var(--m-line)' }}>
-                  <Link to={`/travel/${c.slug}`} className="hover:opacity-70">{c.name.toUpperCase()}</Link>
-                  <span style={{ color: c.status === 'edit' ? 'var(--m-rec)' : 'var(--m-faint)' }}>
-                    {cityCounts[c.slug] ? `${cityCounts[c.slug]} ${cityCounts[c.slug] === 1 ? 'STORY' : 'STORIES'}` : c.status === 'edit' ? '● IN THE EDIT' : 'SOON'}
+                  <Link to={`/travel/${c.slug}`} className="hover:opacity-70">{c.name}</Link>
+                  <span className="text-sm" style={{ color: c.status === 'edit' ? 'var(--m-rec)' : 'var(--m-faint)' }}>
+                    {cityCounts[c.slug] ? `${cityCounts[c.slug]} ${cityCounts[c.slug] === 1 ? 'story' : 'stories'}` : c.status === 'edit' ? '● In the edit' : 'Soon'}
                   </span>
                 </li>
               ))}
