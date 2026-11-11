@@ -289,6 +289,10 @@ tbody tr:hover td, tbody tr:hover th { background: rgba(70, 58, 44, .05); }
 .pane-pick { padding-bottom: clamp(36px, 5vw, 64px); border-bottom: 1px solid var(--hair); margin-bottom: clamp(32px, 4vw, 56px); }
 .pane-pick button { min-height: 52px; padding: 0 26px; }
 .pane-lead { font-size: var(--step-lead); font-weight: 300; line-height: 1.35; max-width: 34ch; }
+.pane-title { font-size: var(--step-h2); font-weight: 300; line-height: 1.08; letter-spacing: -0.015em; padding-bottom: 18px; }
+.pane-title em { font-family: var(--serif); font-weight: 400; }
+#pane-prewedding .pane-lead { max-width: 48ch; }
+.steps.scenes { padding-top: clamp(36px, 5vw, 64px); }
 #pane-prewedding .pw-ask { padding-top: 32px; }
 .pw-card table { min-width: 0; }
 .pw-more + .pw-more { margin-top: 0; border-top: 0; }
@@ -530,7 +534,7 @@ footer a:hover { color: var(--ink); }
   <section id="pricing">
     <span id="collections"></span>
     <div class="wrap">
-      <div class="eyebrow label"><span>Pricing</span><span class="count">Weddings from $4,500 · Pre-wedding from $400</span></div>
+      <div class="eyebrow label"><span>Pricing</span><span class="count">From $400 CAD</span></div>
       <h2>What are you <b>planning?</b></h2>
       <div class="pw-pick pane-pick" role="group" aria-label="Pricing">
         <button type="button" data-pane="weddings" aria-pressed="true">Wedding</button>
@@ -608,8 +612,14 @@ footer a:hover { color: var(--ink); }
       </div>
 
       <div class="pane" id="pane-prewedding" hidden>
-        <p class="pane-lead">A few hours with us somewhere that feels like you. You get used to the camera and walk away with portraits, a short film, or both for your save-the-dates.</p>
-        <p style="padding-top: 18px"><button class="btn-line" type="button" data-film>Watch K&amp;A's pre-wedding film</button></p>
+        <h3 class="pane-title">Your love story, <em>shot like a film.</em></h3>
+        <p class="pane-lead">Before the wedding, we plan a short film around the two of you: the story, the places, the golden-hour light. On the day we direct every scene, so you're never stuck wondering what to do with your hands. You walk away with something that looks like the opening of a movie, and it stars you.</p>
+        <div class="steps scenes">
+          <div><span class="n">Scene 01</span><h3>Write it</h3><p>A call to get to know you two. We plan the story, the locations and the light.</p></div>
+          <div><span class="n">Scene 02</span><h3>Shoot it</h3><p>We direct each moment like a film set, minus the pressure. Walk, laugh, we'll handle the rest.</p></div>
+          <div><span class="n">Scene 03</span><h3>Premiere it</h3><p>Your film arrives in 2 to 3 weeks, ready for save-the-dates, Instagram, or the big screen at your reception.</p></div>
+        </div>
+        <p style="padding-block: 40px 8px"><button class="btn-line" type="button" data-film>Watch K&amp;A's pre-wedding film</button></p>
         <div class="pw-ask">
         <p class="q" id="pw-q">What would you like?</p>
         <div class="pw-pick" role="group" aria-labelledby="pw-q">
@@ -630,19 +640,19 @@ footer a:hover { color: var(--ink); }
           <div class="price-row"><div class="price">$850 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Photo Full ($850)">Ask about this</a></div>
         </article>
         <article class="pw-card" data-types="film">
-          <div class="top-row"><h3>Film <em>Only</em></h3></div>
-          <ul><li>2 hours</li><li>1 videographer</li><li>60 to 90 second film + vertical reel</li></ul>
-          <div class="price-row"><div class="price">$1,200 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Film Only ($1,200)">Ask about this</a></div>
+          <div class="top-row"><h3>The <em>Teaser</em></h3></div>
+          <ul><li>Story and location plan with us</li><li>2-hour directed shoot, 1 filmmaker</li><li>60 to 90 second film, colour graded, set to licensed music</li><li>Vertical cut for Instagram</li></ul>
+          <div class="price-row"><div class="price">$1,200 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="The Teaser ($1,200)">Ask about this</a></div>
         </article>
         <article class="pw-card" data-types="both">
-          <div class="top-row"><h3>Photo <em>+</em> Film</h3><span class="tag">Our pick</span></div>
-          <ul><li>2 hours, 2 locations</li><li>1 photographer + 1 videographer</li><li>About 120 photos, 1 to 2 minute film, vertical reel</li></ul>
-          <div class="price-row"><div class="price">$1,800 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Photo + Film ($1,800)">Ask about this</a></div>
+          <div class="top-row"><h3>The Short <em>Film</em></h3><span class="tag">Our pick</span></div>
+          <ul><li>Story and location plan with us</li><li>2-hour shoot, 2 locations, filmmaker + photographer</li><li>1 to 2 minute film and about 120 photos</li><li>Vertical cut for Instagram</li></ul>
+          <div class="price-row"><div class="price">$1,800 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="The Short Film ($1,800)">Ask about this</a></div>
         </article>
         <article class="pw-card" data-types="both">
-          <div class="top-row"><h3>Love <em>Story</em></h3></div>
-          <ul><li>4 hours, 3 locations, drone</li><li>1 photographer + 1 videographer</li><li>About 200 photos, 2 to 3 minute film with a short interview, 2 vertical reels</li></ul>
-          <div class="price-row"><div class="price">$2,800 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="Love Story ($2,800)">Ask about this</a></div>
+          <div class="top-row"><h3>The <em>Feature</em></h3></div>
+          <ul><li>Story, location and outfit plan with us</li><li>4-hour shoot, 3 locations, drone, filmmaker + photographer</li><li>2 to 3 minute film told in your own words</li><li>About 200 photos and 2 vertical cuts</li></ul>
+          <div class="price-row"><div class="price">$2,800 <span>CAD</span></div><a class="btn-line pw-cta" href="#contact" data-pkg="The Feature ($2,800)">Ask about this</a></div>
         </article>
       </div>
       <details class="pw-more">
