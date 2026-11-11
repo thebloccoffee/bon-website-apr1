@@ -47,7 +47,7 @@ function wireframe() {
  */
 export default function GlobeMap({
   focus, onFocus, onPin, onCountry, counts = {}, flyTo, zoom = 1, onZoom,
-  spin = true, compact = false, className = '', style,
+  spin = true, compact = false, radius = 0.31, band = [0.13, 0.68], className = '', style,
 }) {
   const wrap = useRef(null);
   const canvas = useRef(null);
@@ -79,7 +79,7 @@ export default function GlobeMap({
 
   // Keep props readable from the animation loop without restarting it.
   const props = useRef({});
-  props.current = { focus, onFocus, onPin, onCountry, onZoom, spin, compact };
+  props.current = { focus, onFocus, onPin, onCountry, onZoom, spin, compact, radius, band };
 
   // ── controlled zoom and fly-to ────────────────────────────────────────────
   useEffect(() => { st.current.kTarget = Math.min(MAX_ZOOM, Math.max(1, zoom)); }, [zoom]);
@@ -178,7 +178,7 @@ export default function GlobeMap({
       s.k += (s.kTarget - s.k) * Math.min(1, dt / 120);
 
       // layout: tags take the edges, the globe sits in the middle
-      const R = Math.min(h * 0.31, w * (P.compact ? 0.27 : 0.22)) * s.k;
+      const R = Math.min(h * P.radius, w * (P.compact ? 0.27 : 0.22)) * s.k;
       const cx = w / 2;
       const cy = h / 2;
       for (const pr of [front, back]) pr.scale(R).translate([cx, cy]);
@@ -234,8 +234,8 @@ export default function GlobeMap({
       // pins, tags and leader lines
       const t = now / 1000;
       const tagH = P.compact ? 22 : 26;
-      const top = h * (P.compact ? 0.06 : 0.13);
-      const span = h * (P.compact ? 0.78 : 0.68);
+      const top = h * P.band[0];
+      const span = h * P.band[1];
       for (const p of places) {
         const near = geoDistance([p.lng, p.lat], center) < Math.PI / 2 - 0.05;
         const xy = (near ? front : back)([p.lng, p.lat]);
@@ -259,7 +259,7 @@ export default function GlobeMap({
         const tw = el.offsetWidth;
         const tx = p.side === 'left' ? gap + fx : w - gap - tw + fx;
         el.style.transform = `translate(${tx}px, ${ty - tagH / 2}px)`;
-        el.style.opacity = near ? (isFocus ? '1' : '0.95') : '0.32';
+        el.style.opacity = near ? (isFocus ? '1' : '0.9') : (P.compact ? '0.18' : '0.3');
         el.classList.toggle('is-back', !near);
         el.classList.toggle('is-focus', isFocus);
         if (near && xy) {
@@ -283,7 +283,7 @@ export default function GlobeMap({
     const s = st.current;
     const r = wrap.current.getBoundingClientRect();
     const { w, h } = s.size;
-    const R = Math.min(h * 0.31, w * (compact ? 0.27 : 0.22)) * s.k;
+    const R = Math.min(h * radius, w * (compact ? 0.27 : 0.22)) * s.k;
     const pr = geoOrthographic().clipAngle(90).scale(R).translate([w / 2, h / 2]).rotate([s.rot[0], s.rot[1], 0]);
     const x = e.clientX - r.left; const y = e.clientY - r.top;
     if (Math.hypot(x - w / 2, y - h / 2) > R) return null;

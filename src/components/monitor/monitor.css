@@ -102,10 +102,10 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
   position: absolute; left: 0; top: 0; height: 26px; padding: 0 12px; display: flex; align-items: center;
   font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.1em; white-space: nowrap;
   color: var(--m-text); background: color-mix(in srgb, var(--m-bg) 88%, transparent);
-  border: 1px solid var(--m-line-2); will-change: transform, opacity; transition: opacity 0.35s ease, border-color 0.2s ease;
+  border: 1px solid var(--m-line); font-weight: 400; will-change: transform, opacity; transition: opacity 0.35s ease, border-color 0.2s ease;
 }
-.g-tag.is-left { border-right: 3px solid var(--m-text); }
-.g-tag.is-right { border-left: 3px solid var(--m-text); }
+.g-tag.is-left { border-right: 2px solid var(--m-text); }
+.g-tag.is-right { border-left: 2px solid var(--m-text); }
 .g-tag.is-edit, .g-tag.is-soon { color: var(--m-dim); }
 .g-tag.is-soon.is-left { border-right-color: var(--m-faint); }
 .g-tag.is-soon.is-right { border-left-color: var(--m-faint); }
