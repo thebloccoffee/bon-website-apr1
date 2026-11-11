@@ -94,3 +94,41 @@ html.light .m-log { filter: saturate(0) contrast(0.5) brightness(0.95); }
 
 .m-clip-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .m-clip { min-width: 96px; }
+
+/* globe: tags at the edges, leader lines to the pins (see GlobeMap.jsx) */
+.m-globe { touch-action: pan-y; }
+.m-globe .g-line { stroke: var(--m-text); stroke-width: 0.8; transition: opacity 0.3s ease; }
+.g-tag {
+  position: absolute; left: 0; top: 0; height: 26px; padding: 0 12px; display: flex; align-items: center;
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.1em; white-space: nowrap;
+  color: var(--m-text); background: color-mix(in srgb, var(--m-bg) 88%, transparent);
+  border: 1px solid var(--m-line-2); will-change: transform, opacity; transition: opacity 0.35s ease, border-color 0.2s ease;
+}
+.g-tag.is-left { border-right: 3px solid var(--m-text); }
+.g-tag.is-right { border-left: 3px solid var(--m-text); }
+.g-tag.is-edit, .g-tag.is-soon { color: var(--m-dim); }
+.g-tag.is-soon.is-left { border-right-color: var(--m-faint); }
+.g-tag.is-soon.is-right { border-left-color: var(--m-faint); }
+.g-tag.is-focus { border-color: var(--m-text); }
+.g-tag.is-focus.is-left { border-right-color: var(--m-rec); }
+.g-tag.is-focus.is-right { border-left-color: var(--m-rec); }
+.g-tag:hover, .g-tag:focus-visible { border-color: var(--m-text); outline: none; opacity: 1 !important; }
+.g-tag.is-compact { height: 22px; padding: 0 7px; font-size: 9px; letter-spacing: 0.06em; }
+@media (hover: none) { .g-tag { min-height: 28px; } .g-tag.is-compact { min-height: 24px; } }
+
+/* floating dust, like specks in the viewfinder */
+.m-dust {
+  position: absolute; inset: -20%; pointer-events: none; opacity: 0.55;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, var(--m-faint) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 12%, var(--m-faint) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 33% 72%, var(--m-faint) 50%, transparent 51%),
+    radial-gradient(1px 1px at 64% 58%, var(--m-faint) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 84%, var(--m-faint) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 22% 44%, var(--m-faint) 50%, transparent 51%),
+    radial-gradient(1px 1px at 52% 28%, var(--m-faint) 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 90%, var(--m-faint) 50%, transparent 51%);
+  background-size: 420px 380px; animation: m-dust 90s linear infinite;
+}
+@keyframes m-dust { to { transform: translate(-60px, 40px); } }
+@media (prefers-reduced-motion: reduce) { .m-dust { animation: none; } }

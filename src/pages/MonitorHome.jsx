@@ -1,74 +1,45 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MonitorHeader from '@/components/monitor/MonitorHeader';
-import WorldMap, { WORLD, MAX_K, fitBox } from '@/components/monitor/WorldMap';
+import GlobeMap, { MAX_ZOOM } from '@/components/monitor/GlobeMap';
 import { useMapContent } from '@/components/monitor/useMapContent';
 import FocusCard from '@/components/monitor/FocusCard';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { COUNTRIES, PLACES, COUNTRY_COLORS, MAP_W, MAP_H, findPlace, itemsFor, countryOf, citiesIn, project } from '@/lib/places';
-import { CoachMarks } from '@/components/monitor/MapLegend';
+import { COUNTRIES, PLACES, COUNTRY_COLORS, findPlace, itemsFor, countryOf, citiesIn } from '@/lib/places';
 import '@/components/monitor/monitor.css';
-
-const MAP_ASPECT = MAP_W / MAP_H;
-const PHONE_ASPECT = 4 / 5; // tall frame on phones: the map fills it and you swipe sideways
-const PHONE_B = MAP_ASPECT / PHONE_ASPECT;
-
-/** A view that frames a city or a whole country. */
-function viewFor(place, b, current) {
-  if (!place) return WORLD;
-  if (place.kind === 'city') {
-    const [x, y] = project(place.lat, place.lng);
-    return { k: Math.max(current?.k || 1, 4 / b, 1.6), cx: x, cy: y };
-  }
-  const pts = citiesIn(place.slug).map((c) => project(c.lat, c.lng));
-  if (!pts.length) return WORLD;
-  const xs = pts.map((p) => p[0]); const ys = pts.map((p) => p[1]);
-  const x = Math.min(...xs); const y = Math.min(...ys);
-  return fitBox({ x: x - 12, y: y - 12, width: Math.max(...xs) - x + 24, height: Math.max(...ys) - y + 24 }, b, 0.5);
-}
 
 // Home: the world map seen through Jon's camera monitor. Trips run along the
 // bottom like clips on an edit timeline.
 export default function MonitorHome() {
   const { all, countryCounts, cityCounts, cityFirst, latestCity } = useMapContent();
   const phone = useIsMobile();
-  const b = phone ? PHONE_B : 1;
 
   const [hover, setHover] = useState(null);
   const [sel, setSel] = useState(null); // { slug } of a city or country, or { name } of a country with nothing yet
-  const [view, setView] = useState(WORLD);
-  const touched = useRef(false);
+  const [zoom, setZoom] = useState(1);
+  const [flyTo, setFlyTo] = useState(null);
+  const flyN = useRef(0);
   const mapRef = useRef(null);
 
-  // On a phone, open on the latest place instead of the middle of the Atlantic.
+  const fly = useCallback((target) => { flyN.current += 1; setFlyTo({ ...target, n: flyN.current }); }, []);
+
+  // Phones open spun to the latest place.
   useEffect(() => {
-    if (touched.current) return;
-    const p = latestCity ? findPlace(latestCity) : null;
-    if (phone && p) setView({ k: 1, cx: project(p.lat, p.lng)[0], cy: MAP_H / 2 });
-    else setView(WORLD);
-  }, [phone, latestCity]);
+    if (phone && latestCity) fly({ slug: latestCity });
+  }, [phone, latestCity, fly]);
 
-  const changeView = useCallback((next) => {
-    touched.current = true;
-    setView((cur) => (typeof next === 'function' ? next(cur) : next));
-  }, []);
-
-  const select = useCallback((slug, { zoom = true, scroll = false } = {}) => {
+  const select = useCallback((slug, { zoom: z = true, scroll = false } = {}) => {
     const place = findPlace(slug);
     if (!place) return;
     setSel({ slug });
-    if (zoom) {
-      // A country frames its whole outline, like tapping it on the map.
-      const shape = place.kind === 'country' ? mapRef.current?.querySelector(`path[data-geo="${CSS.escape(place.geo)}"]`) : null;
-      changeView((cur) => (shape ? fitBox(shape.getBBox(), b) : viewFor(place, b, cur)));
-    }
+    fly({ slug });
+    if (z) setZoom((cur) => Math.max(cur, place.kind === 'country' ? 1.6 : 2.2));
     if (scroll) mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [b, changeView]);
+  }, [fly]);
 
-  const onCountry = useCallback((slug, bbox, name) => {
-    if (slug) { setSel({ slug }); changeView(fitBox(bbox, b)); }
-    else { setSel({ name }); changeView(fitBox(bbox, b)); }
-  }, [b, changeView]);
+  const onCountry = useCallback((slug, name) => {
+    setSel(slug ? { slug } : { name });
+  }, []);
 
   const activeSlug = sel?.slug || hover || latestCity;
   const place = activeSlug ? findPlace(activeSlug) : null;
@@ -83,10 +54,10 @@ export default function MonitorHome() {
     };
   }, [place, all]);
   const focusCity = place?.kind === 'city' ? place.slug : null;
-  const zoomed = view.k > 1.01 || (phone && touched.current);
+  const zoomed = zoom > 1.01 || Boolean(sel);
 
-  const zoomBy = (f) => changeView((cur) => ({ ...cur, k: Math.min(MAX_K, Math.max(1, cur.k * f)) }));
-  const reset = () => { setSel(null); changeView(phone && latestCity ? { k: 1, cx: view.cx, cy: MAP_H / 2 } : WORLD); };
+  const zoomBy = (f) => setZoom((cur) => Math.min(MAX_ZOOM, Math.max(1, cur * f)));
+  const reset = () => { setSel(null); setZoom(1); fly({ world: true }); };
 
   const statusLine = (p, pv) =>
     pv?.count ? `${pv.count} ${pv.count === 1 ? 'STORY' : 'STORIES'}` : p?.status === 'edit' ? 'IN THE EDIT' : 'COMING SOON';
@@ -135,53 +106,49 @@ export default function MonitorHome() {
       </div>
 
       {/* the frame */}
-      <section ref={mapRef} aria-label="World map" className="relative md:flex-1 flex items-center justify-center overflow-hidden border md:min-h-[300px]" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)' }}>
-        <WorldMap
+      <section ref={mapRef} aria-label="Globe" className="relative overflow-hidden border" style={{ borderColor: 'var(--m-line)', background: 'var(--m-ocean)', height: phone ? 'min(118vw, 560px)' : 'max(460px, calc(100svh - 300px))' }}>
+        <GlobeMap
           focus={focusCity}
           onFocus={phone ? undefined : setHover}
           onPin={(slug) => select(slug)}
           onCountry={onCountry}
           counts={countryCounts}
-          view={view}
-          onViewChange={changeView}
-          aspect={phone ? PHONE_ASPECT : MAP_ASPECT}
-          style={phone ? undefined : { width: 'min(100%, calc((100svh - 250px) * 1.92))' }}
+          flyTo={flyTo}
+          zoom={zoom}
+          onZoom={setZoom}
+          spin={!sel && !hover}
+          compact={phone}
         />
 
         {/* 2.39 letterbox and frame lines: decoration only */}
-        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[9%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderBottom: '1px solid var(--m-line-2)' }} />
-        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[9%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderTop: '1px solid var(--m-line-2)' }} />
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[7%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderBottom: '1px solid var(--m-line-2)' }} />
+        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[7%] pointer-events-none hidden md:block" style={{ background: 'color-mix(in srgb, var(--m-bg) 60%, transparent)', borderTop: '1px solid var(--m-line-2)' }} />
         <span aria-hidden="true" className="absolute pointer-events-none" style={{ inset: 12 }}>
           <span className="m-br tl" style={{ width: 22, height: 22 }} /><span className="m-br tr" style={{ width: 22, height: 22 }} />
           <span className="m-br bl" style={{ width: 22, height: 22 }} /><span className="m-br brr" style={{ width: 22, height: 22 }} />
         </span>
         <span aria-hidden="true" className="m-mono absolute hidden sm:block pointer-events-none" style={{ left: 48, top: 16, fontSize: 10, letterSpacing: '0.12em', color: 'var(--m-dim)' }}>2.39:1</span>
 
-        {/* zoom controls: bottom-right on phones, middle-right on desktop */}
-        <div className="absolute right-3 bottom-3 md:bottom-auto md:right-4 md:top-1/2 md:-translate-y-1/2 flex flex-col border" style={{ borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
-          <button type="button" aria-label="Zoom in" disabled={view.k >= MAX_K} onClick={() => zoomBy(2)} className="m-mono w-11 h-11 disabled:opacity-30 text-lg" style={{ borderBottom: '1px solid var(--m-line-2)' }}>+</button>
-          <button type="button" aria-label="Zoom out" disabled={view.k <= 1} onClick={() => zoomBy(0.5)} className="m-mono w-11 h-11 disabled:opacity-30 text-lg">−</button>
+        {/* bottom centre: hint or reset, plus zoom */}
+        <div className="absolute inset-x-0 bottom-3 md:bottom-[8.5%] flex items-center justify-center gap-2 pointer-events-none">
+          {zoomed ? (
+            <button type="button" onClick={reset} className="m-mono pointer-events-auto min-h-[40px] px-3 border" style={{ fontSize: 11, letterSpacing: '0.1em', borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
+              ⤢ WHOLE WORLD
+            </button>
+          ) : (
+            <span className="m-mono whitespace-nowrap px-2" style={{ fontSize: 11, letterSpacing: '0.18em', color: 'var(--m-dim)' }}>
+              SPIN THE GLOBE · PICK A CITY
+            </span>
+          )}
+          <div className="flex border pointer-events-auto" style={{ borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
+            <button type="button" aria-label="Zoom in" disabled={zoom >= MAX_ZOOM} onClick={() => zoomBy(1.6)} className="m-mono w-10 h-10 disabled:opacity-30 text-lg">+</button>
+            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => zoomBy(1 / 1.6)} className="m-mono w-10 h-10 disabled:opacity-30 text-lg" style={{ borderLeft: '1px solid var(--m-line-2)' }}>−</button>
+          </div>
         </div>
-        {zoomed && (
-          <button type="button" onClick={reset} className="m-mono absolute left-3 bottom-3 md:left-4 md:bottom-[11%] min-h-[44px] px-3 border" style={{ fontSize: 11, letterSpacing: '0.1em', borderColor: 'var(--m-line-2)', background: 'color-mix(in srgb, var(--m-bg) 85%, transparent)' }}>
-            ⤢ WORLD
-          </button>
-        )}
-        {!zoomed && (
-          <span className="m-mono absolute left-3 bottom-3 md:hidden pointer-events-none px-2 py-1" style={{ fontSize: 10, letterSpacing: '0.1em', color: 'var(--m-dim)', background: 'color-mix(in srgb, var(--m-bg) 70%, transparent)' }}>
-            SWIPE · PINCH · TAP A COUNTRY
-          </span>
-        )}
-
-        {/* desktop: what's in focus */}
-        <FocusCard item={card} className="absolute hidden md:block" style={{ right: 76, bottom: '11%', width: 380 }} />
-
-        <CoachMarks />
       </section>
 
-
-      {/* phone: card for the selected place */}
-      <FocusCard item={card || { key: 'empty', label: '▸ TAP A PIN OR A COUNTRY', name: 'Explore the map', muted: true }} size="md" className="md:hidden" />
+      {/* what's in focus */}
+      <FocusCard item={card || { key: 'empty', label: '▸ TAP A CITY OR A COUNTRY', name: 'Explore the globe', muted: true }} size={phone ? 'md' : 'lg'} />
 
       {/* places timeline: every city filmed, oldest to newest; in-the-edit last */}
       <section aria-label="Places" className="flex">
