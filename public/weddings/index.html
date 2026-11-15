@@ -290,8 +290,8 @@ tbody tr:hover td, tbody tr:hover th { background: rgba(70, 58, 44, .05); }
 .pane-pick button { min-height: 52px; padding: 0 26px; }
 .pw-cards.cards-3 { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 900px) { .pw-cards.cards-3 { grid-template-columns: 1fr; } }
-.one-only { margin-top: 28px; line-height: 1.9; }
-.one-only a { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+#pane-weddings .wd-ask { padding-top: 0; padding-bottom: clamp(24px, 3vw, 40px); }
+.sub[hidden] { display: none; }
 .pane-lead { font-size: var(--step-lead); font-weight: 300; line-height: 1.35; max-width: 34ch; }
 .pane-title { font-size: var(--step-h2); font-weight: 300; line-height: 1.08; letter-spacing: -0.015em; padding-bottom: 18px; }
 .pane-title em { font-family: var(--serif); font-weight: 400; }
@@ -543,11 +543,18 @@ footer a:hover { color: var(--ink); }
       <div class="pw-pick pane-pick" role="group" aria-label="Pricing">
         <button type="button" data-pane="weddings" aria-pressed="true">Wedding</button>
         <button type="button" data-pane="prewedding" aria-pressed="false">Pre-wedding</button>
-        <button type="button" data-pane="film" aria-pressed="false">Film only</button>
-        <button type="button" data-pane="photo" aria-pressed="false">Photo only</button>
       </div>
 
       <div class="pane" id="pane-weddings">
+      <div class="pw-ask wd-ask">
+        <p class="q" id="wd-q">What do you need?</p>
+        <div class="pw-pick wd-pick" role="group" aria-labelledby="wd-q">
+          <button type="button" data-sub="both" aria-pressed="true">Photo + Film</button>
+          <button type="button" data-sub="film" aria-pressed="false">Film only</button>
+          <button type="button" data-sub="photo" aria-pressed="false">Photo only</button>
+        </div>
+      </div>
+      <div class="sub" id="sub-both">
       <div class="coll-head">
         <div class="coll-name" id="coll-name">GOLD</div>
         <div class="tabs" role="tablist" aria-label="Collections">
@@ -613,8 +620,51 @@ footer a:hover { color: var(--ink); }
             <tr><td>Express delivery (photos in 3 weeks, films in 6)</td><td>$500</td></tr>
           </tbody></table>
         </details>
-        <p class="one-only">Only need a videographer? <a href="#film-only" data-go="film">See film only, from $2,500 →</a><br>Only need a photographer? <a href="#photo-only" data-go="photo">See photo only, from $2,500 →</a></p>
         <p class="fine">// All prices in CAD, no GST. 40% retainer holds your date. Travel outside Metro Vancouver quoted separately.</p>
+      </div>
+      <div class="sub" id="sub-film" hidden>
+        <p class="pane-lead">Already have a photographer? Book videographers only.</p>
+        <div class="pw-cards cards-3">
+          <article class="pw-card">
+            <div class="top-row"><h3>1 videographer<em>, 8 hours</em></h3></div>
+            <ul><li>3 to 4 minute highlight film</li><li>Colour graded, set to licensed music</li><li>Drone: $400 add-on</li></ul>
+            <div class="price-row"><div class="price">$2,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Film only: 1 videographer, 8 hours ($2,500)">Ask about this</a></div>
+          </article>
+          <article class="pw-card">
+            <div class="top-row"><h3>2 videographers<em>, 10 hours</em></h3></div>
+            <ul><li>4 to 6 minute highlight film</li><li>Ceremony and speeches films</li><li>30 to 60 second vertical reel</li><li>Drone: $400 add-on</li></ul>
+            <div class="price-row"><div class="price">$4,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Film only: 2 videographers, 10 hours ($4,500)">Ask about this</a></div>
+          </article>
+          <article class="pw-card">
+            <div class="top-row"><h3>3 videographers<em>, 11 hours</em></h3></div>
+            <ul><li>4 to 6 minute highlight film</li><li>20 to 30 minute documentary film</li><li>Ceremony and speeches films</li><li>30 to 60 second vertical reel</li><li>Drone included</li></ul>
+            <div class="price-row"><div class="price">$6,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Film only: 3 videographers, 11 hours ($6,500)">Ask about this</a></div>
+          </article>
+        </div>
+        <p class="fine">// All prices in CAD, no GST. 40% retainer holds your date. Travel outside Metro Vancouver quoted separately.</p>
+      </div>
+
+      <div class="sub" id="sub-photo" hidden>
+        <p class="pane-lead">Already have a videographer? Book photographers only.</p>
+        <div class="pw-cards cards-3">
+          <article class="pw-card">
+            <div class="top-row"><h3>1 photographer<em>, 8 hours</em></h3></div>
+            <ul><li>About 400 edited photos</li><li>Online gallery with downloads and print release</li></ul>
+            <div class="price-row"><div class="price">$2,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Photo only: 1 photographer, 8 hours ($2,500)">Ask about this</a></div>
+          </article>
+          <article class="pw-card">
+            <div class="top-row"><h3>2 photographers<em>, 10 hours</em></h3></div>
+            <ul><li>About 600 edited photos</li><li>Sneak peek of 10 photos within 1 week</li><li>Online gallery with downloads and print release</li></ul>
+            <div class="price-row"><div class="price">$4,200 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Photo only: 2 photographers, 10 hours ($4,200)">Ask about this</a></div>
+          </article>
+          <article class="pw-card">
+            <div class="top-row"><h3>2 photographers<em>, 11 hours</em></h3></div>
+            <ul><li>About 800 edited photos</li><li>Sneak peek of 15 photos within 48 hours</li><li>Photo Mini pre-wedding shoot included</li><li>Online gallery with downloads and print release</li></ul>
+            <div class="price-row"><div class="price">$5,200 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Photo only: 2 photographers, 11 hours + Photo Mini ($5,200)">Ask about this</a></div>
+          </article>
+        </div>
+        <p class="fine">// All prices in CAD, no GST. 40% retainer holds your date. Travel outside Metro Vancouver quoted separately.</p>
+      </div>
       </div>
 
       <div class="pane" id="pane-prewedding" hidden>
@@ -627,11 +677,11 @@ footer a:hover { color: var(--ink); }
         </div>
         <p style="padding-block: 40px 8px"><button class="btn-line" type="button" data-film>Watch K&amp;A's pre-wedding film</button></p>
         <div class="pw-ask">
-        <p class="q" id="pw-q">What would you like?</p>
+        <p class="q" id="pw-q">What do you need?</p>
         <div class="pw-pick" role="group" aria-labelledby="pw-q">
-          <button type="button" data-type="photo" aria-pressed="false">Photos</button>
-          <button type="button" data-type="film" aria-pressed="false">Film</button>
           <button type="button" data-type="both" aria-pressed="true">Photo + Film</button>
+          <button type="button" data-type="film" aria-pressed="false">Film only</button>
+          <button type="button" data-type="photo" aria-pressed="false">Photo only</button>
         </div>
       </div>
       <div class="pw-cards" id="pw-cards" aria-live="polite">
@@ -698,51 +748,6 @@ footer a:hover { color: var(--ink); }
       <p class="fine">// All prices in CAD, no GST. 30% retainer holds the date. Delivery in 2 to 3 weeks. Book a wedding collection and get 15% off, or the Photo Mini free with Platinum.</p>
       </div>
 
-      <div class="pane" id="pane-film" hidden>
-        <h3 class="pane-title">Just the <em>film.</em></h3>
-        <p class="pane-lead">Already have a photographer? Book videographers only. Here is what each crew size gets you.</p>
-        <div class="pw-cards cards-3">
-          <article class="pw-card">
-            <div class="top-row"><h3>Film <em>One</em></h3></div>
-            <ul><li>1 videographer, 8 hours</li><li>3 to 4 minute highlight film</li><li>Colour graded, set to licensed music</li><li>Drone: $400 add-on</li></ul>
-            <div class="price-row"><div class="price">$2,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Film only: 1 videographer, 8 hours ($2,500)">Ask about this</a></div>
-          </article>
-          <article class="pw-card">
-            <div class="top-row"><h3>Film <em>Two</em></h3></div>
-            <ul><li>2 videographers, 10 hours</li><li>4 to 6 minute highlight film</li><li>Ceremony and speeches films</li><li>30 to 60 second vertical reel</li><li>Drone: $400 add-on</li></ul>
-            <div class="price-row"><div class="price">$4,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Film only: 2 videographers, 10 hours ($4,500)">Ask about this</a></div>
-          </article>
-          <article class="pw-card">
-            <div class="top-row"><h3>Film <em>Three</em></h3></div>
-            <ul><li>3 videographers, 11 hours</li><li>4 to 6 minute highlight film</li><li>20 to 30 minute documentary film</li><li>Ceremony and speeches films</li><li>30 to 60 second vertical reel</li><li>Drone included</li></ul>
-            <div class="price-row"><div class="price">$6,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Film only: 3 videographers, 11 hours ($6,500)">Ask about this</a></div>
-          </article>
-        </div>
-        <p class="fine">// All prices in CAD, no GST. 40% retainer holds your date. Travel outside Metro Vancouver quoted separately.</p>
-      </div>
-
-      <div class="pane" id="pane-photo" hidden>
-        <h3 class="pane-title">Just the <em>photos.</em></h3>
-        <p class="pane-lead">Already have a videographer? Book photographers only. Here is what each crew size gets you.</p>
-        <div class="pw-cards cards-3">
-          <article class="pw-card">
-            <div class="top-row"><h3>Photo <em>One</em></h3></div>
-            <ul><li>1 photographer, 8 hours</li><li>About 400 edited photos</li><li>Online gallery with downloads and print release</li></ul>
-            <div class="price-row"><div class="price">$2,500 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Photo only: 1 photographer, 8 hours ($2,500)">Ask about this</a></div>
-          </article>
-          <article class="pw-card">
-            <div class="top-row"><h3>Photo <em>Two</em></h3></div>
-            <ul><li>2 photographers, 10 hours</li><li>About 600 edited photos</li><li>Sneak peek of 10 photos within 1 week</li><li>Online gallery with downloads and print release</li></ul>
-            <div class="price-row"><div class="price">$4,200 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Photo only: 2 photographers, 10 hours ($4,200)">Ask about this</a></div>
-          </article>
-          <article class="pw-card">
-            <div class="top-row"><h3>Photo <em>Plus</em></h3></div>
-            <ul><li>2 photographers, 11 hours</li><li>About 800 edited photos</li><li>Sneak peek of 15 photos within 48 hours</li><li>Photo Mini pre-wedding shoot included</li><li>Online gallery with downloads and print release</li></ul>
-            <div class="price-row"><div class="price">$5,200 <span>CAD</span></div><a class="btn-line ala-cta" href="#contact" data-pkg="Photo only: 2 photographers, 11 hours + Photo Mini ($5,200)">Ask about this</a></div>
-          </article>
-        </div>
-        <p class="fine">// All prices in CAD, no GST. 40% retainer holds your date. Travel outside Metro Vancouver quoted separately.</p>
-      </div>
     </div>
   </section>
 
@@ -954,26 +959,31 @@ footer a:hover { color: var(--ink); }
   var paneBtns = Array.prototype.slice.call(document.querySelectorAll(".pane-pick button"));
   function paneShow(name) {
     paneBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.pane === name)); });
-    ["weddings", "prewedding", "film", "photo"].forEach(function (n) {
+    ["weddings", "prewedding"].forEach(function (n) {
       var el = $("pane-" + n), on = n === name; el.hidden = !on;
       if (on) { el.classList.remove("fade"); void el.offsetWidth; el.classList.add("fade"); }
     });
   }
   paneBtns.forEach(function (b) { b.addEventListener("click", function () { paneShow(b.dataset.pane); }); });
+  /* Wedding: Photo + Film / Film only / Photo only */
+  var subBtns = Array.prototype.slice.call(document.querySelectorAll(".wd-pick button"));
+  function subShow(name) {
+    subBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.sub === name)); });
+    ["both", "film", "photo"].forEach(function (n) {
+      var el = $("sub-" + n), on = n === name; el.hidden = !on;
+      if (on) { el.classList.remove("fade"); void el.offsetWidth; el.classList.add("fade"); }
+    });
+  }
+  subBtns.forEach(function (b) { b.addEventListener("click", function () { subShow(b.dataset.sub); }); });
   /* Shareable links: /weddings#prewedding opens that tab */
   function fromHash() {
     var h = location.hash.replace("#", "");
-    var map = { prewedding: "prewedding", "pre-wedding": "prewedding", alacarte: "film", "film-only": "film", videographer: "film", "photo-only": "photo", photographer: "photo", collections: "weddings", pricing: null };
-    if (h in map) { if (map[h]) paneShow(map[h]); $("pricing").scrollIntoView(); }
+    var map = { prewedding: "prewedding", "pre-wedding": "prewedding", collections: "weddings", pricing: null };
+    var sub = { alacarte: "film", "film-only": "film", videographer: "film", "photo-only": "photo", photographer: "photo" };
+    if (h in sub) { paneShow("weddings"); subShow(sub[h]); $("pricing").scrollIntoView(); }
+    else if (h in map) { if (map[h]) paneShow(map[h]); $("pricing").scrollIntoView(); }
   }
   window.addEventListener("hashchange", fromHash); fromHash();
-  Array.prototype.forEach.call(document.querySelectorAll("[data-go]"), function (a) {
-    a.addEventListener("click", function (e) {
-      e.preventDefault(); paneShow(a.dataset.go);
-      history.replaceState(null, "", a.getAttribute("href"));
-      $("pricing").scrollIntoView({ behavior: "smooth" });
-    });
-  });
   Array.prototype.forEach.call(document.querySelectorAll(".ala-cta"), function (a) {
     a.addEventListener("click", function () {
       $("f-coll").value = a.dataset.pkg.indexOf("Film only") === 0 ? "Film only" : a.dataset.pkg.indexOf("Photo only") === 0 ? "Photo only" : "Custom package";
